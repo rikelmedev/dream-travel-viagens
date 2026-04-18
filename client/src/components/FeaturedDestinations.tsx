@@ -1,115 +1,125 @@
 import { motion } from 'framer-motion';
-import DestinationCard from './DestinationCard';
-
-/**
- * Featured Destinations Section
- * Design: Minimalismo Contemporâneo
- * - Grid assimétrico elegante
- * - Cards com imagens imersivas
- * - Animações de entrada escalonadas
- */
+import { ArrowRight, Sparkles, MapPin } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useLocation } from 'wouter';
 
 const destinations = [
   {
     id: '1',
-    name: 'Maldivas',
-    description: 'Bungalôs sobre água em lagoas cristalinas com recifes de coral.',
-    price: 8500,
-    image:
-      'https://d2xsxph8kpxj0f.cloudfront.net/310519663146852942/7vU7SskgToGin35SQBrLa4/destination-maldives-ipFi9vqv44aNq6YXDsczWz.webp',
-    rating: 4.9,
+    name: 'Maldivas: O Refúgio dos Sonhos',
+    description: 'Roteiro exclusivo com bangalôs sobre a água e experiências gastronômicas privativas.',
+    image: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=1200&q=80',
+    duration: '7 Noites',
+    highlight: 'Destaque Premium',
+    location: 'Maldivas',
+    size: 'large' 
   },
   {
     id: '2',
-    name: 'Bali',
-    description: 'Templos antigos, praias paradisíacas e resorts de luxo em meio à natureza.',
-    price: 5200,
-    image:
-      'https://d2xsxph8kpxj0f.cloudfront.net/310519663146852942/7vU7SskgToGin35SQBrLa4/destination-bali-MHJqoM6xYez52SfzFpHvAt.webp',
-    rating: 4.7,
+    name: 'Safari na África do Sul',
+    description: 'Aventura de luxo no Kruger Park com guias especializados.',
+    image: 'https://images.unsplash.com/photo-1516426122078-c23e76319801?w=800&q=80',
+    duration: '10 Noites',
+    highlight: 'Mais Vendido',
+    location: 'África do Sul',
+    size: 'small'
   },
   {
     id: '3',
-    name: 'Alpes Suíços',
-    description: 'Montanhas nevadas, resorts de luxo e experiências de esqui exclusivas.',
-    price: 9800,
-    image:
-      'https://d2xsxph8kpxj0f.cloudfront.net/310519663146852942/7vU7SskgToGin35SQBrLa4/destination-alps-mLjHD9tv5bgkGQoeYwTW3S.webp',
-    rating: 4.8,
+    name: 'Verão em Positano',
+    description: 'O charme da Costa Amalfitana em hotéis boutique.',
+    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80',
+    duration: '5 Noites',
+    highlight: 'Nova Curadoria',
+    location: 'Itália',
+    size: 'small'
   },
 ];
 
 export default function FeaturedDestinations() {
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.15,
-        delayChildren: 0.2,
-      },
-    },
-  };
-
-  const titleVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.6 },
-    },
-  };
+  const [, setLocation] = useLocation();
 
   return (
-    <section
-      className="py-20 sm:py-32 bg-white"
-      id="destinos"
-    >
-      <div className="container">
-        {/* Header */}
-        <motion.div
-          className="text-center mb-16"
-          variants={titleVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-100px' }}
-        >
-          <h2 className="mb-4">Destinos Que Você Vai Amar 🌍</h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Desde praias paradisíacas até montanhas nevadas, cada destino é cuidadosamente
-            selecionado. Deixe a Jackeline montar seu roteiro personalizado!
-          </p>
-        </motion.div>
+    <section className="py-32 bg-slate-50" id="destinos">
+      <div className="container px-4 md:px-8 max-w-7xl mx-auto">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+          <div className="max-w-2xl">
+            <motion.div 
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              className="flex items-center gap-2 text-primary font-semibold uppercase tracking-[0.2em] text-xs mb-4"
+            >
+              <Sparkles className="w-4 h-4" />
+              <span>Experiências sob medida</span>
+            </motion.div>
+            <h2 className="text-4xl md:text-6xl font-bold font-serif leading-tight text-slate-900">
+              Roteiros que <span className="italic text-primary">inspiram</span>
+            </h2>
+          </div>
+          <Button 
+            variant="ghost" 
+            onClick={() => setLocation('/destinos')}
+            className="group text-primary font-bold hover:bg-primary/5 text-lg rounded-full px-6"
+          >
+            Ver catálogo 
+            <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-2 transition-transform" />
+          </Button>
+        </div>
 
-        {/* Grid de Destinos */}
-        <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-100px' }}
-        >
-          {destinations.map((destination, index) => (
-            <DestinationCard
-              key={destination.id}
-              {...destination}
-              delay={index * 0.1}
-            />
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-8 min-h-[700px]">
+          {destinations.map((dest, index) => (
+            <motion.div
+              key={dest.id}
+              onClick={() => setLocation('/contato')}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ 
+                duration: 0.8, 
+                delay: index * 0.15, // Delay em cascata da Skill
+                ease: [0.21, 0.47, 0.32, 0.98] // Curva Bezier Premium
+              }}
+              className={`group relative rounded-[2rem] overflow-hidden cursor-pointer shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.12)] transition-all duration-700 ${
+                dest.size === 'large' ? 'md:col-span-2 md:row-span-2' : 'md:col-span-2'
+              }`}
+            >
+              <img
+                src={dest.image}
+                alt={dest.name}
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent opacity-80 group-hover:opacity-100 transition-opacity duration-700" />
+              
+              <div className="absolute top-6 left-6 flex gap-3">
+                <span className="bg-white/10 backdrop-blur-xl text-white text-[10px] font-bold px-4 py-1.5 rounded-full border border-white/20 tracking-widest">
+                  {dest.duration}
+                </span>
+                <span className="bg-primary/90 backdrop-blur-md text-white text-[10px] font-bold px-4 py-1.5 rounded-full uppercase tracking-wider">
+                  {dest.highlight}
+                </span>
+              </div>
+
+              <div className="absolute bottom-0 left-0 right-0 p-8 md:p-10 text-white translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                <div className="flex items-center gap-2 text-white/70 text-xs mb-3 font-medium uppercase tracking-widest">
+                  <MapPin className="w-3.5 h-3.5 text-primary" />
+                  <span>{dest.location}</span>
+                </div>
+                <h3 className={`font-bold font-serif leading-tight mb-4 ${dest.size === 'large' ? 'text-4xl' : 'text-2xl'}`}>
+                  {dest.name}
+                </h3>
+                <p className="text-white/80 text-sm md:text-base font-light leading-relaxed mb-6 line-clamp-2 max-w-md">
+                  {dest.description}
+                </p>
+                <div className="flex items-center gap-3 text-primary font-bold text-sm tracking-widest overflow-hidden">
+                  <span className="relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[1px] after:bg-primary after:origin-right after:scale-x-0 group-hover:after:scale-x-100 group-hover:after:origin-left after:transition-transform after:duration-500">
+                    Descobrir Roteiro
+                  </span>
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform duration-500" />
+                </div>
+              </div>
+            </motion.div>
           ))}
-        </motion.div>
-
-        {/* CTA Button */}
-        <motion.div
-          className="text-center mt-16"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-          viewport={{ once: true, margin: '-100px' }}
-        >
-          <button className="px-8 py-3 bg-secondary hover:bg-secondary/90 text-primary font-semibold rounded-lg transition-colors">
-            Montar Meu Roteiro
-          </button>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

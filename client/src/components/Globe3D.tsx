@@ -1,355 +1,220 @@
 import { useEffect, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
-import { MapPin } from 'lucide-react';
-import { useMapForm } from '@/contexts/MapFormContext';
-import DestinationPopup, { DestinationInfo } from './DestinationPopup';
+import { motion, AnimatePresence } from 'framer-motion';
+import { MapPin, Navigation, ArrowRight, X, Loader2, Globe2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useLocation } from 'wouter';
+import * as Cesium from 'cesium';
+import 'cesium/Build/Cesium/Widgets/widgets.css';
 
-/**
- * Globe3D Component
- * Design: Globo 3D interativo com Cesium.js
- * - Visualização realista do planeta
- * - Seleção de destinos com clique
- * - Integração com formulário
- */
-
-interface Destination {
-  id: string;
+interface LocationData {
   name: string;
-  lat: number;
-  lng: number;
   description: string;
+  image: string;
+  country: string;
 }
 
-const destinations: Destination[] = [
-  {
-    id: 'maldivas',
-    name: 'Maldivas',
-    lat: 4.1694,
-    lng: 73.5093,
-    description: 'Bungalôs sobre água em lagoas cristalinas',
-  },
-  {
-    id: 'bali',
-    name: 'Bali',
-    lat: -8.6705,
-    lng: 115.2126,
-    description: 'Templos antigos e praias paradisíacas',
-  },
-  {
-    id: 'alpes',
-    name: 'Alpes Suíços',
-    lat: 46.8182,
-    lng: 8.2275,
-    description: 'Montanhas nevadas e resorts de luxo',
-  },
-];
-
-const destinationDetails: { [key: string]: DestinationInfo } = {
-  maldivas: {
-    id: 'maldivas',
-    name: 'Maldivas',
-    description: 'Bungalôs sobre água em lagoas cristalinas',
-    fullDescription: 'As Maldivas são um paraíso tropical no Oceano Índico, famosas por suas águas cristalinas, recifes de coral vibrantes e resorts de luxo. Perfeito para casais em lua de mel e viajantes em busca de relaxamento absoluto.',
-    image: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&h=600&fit=crop',
-    activities: ['Mergulho', 'Snorkel', 'Spa', 'Passeios de barco', 'Pesca'],
-    bestSeason: 'Novembro a Março',
-    climate: 'Tropical, 24-30°C',
-    highlights: [
-      'Recifes de coral intactos',
-      'Resorts all-inclusive de luxo',
-      'Vida marinha exuberante',
-      'Praias de areia branca',
-    ],
-  },
-  bali: {
-    id: 'bali',
-    name: 'Bali',
-    description: 'Templos antigos e praias paradisíacas',
-    fullDescription: 'Bali é um destino versátil que oferece desde templos antigos e tradições culturais até praias paradisíacas e vida noturna vibrante. Ideal para viajantes que buscam experiências culturais, aventura e relaxamento.',
-    image: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&h=600&fit=crop',
-    activities: ['Yoga', 'Surf', 'Trekking', 'Cultura', 'Gastronomia'],
-    bestSeason: 'Abril a Outubro',
-    climate: 'Tropical, 25-32°C',
-    highlights: [
-      'Templos hindus milenares',
-      'Arrozais em terraços',
-      'Praias de areia vulcânica',
-      'Vida cultural rica',
-    ],
-  },
-  alpes: {
-    id: 'alpes',
-    name: 'Alpes Suíços',
-    description: 'Montanhas nevadas e resorts de luxo',
-    fullDescription: 'Os Alpes Suíços oferecem paisagens de tirar o fôlego com montanhas nevadas, vales verdes e vilas pitorescas. Perfeito para esqui no inverno, trilhas no verão e experiências gastronômicas de classe mundial.',
-    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop',
-    activities: ['Esqui', 'Trilhas', 'Escalada', 'Gastronomia', 'Fotografia'],
-    bestSeason: 'Dezembro a Fevereiro (esqui) ou Junho a Setembro (verão)',
-    climate: 'Alpino, -10 a 20°C',
-    highlights: [
-      'Montanhas de 4000+ metros',
-      'Vilas medievais encantadoras',
-      'Culinária de classe mundial',
-      'Trens panorâmicos',
-    ],
-  },
-};
-
 export default function Globe3D() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [viewer, setViewer] = useState<any>(null);
-  const [selectedDestination, setSelectedDestination] = useState<string | null>(null);
-  const [selectedPopupDestination, setSelectedPopupDestination] = useState<DestinationInfo | null>(null);
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const { setSelectedDestinationName, scrollToForm } = useMapForm();
-  const entitiesRef = useRef<{ [key: string]: any }>({});
+  const cesiumContainer = useRef<HTMLDivElement>(null);
+  const viewerRef = useRef<Cesium.Viewer | null>(null);
+  
+  const [activeLocation, setActiveLocation] = useState<LocationData | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [, setLocation] = useLocation();
+
+  // Função para buscar dados em tempo real da internet
+  const fetchRealTimeLocationData = async (lat: number, lng: number) => {
+    setIsLoading(true);
+    setActiveLocation(null); // Limpa o anterior para mostrar o loading
+
+    try {
+      // 1. Descobrir onde o usuário clicou
+      const geoResponse = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=pt-BR`
+      );
+      const geoData = await geoResponse.json();
+
+      if (geoData.error) {
+        throw new Error("Oceano ou área não mapeada");
+      }
+
+      const locationName = geoData.address.city || geoData.address.town || geoData.address.state || geoData.address.country;
+      const countryName = geoData.address.country;
+
+      // 2. Buscar informações e foto real na Wikipedia
+      const wikiResponse = await fetch(
+        `https://pt.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(locationName)}`
+      );
+      const wikiData = await wikiResponse.json();
+
+      setActiveLocation({
+        name: locationName,
+        country: countryName,
+        description: wikiData.extract || `Descubra as maravilhas e roteiros exclusivos que podemos preparar para você em ${locationName}, ${countryName}.`,
+        image: wikiData.thumbnail?.source || 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&q=80'
+      });
+
+    } catch (error) {
+      console.log("Erro ao buscar local:", error);
+      setActiveLocation({
+        name: "Águas Internacionais",
+        country: "Mundo",
+        description: "Explore cruzeiros de luxo e expedições marítimas exclusivas navegando por águas cristalinas.",
+        image: 'https://images.unsplash.com/photo-1505881502353-a1986add3762?w=800&q=80'
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    // Esperar Cesium carregar do CDN
-    const checkCesium = () => {
-      const Cesium = (window as any).Cesium;
-      if (!Cesium) {
-        setTimeout(checkCesium, 100);
-        return;
+    if (!cesiumContainer.current || viewerRef.current) return;
+
+    const viewer = new Cesium.Viewer(cesiumContainer.current, {
+      animation: false,
+      baseLayerPicker: false,
+      fullscreenButton: false,
+      geocoder: false,
+      homeButton: false,
+      infoBox: false,
+      sceneModePicker: false,
+      selectionIndicator: true, // Mostra o anel verde onde clicou
+      timeline: false,
+      navigationHelpButton: false,
+      navigationInstructionsInitiallyVisible: false,
+      scene3DOnly: true,
+      creditContainer: document.createElement('div'),
+    });
+
+    viewer.scene.globe.enableLighting = true;
+    viewer.scene.skyAtmosphere.show = true;
+    viewer.scene.sun.show = false;
+    viewer.scene.moon.show = false;
+    viewer.scene.skyBox.show = false;
+    viewer.scene.backgroundColor = Cesium.Color.fromCssColorString('#ffffff');
+
+    // Foco inicial
+    viewer.camera.setView({
+      destination: Cesium.Cartesian3.fromDegrees(-50.0, 0.0, 18000000),
+    });
+
+    // Evento de CLIQUE EM QUALQUER LUGAR do globo
+    const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+    handler.setInputAction((click: any) => {
+      // Pega a posição exata da Terra onde o usuário clicou
+      const ellipsoid = viewer.scene.globe.ellipsoid;
+      const cartesian = viewer.camera.pickEllipsoid(click.position, ellipsoid);
+
+      if (cartesian) {
+        const cartographic = Cesium.Cartographic.fromCartesian(cartesian);
+        const lng = Cesium.Math.toDegrees(cartographic.longitude);
+        const lat = Cesium.Math.toDegrees(cartographic.latitude);
+
+        // Voar suavemente para o local clicado
+        viewer.camera.flyTo({
+          destination: Cesium.Cartesian3.fromDegrees(lng, lat, 2500000),
+          duration: 1.5,
+        });
+
+        // Dispara a busca em tempo real
+        fetchRealTimeLocationData(lat, lng);
       }
+    }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 
-      if (!containerRef.current) return;
-
-      try {
-        // Configurar token de acesso
-        Cesium.Ion.defaultAccessToken =
-          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI0YzI5MzJjYS1jZWY2LTRhYjItODRmNy1iZjI2YzJhMTY1YzQiLCJpZCI6MjU5OTYsImlhdCI6MTY5Njk0NzI2MH0.9nBr0Aq2_uMJxE5TpVKwLhPvLHqVNKp9Uj3tKpBPvVg';
-
-        // Criar visualizador
-        const newViewer = new Cesium.Viewer(containerRef.current, {
-          terrainProvider: Cesium.ArcGISTiledElevationTerrainProvider.fromUrl(
-            'https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/ImageServer'
-          ),
-          imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
-            url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer',
-          }),
-          animation: true,
-          timeline: false,
-          fullscreenButton: true,
-          baseLayerPicker: false,
-          homeButton: true,
-          infoBox: false,
-          sceneModePicker: false,
-          navigationHelpButton: false,
-          geocoder: false,
-        });
-
-        // Desabilitar créditos
-        if (newViewer.cesiumWidget.creditContainer) {
-          (newViewer.cesiumWidget.creditContainer as HTMLElement).style.display = 'none';
-        }
-
-        // Adicionar entidades para cada destino
-        destinations.forEach((destination) => {
-          const entity = newViewer.entities.add({
-            position: Cesium.Cartesian3.fromDegrees(destination.lng, destination.lat),
-            point: {
-              pixelSize: 12,
-              color: Cesium.Color.fromCssColorString('#0077B6'),
-              outlineColor: Cesium.Color.WHITE,
-              outlineWidth: 2,
-            },
-            properties: {
-              name: destination.name,
-              description: destination.description,
-              id: destination.id,
-            },
-          });
-
-          entitiesRef.current[destination.id] = entity;
-        });
-
-        // Adicionar handler de clique
-        const handler = new Cesium.ScreenSpaceEventHandler(newViewer.canvas);
-        handler.setInputAction((click: any) => {
-          const pickedObject = newViewer.scene.pick(click.position);
-          if (Cesium.defined(pickedObject)) {
-            const entity = pickedObject.id;
-            if (entity && entity.properties) {
-              const destId = entity.properties.id.getValue();
-              const destName = entity.properties.name.getValue();
-
-              // Atualizar estado
-              setSelectedDestination(destId);
-
-              // Destacar entidade
-              entity.point.color = Cesium.Color.fromCssColorString('#E9C46A');
-              entity.point.pixelSize = 16;
-
-              // Resetar outras entidades
-              Object.entries(entitiesRef.current).forEach(([id, ent]: any) => {
-                if (id !== destId) {
-                  ent.point.color = Cesium.Color.fromCssColorString('#0077B6');
-                  ent.point.pixelSize = 12;
-                }
-              });
-
-              // Fazer zoom no destino
-              newViewer.flyTo(entity, {
-                duration: 1.5,
-                offset: new Cesium.HeadingPitchRange(0, -45, 2000000),
-              });
-
-              // Abrir popup com detalhes
-              const details = destinationDetails[destId];
-              if (details) {
-                setSelectedPopupDestination(details);
-                setIsPopupOpen(true);
-              }
-            }
-          }
-        }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
-
-        setViewer(newViewer);
-
-        // Zoom inicial
-        newViewer.camera.flyTo({
-          destination: Cesium.Cartesian3.fromDegrees(0, 20, 15000000),
-          duration: 2,
-        });
-
-        return () => {
-          handler.destroy();
-          newViewer.destroy();
-        };
-      } catch (error) {
-        console.error('Erro ao carregar Cesium:', error);
+    // Rotação automática suave
+    viewer.clock.onTick.addEventListener(() => {
+      if (!isLoading && !activeLocation) {
+        viewer.scene.camera.rotate(Cesium.Cartesian3.UNIT_Z, 0.0005);
       }
+    });
+
+    viewerRef.current = viewer;
+
+    return () => {
+      handler.destroy();
+      viewer.destroy();
+      viewerRef.current = null;
     };
-
-    checkCesium();
-  }, [setSelectedDestinationName, scrollToForm]);
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.6 },
-    },
-  };
-
-  const handleSelectFromPopup = (destName: string) => {
-    setSelectedDestinationName(destName);
-    setTimeout(() => scrollToForm(), 300);
-  };
+  }, []);
 
   return (
-    <>
-      <DestinationPopup
-        destination={selectedPopupDestination}
-        isOpen={isPopupOpen}
-        onClose={() => setIsPopupOpen(false)}
-        onSelectDestination={handleSelectFromPopup}
-      />
-      <section className="py-20 sm:py-32 bg-gray-50">
-        <div className="container">
-        {/* Header */}
-        <motion.div
-          className="text-center mb-12"
-          variants={itemVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-100px' }}
-        >
-          <h2 className="mb-4">Explore o Mundo em 3D 🌍</h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Clique em qualquer destino no globo para conhecer mais e montar seu roteiro
-          </p>
-        </motion.div>
+    <div className="relative w-full h-[600px] lg:h-[700px] bg-white rounded-3xl overflow-hidden">
+      <div ref={cesiumContainer} className="absolute inset-0 w-full h-full cursor-crosshair" />
+      
+      {/* Dica de interação */}
+      <div className="absolute top-6 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-md px-6 py-3 rounded-full shadow-lg border border-slate-100 flex items-center gap-3 pointer-events-none z-10">
+        <Globe2 className="w-5 h-5 text-primary animate-pulse" />
+        <span className="text-sm font-bold text-slate-800 uppercase tracking-widest">Clique em qualquer país do globo</span>
+      </div>
 
-        <motion.div
-          className="grid grid-cols-1 lg:grid-cols-3 gap-8"
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-100px' }}
-        >
-          {/* Globe */}
+      {/* Painel Interativo em Tempo Real */}
+      <AnimatePresence>
+        {(activeLocation || isLoading) && (
           <motion.div
-            className="lg:col-span-2"
-            variants={itemVariants}
+            initial={{ opacity: 0, x: 50, scale: 0.95 }}
+            animate={{ opacity: 1, x: 0, scale: 1 }}
+            exit={{ opacity: 0, x: 50, scale: 0.95 }}
+            transition={{ duration: 0.4, type: 'spring', bounce: 0.2 }}
+            className="absolute top-6 right-6 bottom-6 w-80 md:w-96 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/50 overflow-hidden flex flex-col z-20"
           >
-            <div
-              ref={containerRef}
-              className="w-full h-96 sm:h-[500px] rounded-2xl shadow-xl border-2 border-border overflow-hidden"
-              style={{ position: 'relative' }}
-            />
-          </motion.div>
-
-          {/* Destinations List */}
-          <motion.div className="space-y-4" variants={itemVariants}>
-            <h3 className="font-bold text-foreground mb-6">Destinos</h3>
-            {destinations.map((destination) => (
-              <motion.button
-                key={destination.id}
-                onClick={() => {
-                  if (viewer) {
-                    const Cesium = (window as any).Cesium;
-                    const entity = entitiesRef.current[destination.id];
-                    if (entity && Cesium) {
-                      entity.point.color = Cesium.Color.fromCssColorString('#E9C46A');
-                      entity.point.pixelSize = 16;
-
-                      Object.entries(entitiesRef.current).forEach(([id, ent]: any) => {
-                        if (id !== destination.id) {
-                          ent.point.color = Cesium.Color.fromCssColorString('#0077B6');
-                          ent.point.pixelSize = 12;
-                        }
-                      });
-
-                      viewer.flyTo(entity, {
-                        duration: 1.5,
-                        offset: new Cesium.HeadingPitchRange(0, -45, 2000000),
-                      });
-
-                      setSelectedDestination(destination.id);
-                      setSelectedDestinationName(destination.name);
-                      setTimeout(() => scrollToForm(), 800);
-                    }
-                  }
-                }}
-                className={`w-full p-4 rounded-lg border-2 transition-all text-left ${
-                  selectedDestination === destination.id
-                    ? 'border-secondary bg-secondary/10'
-                    : 'border-border hover:border-primary'
-                }`}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <div className="flex items-start gap-3">
-                  <MapPin className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="font-semibold text-foreground">
-                      {destination.name}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {destination.description}
-                    </p>
+            {isLoading ? (
+              // Tela de Carregamento 
+              <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
+                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6">
+                  <Loader2 className="w-8 h-8 text-primary animate-spin" />
+                </div>
+                <h3 className="text-xl font-bold font-serif text-slate-900 mb-2">Buscando coordenadas...</h3>
+                <p className="text-slate-500 text-sm">Satélites rastreando o destino selecionado em tempo real.</p>
+              </div>
+            ) : activeLocation ? (
+              // Resultado Encontrado
+              <>
+                <div className="relative h-56 shrink-0">
+                  <img 
+                    src={activeLocation.image} 
+                    alt={activeLocation.name}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+                  <button 
+                    onClick={() => setActiveLocation(null)}
+                    className="absolute top-4 right-4 bg-black/40 hover:bg-black/60 backdrop-blur-md text-white p-2 rounded-full transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                  <div className="absolute bottom-4 left-4">
+                    <span className="bg-primary text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-md">
+                      Descoberta Dinâmica
+                    </span>
                   </div>
                 </div>
-              </motion.button>
-            ))}
+                
+                <div className="p-6 flex flex-col flex-1 overflow-y-auto">
+                  <div className="flex items-center gap-2 text-primary text-xs font-bold uppercase tracking-widest mb-2">
+                    <MapPin className="w-4 h-4" />
+                    <span>{activeLocation.country}</span>
+                  </div>
+                  <h3 className="text-3xl font-bold font-serif text-slate-900 mb-4 leading-tight">
+                    {activeLocation.name}
+                  </h3>
+                  <p className="text-slate-600 text-sm leading-relaxed mb-6">
+                    {activeLocation.description}
+                  </p>
+                  
+                  <div className="mt-auto pt-4 border-t border-slate-100">
+                    <Button 
+                      onClick={() => setLocation('/contato')}
+                      className="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-6 rounded-xl text-md group"
+                    >
+                      Solicitar Roteiro para {activeLocation.name.split(' ')[0]}
+                      <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </Button>
+                  </div>
+                </div>
+              </>
+            ) : null}
           </motion.div>
-        </motion.div>
-      </div>
-    </section>
-    </>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }

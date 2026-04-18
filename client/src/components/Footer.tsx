@@ -1,187 +1,78 @@
-import { motion } from 'framer-motion';
-import {
-  Facebook,
-  Instagram,
-  Twitter,
-  Linkedin,
-  Mail,
-  Phone,
-  MapPin,
-} from 'lucide-react';
-
-/**
- * Footer Component
- * Design: Minimalismo Contemporâneo
- * - Organizado com sitemap, redes sociais e contato
- * - Links úteis
- * - Copyright
- */
+import { Link } from 'wouter';
+import { Instagram, Facebook, Twitter, Phone, Mail } from 'lucide-react';
 
 export default function Footer() {
-  const currentYear = new Date().getFullYear();
-
-  const footerSections = [
-    {
-      title: 'Destinos',
-      links: ['Maldivas', 'Bali', 'Alpes Suíços', 'Caribe', 'Japão', 'Europa'],
-    },
-    {
-      title: 'Empresa',
-      links: ['Sobre Nós', 'Blog', 'Carreiras', 'Imprensa', 'Parceiros'],
-    },
-    {
-      title: 'Suporte',
-      links: ['Contato', 'FAQ', 'Política de Privacidade', 'Termos de Uso', 'Cancelamentos'],
-    },
-  ];
-
-  const socialLinks = [
-    { icon: Facebook, label: 'Facebook', href: '#' },
-    { icon: Instagram, label: 'Instagram', href: '#' },
-    { icon: Twitter, label: 'Twitter', href: '#' },
-    { icon: Linkedin, label: 'LinkedIn', href: '#' },
-  ];
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 10 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.4 },
-    },
-  };
-
   return (
-    <footer className="bg-foreground text-white">
-      {/* Main Footer */}
-      <div className="container py-16 sm:py-20">
-        <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-12"
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-100px' }}
-        >
-          {/* Brand */}
-          <motion.div className="lg:col-span-1" variants={itemVariants}>
-            <div className="flex items-center gap-2 mb-4">
-              <img
-                src="https://d2xsxph8kpxj0f.cloudfront.net/310519663146852942/7vU7SskgToGin35SQBrLa4/dream-travel-logo_16e9196b.webp"
-                alt="Dream Travel"
-                className="h-10 w-auto"
-              />
-              <span className="font-bold text-lg">Dream Travel</span>
-            </div>
-            <p className="text-white/70 text-sm mb-6">
-              Experiências de viagem premium para viajantes exigentes.
+    <footer className="bg-slate-900 text-slate-300 py-16 border-t border-slate-800">
+      <div className="container px-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+          {/* Coluna 1: Sobre a Marca */}
+          <div className="md:col-span-1">
+            <h3 className="text-2xl font-bold text-white mb-6 font-serif">Dream Travel</h3>
+            <p className="text-slate-400 mb-6 leading-relaxed">
+              Transformando sonhos em experiências inesquecíveis. Nossa missão é desenhar roteiros exclusivos que conectam você à essência de cada destino.
             </p>
-            {/* Contact Info */}
-            <div className="space-y-3">
-              <div className="flex items-center gap-3 text-sm text-white/70 hover:text-secondary transition-colors">
-                <Phone className="w-4 h-4 flex-shrink-0" />
-                <a href="tel:+55-11-3000-0000">+55 (11) 3000-0000</a>
-              </div>
-              <div className="flex items-center gap-3 text-sm text-white/70 hover:text-secondary transition-colors">
-                <Mail className="w-4 h-4 flex-shrink-0" />
-                <a href="mailto:contato@luxurytravel.com">contato@luxurytravel.com</a>
-              </div>
-              <div className="flex items-start gap-3 text-sm text-white/70">
-                <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                <span>São Paulo, SP - Brasil</span>
-              </div>
+            <div className="flex gap-4">
+              <a href="#" className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
+                <Instagram className="w-5 h-5" />
+              </a>
+              <a href="#" className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
+                <Facebook className="w-5 h-5" />
+              </a>
+              <a href="#" className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
+                <Twitter className="w-5 h-5" />
+              </a>
             </div>
-          </motion.div>
+          </div>
 
-          {/* Footer Sections */}
-          {footerSections.map((section, idx) => (
-            <motion.div key={idx} variants={itemVariants}>
-              <h4 className="font-semibold mb-4 text-white">{section.title}</h4>
-              <ul className="space-y-2">
-                {section.links.map((link, linkIdx) => (
-                  <li key={linkIdx}>
-                    <a
-                      href="#"
-                      className="text-sm text-white/70 hover:text-secondary transition-colors"
-                    >
-                      {link}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </motion.div>
-          ))}
-        </motion.div>
+          {/* Coluna 2: Links Rápidos */}
+          <div className="md:col-span-1">
+            <h3 className="text-xl font-bold text-white mb-6 font-serif">Links Rápidos</h3>
+            <ul className="space-y-4">
+              <li>
+                <Link href="/" className="hover:text-primary transition-colors">Início</Link>
+              </li>
+              <li>
+                <Link href="/destinos" className="hover:text-primary transition-colors">Destinos</Link>
+              </li>
+              <li>
+                <Link href="/pacotes" className="hover:text-primary transition-colors">Pacotes Especiais</Link>
+              </li>
+              <li>
+                <Link href="/sobre" className="hover:text-primary transition-colors">Quem Somos</Link>
+              </li>
+              <li>
+                <Link href="/contato" className="hover:text-primary transition-colors">Contato</Link>
+              </li>
+            </ul>
+          </div>
 
-        {/* Divider */}
-        <div className="h-px bg-white/10 mb-8" />
+          {/* Coluna 3: Contato Direto */}
+          <div className="md:col-span-1">
+             <h3 className="text-xl font-bold text-white mb-6 font-serif">Fale Conosco</h3>
+             <p className="text-slate-400 mb-6 leading-relaxed">
+               Pronto para planejar sua próxima viagem? Nossos consultores estão disponíveis.
+             </p>
+             <div className="space-y-4">
+               <a href="https://wa.me/5517996077150" target="_blank" rel="noreferrer" className="flex items-center gap-3 hover:text-primary transition-colors">
+                 <Phone className="w-5 h-5 text-primary" />
+                 <span>+55 17 99607-7150</span>
+               </a>
+               <a href="mailto:contato@dreamtravel.com.br" className="flex items-center gap-3 hover:text-primary transition-colors">
+                 <Mail className="w-5 h-5 text-primary" />
+                 <span>contato@dreamtravel.com.br</span>
+               </a>
+             </div>
+          </div>
+        </div>
 
-        {/* Bottom Footer */}
-        <motion.div
-          className="flex flex-col sm:flex-row items-center justify-between gap-6"
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-        >
-          {/* Copyright */}
-          <motion.p
-            className="text-sm text-white/60"
-            variants={itemVariants}
-          >
-            © {currentYear} Luxury Travel Agency. Todos os direitos reservados.
-          </motion.p>
-
-          {/* Social Links */}
-          <motion.div
-            className="flex items-center gap-4"
-            variants={itemVariants}
-          >
-            {socialLinks.map((social) => {
-              const Icon = social.icon;
-              return (
-                <motion.a
-                  key={social.label}
-                  href={social.href}
-                  className="p-2 rounded-lg bg-white/10 hover:bg-secondary hover:text-foreground transition-colors"
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                  aria-label={social.label}
-                >
-                  <Icon className="w-4 h-4" />
-                </motion.a>
-              );
-            })}
-          </motion.div>
-
-          {/* Payment Methods */}
-          <motion.div
-            className="flex items-center gap-2 text-sm text-white/60"
-            variants={itemVariants}
-          >
-            <span>Pagamentos seguros:</span>
-            <div className="flex gap-2">
-              {['Visa', 'MC', 'Amex'].map((method) => (
-                <span
-                  key={method}
-                  className="px-2 py-1 bg-white/10 rounded text-xs"
-                >
-                  {method}
-                </span>
-              ))}
-            </div>
-          </motion.div>
-        </motion.div>
+        <div className="mt-16 pt-8 border-t border-slate-800 text-center text-sm text-slate-500 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p>&copy; {new Date().getFullYear()} Dream Travel. Todos os direitos reservados.</p>
+          <div className="flex gap-4">
+            <Link href="/termos" className="hover:text-white transition-colors">Termos de Uso</Link>
+            <Link href="/privacidade" className="hover:text-white transition-colors">Política de Privacidade</Link>
+          </div>
+        </div>
       </div>
     </footer>
   );

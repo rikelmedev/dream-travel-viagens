@@ -1,149 +1,129 @@
-import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
-import { Menu, X } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Link, useLocation } from 'wouter';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Menu, X, Plane } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useLocation } from 'wouter';
 
-/**
- * Navbar Component
- * Design: Minimalismo Contemporâneo
- * - Transparente sobre o Hero, tornando-se sólida no scroll
- * - Logotipo à esquerda, links centrais, CTA à direita
- * - Responsivo com menu mobile
- */
 export default function Navbar() {
-  const [, setLocation] = useLocation();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [location, setLocation] = useLocation();
+
+  const isHomePage = location === '/';
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
     };
-
+    
+    handleScroll();
+    
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const navLinks = [
-    { label: 'Destinos', href: '/destinos' },
-    { label: 'Pacotes', href: '/pacotes' },
-    { label: 'Blog', href: '/blog' },
-    { label: 'Sobre', href: '/sobre' },
-    { label: 'Contato', href: '/contato' },
+    { name: 'Início', href: '/' },
+    { name: 'Destinos', href: '/destinos' },
+    { name: 'Pacotes', href: '/pacotes' },
+    { name: 'Contato', href: '/contato' },
   ];
 
+  const isTransparent = isHomePage && !isScrolled;
+
   return (
-    <motion.nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled
-          ? 'bg-white shadow-sm border-b border-border'
-          : 'bg-transparent'
-      }`}
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-    >
-      <div className="container flex items-center justify-between h-20">
-        {/* Logo */}
-        <motion.div
-          className="flex-shrink-0 cursor-pointer"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => setLocation('/')}
-        >
-          <div className="flex items-center gap-2">
-            <img
-              src="https://d2xsxph8kpxj0f.cloudfront.net/310519663146852942/7vU7SskgToGin35SQBrLa4/dream-travel-logo_16e9196b.webp"
-              alt="Dream Travel"
-              className="h-12 w-auto"
-            />
-            <span className="hidden sm:inline font-bold text-foreground text-lg">
-              Dream Travel
-            </span>
-          </div>
-        </motion.div>
+    <>
+      <header
+   className={`fixed top-6 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-7xl transition-all duration-500 ease-in-out ${
+    isTransparent 
+      ? 'bg-transparent py-2' 
+      : 'bg-white/80 backdrop-blur-xl shadow-[0_8px_32px_0_rgba(0,0,0,0.05)] border border-white/20 py-3 rounded-3xl'
+  }`}
+>
+        <div className="container px-4 mx-auto flex items-center justify-between">
+          {/* Logo */}
+          <Link href="/">
+            <div className="flex items-center gap-2 cursor-pointer group">
+              <div className={`p-2 rounded-full transition-colors ${isTransparent ? 'bg-white/20' : 'bg-primary/10'}`}>
+                <Plane className={`w-6 h-6 transition-colors ${isTransparent ? 'text-white' : 'text-primary'}`} />
+              </div>
+              <span className={`text-2xl font-bold font-serif transition-colors ${isTransparent ? 'text-white' : 'text-slate-900'}`}>
+                Dream Travel
+              </span>
+            </div>
+          </Link>
 
-        {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center gap-8">
-          {navLinks.map((link) => (
-            <motion.button
-              key={link.label}
-              onClick={() => setLocation(link.href)}
-              className="text-sm font-medium text-foreground hover:text-primary transition-colors"
-              whileHover={{ y: -2 }}
-              whileTap={{ y: 0 }}
-            >
-              {link.label}
-            </motion.button>
-          ))}
-        </div>
-
-        {/* CTA Button - Desktop */}
-        <div className="hidden md:block">
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <Button
+          {/* Menu Desktop */}
+          <nav className="hidden md:flex items-center gap-8">
+            {navLinks.map((link) => (
+              <Link key={link.name} href={link.href}>
+                <span className={`text-sm font-medium transition-colors cursor-pointer hover:text-primary ${
+                  isTransparent ? 'text-white/90' : 'text-slate-600'
+                }`}>
+                  {link.name}
+                </span>
+              </Link>
+            ))}
+            
+            <Button 
               onClick={() => setLocation('/contato')}
-              className="bg-primary hover:bg-primary/90 text-white font-semibold px-6 py-2 rounded-lg"
+              className={`font-semibold rounded-full px-6 transition-all ${
+                isTransparent 
+                  ? 'bg-white text-primary hover:bg-white/90' 
+                  : 'bg-primary text-white hover:bg-primary/90'
+              }`}
             >
-              Fale Conosco
+              Falar com Especialista
             </Button>
-          </motion.div>
-        </div>
+          </nav>
 
-        {/* Mobile Menu Button */}
-        <motion.button
-          className="md:hidden p-2"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          whileTap={{ scale: 0.95 }}
-          aria-label="Toggle menu"
-        >
-          {isMobileMenuOpen ? (
-            <X className="w-6 h-6 text-foreground" />
-          ) : (
-            <Menu className="w-6 h-6 text-foreground" />
-          )}
-        </motion.button>
-      </div>
-
-      {/* Mobile Menu */}
-      <motion.div
-        className="md:hidden bg-white border-b border-border"
-        initial={{ opacity: 0, height: 0 }}
-        animate={{
-          opacity: isMobileMenuOpen ? 1 : 0,
-          height: isMobileMenuOpen ? 'auto' : 0,
-        }}
-        transition={{ duration: 0.3 }}
-        style={{ overflow: 'hidden' }}
-      >
-        <div className="container py-4 space-y-3">
-          {navLinks.map((link) => (
-            <button
-              key={link.label}
-              onClick={() => {
-                setLocation(link.href);
-                setIsMobileMenuOpen(false);
-              }}
-              className="block w-full text-left text-sm font-medium text-foreground hover:text-primary transition-colors py-2"
-            >
-              {link.label}
-            </button>
-          ))}
-          <Button
-            onClick={() => {
-              setLocation('/contato');
-              setIsMobileMenuOpen(false);
-            }}
-            className="w-full bg-primary hover:bg-primary/90 text-white font-semibold mt-2"
+          {/* Botão Menu Mobile */}
+          <button
+            className="md:hidden p-2"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
-            Fale Conosco
-          </Button>
+            {isMobileMenuOpen ? (
+              <X className={`w-6 h-6 ${isTransparent ? 'text-white' : 'text-slate-900'}`} />
+            ) : (
+              <Menu className={`w-6 h-6 ${isTransparent ? 'text-white' : 'text-slate-900'}`} />
+            )}
+          </button>
         </div>
-      </motion.div>
-    </motion.nav>
+      </header>
+
+      {/* Menu Mobile Expandido */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed inset-0 z-40 bg-white pt-24 px-4"
+          >
+            <nav className="flex flex-col gap-6 items-center text-center">
+              {navLinks.map((link) => (
+                <Link key={link.name} href={link.href}>
+                  <span 
+                    className="text-2xl font-serif text-slate-900 hover:text-primary transition-colors cursor-pointer"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {link.name}
+                  </span>
+                </Link>
+              ))}
+              <Button 
+                onClick={() => {
+                  setLocation('/contato');
+                  setIsMobileMenuOpen(false);
+                }}
+                className="w-full mt-4 bg-primary text-white font-semibold py-6 rounded-xl text-lg"
+              >
+                Falar com Especialista
+              </Button>
+            </nav>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 }
