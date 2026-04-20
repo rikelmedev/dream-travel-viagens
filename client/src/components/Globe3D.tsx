@@ -1,187 +1,180 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MapPin, ArrowRight, X, Loader2, Globe2 } from 'lucide-react';
+import { MapPin, ArrowRight, X, Loader2, Globe2, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLocation } from 'wouter';
 import Globe from 'react-globe.gl';
 
-interface LocationData {
-  name: string;
-  description: string;
-  image: string;
-  country: string;
-}
+// Configuração de Rotas de Luxo (Arcos)
+const ARC_DATA = [
+  { startLat: -23.5505, startLng: -46.6333, endLat: 48.8566, endLng: 2.3522, color: ['#ffdb58', '#0077B6'] }, // SP -> Paris
+  { startLat: -23.5505, startLng: -46.6333, endLat: 25.2048, endLng: 55.2708, color: ['#ffdb58', '#0077B6'] }, // SP -> Dubai
+  { startLat: 40.7128, startLng: -74.0060, endLat: -3.2028, endLng: 73.2207, color: ['#0077B6', '#ffdb58'] }, // NY -> Maldivas
+  { startLat: 51.5074, startLng: -0.1278, endLat: -33.9249, endLng: 18.4241, color: ['#0077B6', '#ffdb58'] }, // Londres -> Cape Town
+];
 
 export default function Globe3D() {
   const globeRef = useRef<any>();
-  const containerRef = useRef<HTMLDivElement>(null);
-  
-  const [activeLocation, setActiveLocation] = useState<LocationData | null>(null);
+  const [activeLocation, setActiveLocation] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [, setLocation] = useLocation();
 
   useEffect(() => {
     const updateSize = () => {
-      if (containerRef.current) {
-        setDimensions({
-          width: containerRef.current.offsetWidth,
-          height: containerRef.current.offsetHeight
-        });
+      const container = document.getElementById('globe-container');
+      if (container) {
+        setDimensions({ width: container.offsetWidth, height: container.offsetHeight });
       }
     };
-    updateSize();
     window.addEventListener('resize', updateSize);
+    updateSize();
     return () => window.removeEventListener('resize', updateSize);
   }, []);
 
   useEffect(() => {
     if (globeRef.current) {
-      globeRef.current.controls().autoRotate = true;
-      globeRef.current.controls().autoRotateSpeed = 0.6;
-      globeRef.current.controls().enableZoom = false; 
-      globeRef.current.pointOfView({ altitude: 2.2 });
+      const controls = globeRef.current.controls();
+      controls.autoRotate = true;
+      controls.autoRotateSpeed = 0.8;
+      controls.enableZoom = false;
+      globeRef.current.pointOfView({ altitude: 2.0 });
     }
-  }, [dimensions.width]);
+  }, [dimensions]);
 
-  // Inteligência de busca em tempo real (OpenStreetMap + Wikipedia)
-  const fetchRealTimeLocationData = useCallback(async (lat: number, lng: number) => {
-    // Para a rotação e voa suavemente até ao local clicado
+  const fetchRealTimeLocationData = async (lat: number, lng: number) => {
     if (globeRef.current) {
       globeRef.current.controls().autoRotate = false;
-      globeRef.current.pointOfView({ lat, lng, altitude: 1.2 }, 1200); 
+      globeRef.current.pointOfView({ lat, lng, altitude: 1.2 }, 1000);
     }
-
     setIsLoading(true);
-    setActiveLocation(null);
-
     try {
-      const geoResponse = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=pt-BR`
-      );
-      const geoData = await geoResponse.json();
+      const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=pt-BR`);
+      const geo = await res.json();
+      if (geo.error) throw new Error();
 
-      if (geoData.error) throw new Error("Oceano");
-
-      const locationName = geoData.address.city || geoData.address.town || geoData.address.state || geoData.address.country;
-      const countryName = geoData.address.country;
-
-      const wikiResponse = await fetch(
-        `https://pt.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(locationName)}`
-      );
-      const wikiData = await wikiResponse.json();
+      const name = geo.address.city || geo.address.state || geo.address.country;
+      const wikiRes = await fetch(`https://pt.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(name)}`);
+      const wiki = await wikiRes.json();
 
       setActiveLocation({
-        name: locationName,
-        country: countryName,
-        description: wikiData.extract || `Descubra os roteiros exclusivos que podemos preparar para si em ${locationName}.`,
-        image: wikiData.thumbnail?.source || 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&q=80'
+        name,
+        country: geo.address.country,
+        description: wiki.extract || `Destino exclusivo Dream Travel em ${name}.`,
+        image: wiki.thumbnail?.source || 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&q=80'
       });
-    } catch (error) {
+    } catch {
       setActiveLocation({
-        name: "Águas Internacionais",
-        country: "Mundo",
-        description: "Explore cruzeiros de luxo e expedições marítimas exclusivas navegando por águas cristalinas.",
-        image: 'https://images.unsplash.com/photo-1505881502353-a1986add3762?w=800&q=80'
+        name: "Destino Inexplorado",
+        country: "Dream Travel",
+        description: "Estamos a preparar uma experiência única para estas coordenadas.",
+        image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&q=80'
       });
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  };
 
   return (
-    <div className="relative w-full h-[500px] md:h-[600px] lg:h-[700px] bg-slate-50/50 rounded-[2.5rem] overflow-hidden" ref={containerRef}>
+    <div id="globe-container" className="relative w-full h-[600px] lg:h-[750px] bg-[#020617] rounded-[3rem] overflow-hidden shadow-[0_0_80px_rgba(0,119,182,0.15)] border border-white/5">
       
-      {/* Container do novo Globo 3D Leve */}
+      <div className="absolute inset-0 opacity-30 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] pointer-events-none" />
+
       <div className="absolute inset-0 flex items-center justify-center cursor-crosshair">
         {dimensions.width > 0 && (
           <Globe
             ref={globeRef}
             width={dimensions.width}
             height={dimensions.height}
-            backgroundColor="rgba(0,0,0,0)" 
-            globeImageUrl="//unpkg.com/three-globe/example/img/earth-blue-marble.jpg" 
-            bumpImageUrl="//unpkg.com/three-globe/example/img/earth-topology.png" 
+            backgroundColor="rgba(0,0,0,0)"
+            
+            // TEXTURAS NOTURNAS
+            globeImageUrl="//unpkg.com/three-globe/example/img/earth-night.jpg" 
+            bumpImageUrl="//unpkg.com/three-globe/example/img/earth-topology.png"
+            
+            // ATMOSFERA E BRILHO
+            atmosphereColor="#4facfe"
+            atmosphereAltitude={0.2}
+            
+            // ARCOS DE VOO (VIDA AO GLOBO)
+            arcsData={ARC_DATA}
+            arcColor="color"
+            arcDashLength={0.4}
+            arcDashGap={4}
+            arcDashAnimateTime={2000}
+            arcStroke={0.5}
+            
+            // ANÉIS PULSANTES NOS CLIQUES
+            ringsData={activeLocation ? [{ lat: activeLocation.lat, lng: activeLocation.lng }] : []}
+            ringColor={() => '#ffdb58'}
+            ringMaxRadius={5}
+            ringPropagationSpeed={3}
+            
             onGlobeClick={({ lat, lng }) => fetchRealTimeLocationData(lat, lng)}
-            atmosphereColor="#0077B6"
-            atmosphereAltitude={0.15}
           />
         )}
       </div>
 
-      <div className="absolute top-6 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-md px-6 py-3 rounded-full shadow-lg border border-slate-100 flex items-center gap-3 pointer-events-none z-10">
-        <Globe2 className="w-5 h-5 text-primary animate-pulse" />
-        <span className="text-xs md:text-sm font-bold text-slate-800 uppercase tracking-widest whitespace-nowrap">
-          Clique em qualquer país
-        </span>
+      <div className="absolute top-8 left-8 z-10 hidden md:block">
+        <div className="bg-black/40 backdrop-blur-xl border border-white/10 p-5 rounded-2xl">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+            <span className="text-white/60 text-[10px] font-bold uppercase tracking-[0.2em]">Sistemas Online</span>
+          </div>
+          <h4 className="text-white font-serif text-xl mb-1">Exploração Global</h4>
+          <p className="text-white/40 text-xs">Conectando você aos destinos mais remotos.</p>
+        </div>
+      </div>
+
+      <div className="absolute top-8 left-1/2 -translate-x-1/2 bg-white/10 backdrop-blur-md border border-white/20 px-6 py-3 rounded-full flex items-center gap-3 z-10">
+        <Zap className="w-4 h-4 text-[#ffdb58] fill-[#ffdb58] animate-bounce" />
+        <span className="text-xs font-bold text-white uppercase tracking-widest">Toque num ponto de luz</span>
       </div>
 
       <AnimatePresence>
         {(activeLocation || isLoading) && (
           <motion.div
-            initial={{ opacity: 0, x: 50, scale: 0.95 }}
-            animate={{ opacity: 1, x: 0, scale: 1 }}
-            exit={{ opacity: 0, x: 50, scale: 0.95 }}
-            transition={{ duration: 0.4, type: 'spring', bounce: 0.2 }}
-            className="absolute top-4 right-4 md:top-6 md:right-6 bottom-4 md:bottom-6 w-[calc(100%-2rem)] md:w-96 bg-white/95 backdrop-blur-xl rounded-[2rem] shadow-2xl border border-white/50 overflow-hidden flex flex-col z-20"
+            initial={{ opacity: 0, x: 100, filter: 'blur(10px)' }}
+            animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
+            exit={{ opacity: 0, x: 100, filter: 'blur(10px)' }}
+            className="absolute top-6 right-6 bottom-6 w-full max-w-[380px] bg-slate-900/80 backdrop-blur-2xl rounded-[2.5rem] border border-white/10 shadow-[0_40px_100px_rgba(0,0,0,0.5)] overflow-hidden flex flex-col z-20"
           >
             {isLoading ? (
-              <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
-                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6">
-                  <Loader2 className="w-8 h-8 text-primary animate-spin" />
-                </div>
-                <h3 className="text-xl font-bold font-serif text-slate-900 mb-2">Buscando coordenadas...</h3>
-                <p className="text-slate-500 text-sm">Acessando satélites em tempo real.</p>
+              <div className="flex-1 flex flex-col items-center justify-center p-12 text-center">
+                <Loader2 className="w-12 h-12 text-[#ffdb58] animate-spin mb-6" />
+                <p className="text-white font-serif text-2xl">Rastreando...</p>
               </div>
-            ) : activeLocation ? (
+            ) : (
               <>
-                <div className="relative h-48 md:h-56 shrink-0">
-                  <img 
-                    src={activeLocation.image} 
-                    alt={activeLocation.name}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent" />
+                <div className="relative h-64">
+                  <img src={activeLocation.image} className="w-full h-full object-cover" alt="" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent" />
                   <button 
-                    onClick={() => {
-                      setActiveLocation(null);
-                      if (globeRef.current) globeRef.current.controls().autoRotate = true;
-                    }}
-                    className="absolute top-4 right-4 bg-black/40 hover:bg-black/60 backdrop-blur-md text-white p-2 rounded-full transition-colors"
+                    onClick={() => { setActiveLocation(null); globeRef.current.controls().autoRotate = true; }}
+                    className="absolute top-6 right-6 w-10 h-10 bg-black/50 backdrop-blur-md text-white rounded-full flex items-center justify-center border border-white/10 hover:bg-primary transition-colors"
                   >
-                    <X className="w-4 h-4" />
+                    <X className="w-5 h-5" />
                   </button>
-                  <div className="absolute bottom-4 left-4">
-                    <span className="bg-primary text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-md">
-                      Descoberta Dinâmica
-                    </span>
-                  </div>
                 </div>
                 
-                <div className="p-6 flex flex-col flex-1 overflow-y-auto">
-                  <div className="flex items-center gap-2 text-primary text-xs font-bold uppercase tracking-widest mb-2">
-                    <MapPin className="w-4 h-4" />
+                <div className="p-8 flex flex-col flex-1">
+                  <div className="flex items-center gap-2 text-[#ffdb58] text-[10px] font-bold uppercase tracking-widest mb-4">
+                    <MapPin className="w-3 h-3" />
                     <span>{activeLocation.country}</span>
                   </div>
-                  <h3 className="text-2xl md:text-3xl font-bold font-serif text-slate-900 mb-4 leading-tight">
-                    {activeLocation.name}
-                  </h3>
-                  <p className="text-slate-600 text-sm leading-relaxed mb-6">
-                    {activeLocation.description}
-                  </p>
+                  <h3 className="text-4xl font-serif font-bold text-white mb-4 leading-tight">{activeLocation.name}</h3>
+                  <p className="text-white/60 text-sm leading-relaxed mb-8 flex-1">{activeLocation.description}</p>
                   
-                  <div className="mt-auto pt-4 border-t border-slate-100">
-                    <Button 
-                      onClick={() => setLocation('/contato')}
-                      className="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-6 rounded-xl text-md group"
-                    >
-                      Personalizar Roteiro
-                      <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                    </Button>
-                  </div>
+                  <Button 
+                    onClick={() => setLocation('/contato')}
+                    className="w-full h-16 bg-white text-slate-900 hover:bg-[#ffdb58] hover:text-slate-900 font-bold rounded-2xl transition-all duration-500 group"
+                  >
+                    Planear esta Rota
+                    <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-2 transition-transform" />
+                  </Button>
                 </div>
               </>
-            ) : null}
+            )}
           </motion.div>
         )}
       </AnimatePresence>
