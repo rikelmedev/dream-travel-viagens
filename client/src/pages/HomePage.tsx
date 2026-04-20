@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Search, MapPin, Calendar, Users, ChevronRight } from 'lucide-react';
+import { Search, MapPin, Calendar, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLocation } from 'wouter';
 import Layout from '@/components/Layout';
 import { setSEOHead } from '@/components/SEOHead';
 import Globe3D from '@/components/Globe3D';
-import FeaturedPackages from '@/components/FeaturedPackages';
+import FeaturedDestinations from '@/components/FeaturedDestinations'; // Importação corrigida
 import PageTransition from '@/components/PageTransition';
 import AboutJackeline from '@/components/AboutJackeline';
 import FormularioQuestionario from '@/components/FormularioQuestionario';
@@ -72,7 +72,6 @@ export default function HomePage() {
   return (
     <PageTransition>
       <Layout>
-        {/* 1. HERO SECTION RESTAURADA */}
         <section
           className="relative min-h-screen bg-cover bg-center flex items-center justify-center overflow-hidden pt-20"
           style={{
@@ -85,7 +84,6 @@ export default function HomePage() {
             <h1 className="text-5xl md:text-7xl font-bold mb-4 font-serif text-white">Descubra o Extraordinário</h1>
             <p className="text-xl md:text-2xl mb-12 font-light text-white/90">Viagens desenhadas sob medida para o seu momento.</p>
 
-            {/* Widget de Busca */}
             <motion.div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl p-6 md:p-8 max-w-6xl mx-auto text-left" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }}>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-6">
                 <div className="lg:col-span-2">
@@ -145,9 +143,8 @@ export default function HomePage() {
           </motion.div>
         </section>
 
-        {/* 2. CATEGORIAS DE VIAGEM */}
         <section className="py-24 px-4 bg-slate-50">
-          <div className="container">
+          <div className="container max-w-7xl mx-auto">
             <motion.div className="text-center mb-16" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} viewport={{ once: true }}>
               <h2 className="text-4xl font-bold text-slate-900 mb-4 font-serif">Qual é seu estilo de viagem?</h2>
               <p className="text-slate-600 text-lg">Curadorias exclusivas para diferentes momentos da sua vida</p>
@@ -155,15 +152,15 @@ export default function HomePage() {
 
             <motion.div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" variants={containerVariants} initial="hidden" whileInView="visible" viewport={{ once: true }}>
               {travelCategories.map((category) => (
-                <motion.div key={category.id} variants={itemVariants} className="group cursor-pointer rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500" onClick={() => setLocation('/destinos')}>
+                <motion.div key={category.id} variants={itemVariants} className="group cursor-pointer rounded-[2rem] overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.12)] transition-all duration-500" onClick={() => setLocation('/destinos')}>
                   <div className="relative h-72 overflow-hidden">
                     <img src={category.image} alt={category.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent" />
                   </div>
                   <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
                     <h3 className="text-2xl font-bold mb-2 font-serif">{category.name}</h3>
                     <p className="text-sm text-white/80 mb-3">{category.description}</p>
-                    <span className="inline-block bg-secondary/90 text-primary text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">{category.duration}</span>
+                    <span className="inline-block bg-primary/90 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">{category.duration}</span>
                   </div>
                 </motion.div>
               ))}
@@ -171,28 +168,24 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* 3. HUMANIZAÇÃO: SOBRE A JACKELINE */}
         <AboutJackeline />
 
-        {/* 4. GLOBO 3D DO MANUS */}
         <section className="py-24 px-4 bg-white">
-          <div className="container">
+          <div className="container max-w-7xl mx-auto">
             <motion.div className="text-center mb-12" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} viewport={{ once: true }}>
-              <h2 className="text-4xl font-bold text-slate-900 mb-4 font-serif">Explore o Mundo em 3D</h2>
-              <p className="text-slate-600 text-lg">Gire o globo e descubra nossa curadoria de destinos.</p>
+              <h2 className="text-4xl font-bold text-slate-900 mb-4 font-serif">Explore o Mundo em Tempo Real</h2>
+              <p className="text-slate-600 text-lg">Gire o globo e clique em qualquer país para descobrir destinos únicos.</p>
             </motion.div>
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8 }} viewport={{ once: true }} className="rounded-3xl overflow-hidden shadow-2xl border-4 border-slate-100">
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8 }} viewport={{ once: true }} className="rounded-[2rem] overflow-hidden shadow-2xl border-4 border-slate-50">
               <Globe3D />
             </motion.div>
           </div>
         </section>
 
-        {/* 5. PACOTES  */}
-        <FeaturedPackages />
+        <FeaturedDestinations />
 
-        {/* 6. CTA "PRECISA DE AJUDA?" */}
-        <section className="relative py-24 px-4 bg-cover bg-center text-white" style={{ backgroundImage: `url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&h=600&fit=crop')`, backgroundAttachment: 'fixed' }}>
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+        <section className="relative py-32 px-4 bg-cover bg-center text-white" style={{ backgroundImage: `url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&h=600&fit=crop')`, backgroundAttachment: 'fixed' }}>
+          <div className="absolute inset-0 bg-slate-900/70 backdrop-blur-sm" />
           <motion.div className="relative z-10 container text-center max-w-3xl mx-auto" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} viewport={{ once: true }}>
             <h2 className="text-5xl font-bold mb-6 font-serif">Atendimento Exclusivo</h2>
             <p className="text-xl mb-10 text-white/90 font-light">Nossos especialistas estão prontos para desenhar o seu próximo roteiro inesquecível.</p>
@@ -201,4 +194,17 @@ export default function HomePage() {
                 Falar com Consultor
               </Button>
               <Button variant="outline" className="border-white text-white hover:bg-white/20 font-semibold px-8 py-6 rounded-xl text-lg">
-                +55 1
+                +55 17 99607-7150
+              </Button>
+            </div>
+          </motion.div>
+        </section>
+
+        <div id="contact-form">
+          <FormularioQuestionario />
+        </div>
+        
+      </Layout>
+    </PageTransition>
+  );
+}
