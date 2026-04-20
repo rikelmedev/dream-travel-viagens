@@ -1,236 +1,229 @@
 import { useEffect } from 'react';
-import { useRoute, useLocation } from 'wouter';
-import { ArrowLeft, MapPin, Calendar, Users } from 'lucide-react';
+import { useLocation } from 'wouter';
+import { motion } from 'framer-motion';
+import { MapPin, Calendar, Clock, Star, CheckCircle2, ArrowRight, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Layout from '@/components/Layout';
-import ImageGallery from '@/components/ImageGallery';
 import { setSEOHead } from '@/components/SEOHead';
+import PageTransition from '@/components/PageTransition';
 
-/**
- * DestinationDetailPage
- * Página de detalhe de um destino com galeria de fotos
- */
-
-interface Destination {
-  id: string;
-  name: string;
-  country: string;
-  description: string;
-  fullDescription: string;
-  highlights: string[];
-  bestTime: string;
-  climate: string;
-  images: string[];
-}
-
-const destinations: Record<string, Destination> = {
-  '1': {
-    id: '1',
-    name: 'Maldivas',
-    country: 'Maldivas',
-    description: 'Paraíso tropical com praias de areia branca e águas cristalinas',
-    fullDescription: 'As Maldivas são um arquipélago de 1.190 ilhas de coral no Oceano Índico. Conhecidas por suas águas cristalinas, recifes de coral vibrantes e resorts de luxo, as Maldivas são o destino perfeito para casais em lua de mel e amantes de mergulho.',
-    highlights: [
-      'Mergulho e snorkel em recifes de coral',
-      'Resorts de luxo com bangalôs sobre a água',
-      'Praias de areia branca intocada',
-      'Vida marinha abundante',
-      'Pôr do sol espetacular',
-    ],
-    bestTime: 'Novembro a Abril',
-    climate: 'Tropical, 26-30°C o ano todo',
-    images: [
-      'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&h=600&fit=crop',
-      'https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=800&h=600&fit=crop',
-      'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&h=600&fit=crop',
-      'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop',
-    ],
-  },
-  '2': {
-    id: '2',
-    name: 'Bali',
-    country: 'Indonésia',
-    description: 'Ilha exótica com templos, praias e cultura vibrante',
-    fullDescription: 'Bali é uma ilha indonésia conhecida por suas praias de areia preta e branca, templos antigos, paisagens de arroz em terraços e vida noturna vibrante. É um destino perfeito para viajantes que buscam cultura, natureza e relaxamento.',
-    highlights: [
-      'Templos antigos e sagrados',
-      'Praias paradisíacas',
-      'Paisagens de arroz em terraços',
-      'Vida noturna e gastronomia',
-      'Ioga e bem-estar',
-    ],
-    bestTime: 'Abril a Outubro',
-    climate: 'Tropical, 25-32°C',
-    images: [
-      'https://images.unsplash.com/photo-1537225228614-b4fad34a0b60?w=800&h=600&fit=crop',
-      'https://images.unsplash.com/photo-1552520514-5fefe8c9ef14?w=800&h=600&fit=crop',
-      'https://images.unsplash.com/photo-1537225228614-b4fad34a0b60?w=800&h=600&fit=crop',
-      'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop',
-    ],
-  },
-  '3': {
-    id: '3',
-    name: 'Alpes Suíços',
-    country: 'Suíça',
-    description: 'Montanhas majestosas, trilhas e paisagens de tirar o fôlego',
-    fullDescription: 'Os Alpes Suíços oferecem algumas das paisagens mais espetaculares do mundo. Com picos nevados, vales verdejantes e vilas de conto de fadas, é o destino ideal para caminhadas, esqui e apreciação da natureza.',
-    highlights: [
-      'Trilhas de montanha espetaculares',
-      'Picos nevados',
-      'Vilas de conto de fadas',
-      'Esqui de classe mundial',
-      'Trens panorâmicos',
-    ],
-    bestTime: 'Junho a Setembro (verão), Dezembro a Março (inverno)',
-    climate: 'Temperado, -5 a 20°C',
-    images: [
-      'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=800&h=600&fit=crop',
-      'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop',
-      'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=800&h=600&fit=crop',
-      'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800&h=600&fit=crop',
-    ],
-  },
+const MOCK_DESTINATION = {
+  id: 'maldivas-premium',
+  name: 'Maldivas: O Refúgio dos Sonhos',
+  location: 'Atol de Baa, Maldivas',
+  duration: '7 Noites / 8 Dias',
+  price: 'Sob Consulta',
+  rating: '5.0',
+  heroImage: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=1600&q=80',
+  gallery: [
+    'https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?w=800&q=80',
+    'https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=800&q=80',
+    'https://images.unsplash.com/photo-1544550581-5f7ceaf7f992?w=800&q=80'
+  ],
+  description: `Uma jornada desenhada para transcender a imaginação. Hospede-se num bangalô suspenso sobre águas cristalinas, onde o único som é o do oceano Índico. Este roteiro foi curado pessoalmente pela Jackeline para garantir total privacidade, serviço de mordomo 24h e experiências gastronómicas que celebram a alta culinária local e internacional.`,
+  highlights: [
+    'Transfer de hidroavião VIP desde Malé',
+    'Bangalô Overwater com piscina privativa infinita',
+    'Jantar romântico numa ilha deserta exclusiva',
+    'Sessão de Spa subaquática para o casal',
+    'Mergulho com biólogo marinho privado'
+  ],
+  itinerary: [
+    {
+      day: 'Dia 01',
+      title: 'A Chegada ao Paraíso',
+      desc: 'Receção VIP no aeroporto de Malé, seguida de um voo panorâmico de hidroavião até ao resort. Check-in privativo no seu bangalô e jantar de boas-vindas na praia.'
+    },
+    {
+      day: 'Dia 02 - 06',
+      title: 'Dias Livres & Experiências Curadas',
+      desc: 'Aproveite o tempo ao seu ritmo. Inclui um dia de cruzeiro ao pôr-do-sol num Dhoni tradicional e um jantar no premiado restaurante subaquático do atol.'
+    },
+    {
+      day: 'Dia 07',
+      title: 'Despedida Memorável',
+      desc: 'Pequeno-almoço flutuante na sua piscina. Tarde livre no Spa para relaxamento total antes do jantar de despedida sob as estrelas.'
+    }
+  ]
 };
 
 export default function DestinationDetailPage() {
   const [, setLocation] = useLocation();
-  const [match, params] = useRoute('/destinos/:id');
-
-  const destination = params?.id ? destinations[params.id] : null;
 
   useEffect(() => {
-    if (destination) {
-      setSEOHead({
-        title: `${destination.name} | Dream Travel Viagens`,
-        description: destination.fullDescription,
-        image: destination.images[0],
-        url: `https://dreamtravel.com.br/destinos/${destination.id}`,
-      });
-    }
-  }, [destination]);
-
-  if (!match || !destination) {
-    return (
-      <Layout>
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="text-center">
-            <h1 className="text-4xl font-bold text-foreground mb-4">Destino não encontrado</h1>
-            <Button onClick={() => setLocation('/destinos')}>Voltar para Destinos</Button>
-          </div>
-        </div>
-      </Layout>
-    );
-  }
+    setSEOHead({
+      title: `${MOCK_DESTINATION.name} | Dream Travel`,
+      description: MOCK_DESTINATION.description.substring(0, 150) + '...',
+      image: MOCK_DESTINATION.heroImage,
+    });
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
-    <Layout>
-      <div className="min-h-screen bg-white">
-        {/* Back Button */}
-        <div className="container py-6">
-          <button
-            onClick={() => setLocation('/destinos')}
-            className="flex items-center gap-2 text-primary hover:text-primary/80 transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Voltar para Destinos
-          </button>
-        </div>
-
-        {/* Header */}
-        <section className="bg-gradient-to-r from-primary/10 to-secondary/10 py-8 px-4">
-          <div className="container">
-            <h1 className="text-4xl font-bold text-foreground mb-2 font-serif">
-              {destination.name}
-            </h1>
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <MapPin className="w-4 h-4" />
-              <span>{destination.country}</span>
-            </div>
+    <PageTransition>
+      <Layout>
+        
+        <section className="relative h-[70vh] min-h-[600px] w-full bg-slate-900 flex items-end pb-16">
+          <div className="absolute inset-0 overflow-hidden">
+            <img 
+              src={MOCK_DESTINATION.heroImage} 
+              alt={MOCK_DESTINATION.name} 
+              className="w-full h-full object-cover opacity-80"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent" />
           </div>
-        </section>
-
-        {/* Gallery */}
-        <section className="py-12 px-4">
-          <div className="container">
-            <ImageGallery images={destination.images} title={destination.name} />
-          </div>
-        </section>
-
-        {/* Content */}
-        <section className="py-12 px-4">
-          <div className="container max-w-3xl">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-              {/* Main Content */}
-              <div className="md:col-span-2">
-                <h2 className="text-2xl font-bold text-foreground mb-4 font-serif">
-                  Sobre {destination.name}
-                </h2>
-                <p className="text-lg text-foreground/70 leading-relaxed mb-6">
-                  {destination.fullDescription}
-                </p>
-
-                <h3 className="text-xl font-bold text-foreground mb-4 font-serif">
-                  Destaques
-                </h3>
-                <ul className="space-y-2 mb-8">
-                  {destination.highlights.map((highlight, idx) => (
-                    <li key={idx} className="flex items-start gap-3 text-foreground/70">
-                      <span className="text-primary font-bold mt-1">•</span>
-                      <span>{highlight}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Sidebar Info */}
-              <div className="bg-secondary/5 rounded-lg p-6 h-fit">
-                <h3 className="text-lg font-bold text-foreground mb-4">Informações</h3>
-
-                <div className="space-y-4">
-                  <div>
-                    <p className="text-sm font-semibold text-muted-foreground mb-1">
-                      Melhor Época
-                    </p>
-                    <p className="text-foreground">{destination.bestTime}</p>
-                  </div>
-
-                  <div>
-                    <p className="text-sm font-semibold text-muted-foreground mb-1">
-                      Clima
-                    </p>
-                    <p className="text-foreground">{destination.climate}</p>
-                  </div>
-                </div>
-
-                <Button
-                  onClick={() => setLocation('/contato')}
-                  className="w-full bg-primary hover:bg-primary/90 text-white mt-6"
-                >
-                  Montar Roteiro
-                </Button>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* CTA */}
-        <section className="py-12 px-4 bg-primary text-white">
-          <div className="container text-center">
-            <h2 className="text-3xl font-bold mb-4 font-serif">
-              Pronto para Visitar {destination.name}?
-            </h2>
-            <p className="text-lg mb-6 opacity-90">
-              Deixe nossos consultores criarem o roteiro perfeito para você
-            </p>
-            <Button
-              onClick={() => setLocation('/contato')}
-              className="bg-white text-primary hover:bg-white/90 font-semibold"
+          
+          <div className="container px-4 relative z-10">
+            <motion.div 
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="max-w-4xl"
             >
-              Fale Conosco
-            </Button>
+              <div className="flex flex-wrap items-center gap-4 mb-6">
+                <span className="bg-primary/90 backdrop-blur-md text-white text-xs font-bold px-4 py-2 rounded-full uppercase tracking-widest">
+                  Curadoria de Luxo
+                </span>
+                <div className="flex items-center gap-2 text-white/90 text-sm font-medium bg-white/10 backdrop-blur-md px-4 py-2 rounded-full">
+                  <Star className="w-4 h-4 text-secondary fill-secondary" />
+                  <span>{MOCK_DESTINATION.rating} Excecional</span>
+                </div>
+              </div>
+              <h1 className="text-5xl md:text-7xl font-bold font-serif text-white mb-4 leading-tight">
+                {MOCK_DESTINATION.name}
+              </h1>
+              <div className="flex items-center gap-6 text-white/80 text-lg">
+                <div className="flex items-center gap-2">
+                  <MapPin className="w-5 h-5 text-primary" />
+                  <span>{MOCK_DESTINATION.location}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Clock className="w-5 h-5 text-primary" />
+                  <span>{MOCK_DESTINATION.duration}</span>
+                </div>
+              </div>
+            </motion.div>
           </div>
         </section>
-      </div>
-    </Layout>
+
+        <section className="py-24 bg-slate-50">
+          <div className="container px-4">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
+              
+              <div className="lg:col-span-8 space-y-16">
+                
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                >
+                  <h2 className="text-3xl font-serif font-bold text-slate-900 mb-6">A Visão da Especialista</h2>
+                  <p className="text-slate-600 text-lg font-light leading-relaxed mb-10">
+                    {MOCK_DESTINATION.description}
+                  </p>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="col-span-2 md:col-span-1 h-64 rounded-3xl overflow-hidden">
+                      <img src={MOCK_DESTINATION.gallery[0]} alt="Galeria" className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" />
+                    </div>
+                    <div className="col-span-2 md:col-span-1 grid grid-rows-2 gap-4">
+                      <div className="h-[120px] rounded-3xl overflow-hidden">
+                        <img src={MOCK_DESTINATION.gallery[1]} alt="Galeria" className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" />
+                      </div>
+                      <div className="h-[120px] rounded-3xl overflow-hidden">
+                        <img src={MOCK_DESTINATION.gallery[2]} alt="Galeria" className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" />
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  className="bg-white p-10 rounded-[2.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100"
+                >
+                  <h2 className="text-2xl font-serif font-bold text-slate-900 mb-8 flex items-center gap-3">
+                    <Heart className="w-6 h-6 text-primary" />
+                    Experiências Inesquecíveis
+                  </h2>
+                  <ul className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {MOCK_DESTINATION.highlights.map((item, idx) => (
+                      <li key={idx} className="flex items-start gap-4">
+                        <div className="mt-1 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                          <CheckCircle2 className="w-4 h-4 text-primary" />
+                        </div>
+                        <span className="text-slate-700 font-medium">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </motion.div>
+
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                >
+                  <h2 className="text-3xl font-serif font-bold text-slate-900 mb-10 flex items-center gap-3">
+                    <Calendar className="w-8 h-8 text-primary" />
+                    O Seu Roteiro
+                  </h2>
+                  <div className="space-y-8 relative before:absolute before:inset-0 before:ml-[1.1rem] before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-200 before:to-transparent">
+                    {MOCK_DESTINATION.itinerary.map((item, idx) => (
+                      <div key={idx} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                        <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white bg-slate-100 group-hover:bg-primary group-hover:text-white text-slate-500 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 transition-colors duration-300">
+                          <span className="text-xs font-bold">{idx + 1}</span>
+                        </div>
+                        <div className="w-[calc(100%-3rem)] md:w-[calc(50%-2.5rem)] bg-white p-6 rounded-3xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-slate-100 group-hover:border-primary/20 transition-colors">
+                          <span className="text-primary font-bold text-xs uppercase tracking-widest block mb-2">{item.day}</span>
+                          <h3 className="font-serif font-bold text-xl text-slate-900 mb-2">{item.title}</h3>
+                          <p className="text-slate-600 text-sm leading-relaxed">{item.desc}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+
+              </div>
+
+              <div className="lg:col-span-4">
+                <div className="sticky top-32 bg-white p-8 rounded-[2.5rem] shadow-[0_20px_60px_rgb(0,0,0,0.06)] border border-slate-100 flex flex-col">
+                  <div className="mb-8">
+                    <p className="text-slate-500 font-medium mb-2">Investimento</p>
+                    <p className="text-4xl font-serif font-bold text-slate-900">{MOCK_DESTINATION.price}</p>
+                    <p className="text-xs text-slate-400 mt-2">*Valor pode variar conforme a época do ano.</p>
+                  </div>
+
+                  <div className="space-y-4 mb-8 pt-8 border-t border-slate-100">
+                    <div className="flex justify-between items-center text-sm font-medium text-slate-600">
+                      <span className="flex items-center gap-2"><Clock className="w-4 h-4 text-primary" /> Duração</span>
+                      <span className="text-slate-900">{MOCK_DESTINATION.duration}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-sm font-medium text-slate-600">
+                      <span className="flex items-center gap-2"><MapPin className="w-4 h-4 text-primary" /> Saída</span>
+                      <span className="text-slate-900">Flexível</span>
+                    </div>
+                  </div>
+
+                  <Button 
+                    onClick={() => setLocation('/contato')}
+                    className="w-full h-14 text-lg bg-slate-900 hover:bg-slate-800 text-white rounded-2xl group shadow-xl shadow-slate-900/10 mb-4"
+                  >
+                    Personalizar Roteiro
+                    <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </Button>
+                  
+                  <p className="text-center text-xs text-slate-500 font-medium">
+                    Sem compromisso. Fale diretamente com a Jackeline.
+                  </p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+      </Layout>
+    </PageTransition>
   );
 }

@@ -193,9 +193,6 @@ export default function HomePage() {
               <Button onClick={() => setLocation('/contato')} className="bg-primary text-white hover:bg-primary/90 font-semibold px-8 py-6 rounded-xl text-lg">
                 Falar com Consultor
               </Button>
-              <Button variant="outline" className="border-white text-white hover:bg-white/20 font-semibold px-8 py-6 rounded-xl text-lg">
-                +55 17 99607-7150
-              </Button>
             </div>
           </motion.div>
         </section>

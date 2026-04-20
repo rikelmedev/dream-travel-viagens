@@ -1,356 +1,208 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronRight, Send } from 'lucide-react';
+import { 
+  Palmtree, Mountain, Building, Heart, 
+  Users, User, Baby, Calendar, ArrowRight, CheckCircle2 
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useMapForm } from '@/contexts/MapFormContext';
-
-/**
- * Formulário Questionário Dream Travel
- * Design: Conversão focada em leads
- * - Perguntas progressivas (uma por vez)
- * - Emojis e tom amigável
- * - Integração com WhatsApp
- */
-
-interface FormData {
-  destino: string;
-  datas: string;
-  pessoas: string;
-  tipoViagem: string;
-  hospedagem: string;
-  preferencia: string;
-  transporte: string;
-  orcamento: string;
-  especial: string;
-}
 
 const QUESTIONS = [
   {
-    id: 'destino',
-    label: '1️⃣ Destino desejado:',
-    placeholder: 'ex: Serra Negra, Gramado, Porto de Galinhas...',
-    type: 'text',
-  },
-  {
-    id: 'datas',
-    label: '2️⃣ Datas da viagem:',
-    placeholder: 'ex: 10 a 15 de novembro',
-    type: 'text',
-  },
-  {
-    id: 'pessoas',
-    label: '3️⃣ Quantas pessoas vão?',
-    placeholder: 'ex: 2',
-    type: 'number',
-  },
-  {
-    id: 'tipoViagem',
-    label: '4️⃣ Tipo de viagem:',
-    type: 'select',
+    id: 'vibe',
+    question: 'Qual é o clima ideal para a sua próxima viagem?',
     options: [
-      { value: 'relaxar', label: '🌿 Relaxar' },
-      { value: 'romantica', label: '🍷 Romântica' },
-      { value: 'familia', label: '🎢 Família' },
-      { value: 'aventura', label: '🌄 Aventura' },
-      { value: 'luxo', label: '💎 Luxo' },
-    ],
+      { id: 'praia', label: 'Praia & Descanso', icon: Palmtree },
+      { id: 'natureza', label: 'Natureza & Aventura', icon: Mountain },
+      { id: 'cidade', label: 'Cultura & Cidade', icon: Building },
+      { id: 'romance', label: 'Refúgio Romântico', icon: Heart },
+    ]
   },
   {
-    id: 'hospedagem',
-    label: '5️⃣ Vai precisar de hospedagem?',
-    type: 'select',
+    id: 'company',
+    question: 'Quem vai partilhar esta experiência consigo?',
     options: [
-      { value: 'sim', label: '✅ Sim' },
-      { value: 'nao', label: '❌ Não' },
-    ],
+      { id: 'casal', label: 'Em Casal', icon: Heart },
+      { id: 'familia', label: 'Em Família', icon: Baby },
+      { id: 'amigos', label: 'Com Amigos', icon: Users },
+      { id: 'solo', label: 'Viajante Solo', icon: User },
+    ]
   },
   {
-    id: 'preferencia',
-    label: '6️⃣ Preferência:',
-    type: 'select',
+    id: 'duration',
+    question: 'Qual a duração perfeita para esta jornada?',
     options: [
-      { value: 'hotel', label: '🏨 Hotel / Resort' },
-      { value: 'pousada', label: '🏡 Pousada / Chalé' },
-      { value: 'economico', label: '💰 Econômico' },
-      { value: 'conforto', label: '💎 Conforto' },
-    ],
-  },
-  {
-    id: 'transporte',
-    label: '7️⃣ Vai precisar de transporte (aéreo ou terrestre)?',
-    type: 'select',
-    options: [
-      { value: 'sim', label: '✈️ Sim' },
-      { value: 'nao', label: '🚗 Não' },
-    ],
-  },
-  {
-    id: 'orcamento',
-    label: '8️⃣ Orçamento aproximado por pessoa:',
-    placeholder: 'ex: R$ 3.000',
-    type: 'text',
-  },
-  {
-    id: 'especial',
-    label: '9️⃣ Quer incluir algo especial?',
-    placeholder: 'ex: passeio, vinícola, city tour, gastronomia, etc.',
-    type: 'text',
-  },
+      { id: 'curta', label: 'Escapadinha (até 5 dias)', icon: Calendar },
+      { id: 'media', label: 'Uma Semana Ideal (7 a 10 dias)', icon: Calendar },
+      { id: 'longa', label: 'Imersão Total (Mais de 12 dias)', icon: Calendar },
+    ]
+  }
 ];
 
 export default function FormularioQuestionario() {
   const [currentStep, setCurrentStep] = useState(0);
-  const [formData, setFormData] = useState<FormData>({
-    destino: '',
-    datas: '',
-    pessoas: '',
-    tipoViagem: '',
-    hospedagem: '',
-    preferencia: '',
-    transporte: '',
-    orcamento: '',
-    especial: '',
-  });
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const { selectedDestinationName } = useMapForm();
+  const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [contactInfo, setContactInfo] = useState({ name: '', phone: '' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Preencher destino automaticamente quando selecionado no mapa
-  useEffect(() => {
-    if (selectedDestinationName) {
-      setFormData((prev) => ({
-        ...prev,
-        destino: selectedDestinationName,
-      }));
-    }
-  }, [selectedDestinationName]);
-
-  const currentQuestion = QUESTIONS[currentStep];
-  const progress = ((currentStep + 1) / QUESTIONS.length) * 100;
-
-  const handleInputChange = (value: string) => {
-    setFormData({
-      ...formData,
-      [currentQuestion.id]: value,
-    });
-  };
-
-  const handleNext = () => {
-    if (currentStep < QUESTIONS.length - 1) {
-      setCurrentStep(currentStep + 1);
-    }
-  };
-
-  const handlePrevious = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    // Montar mensagem para WhatsApp
-    const mensagem = `
-Olá Jackeline! 💕
-
-Recebi um novo lead da Dream Travel! ✈️
-
-*Informações do Cliente:*
-1️⃣ Destino: ${formData.destino}
-2️⃣ Datas: ${formData.datas}
-3️⃣ Pessoas: ${formData.pessoas}
-4️⃣ Tipo de viagem: ${formData.tipoViagem}
-5️⃣ Hospedagem: ${formData.hospedagem}
-6️⃣ Preferência: ${formData.preferencia}
-7️⃣ Transporte: ${formData.transporte}
-8️⃣ Orçamento: ${formData.orcamento}
-9️⃣ Especial: ${formData.especial}
-
-Preparar roteiro completo! 🌍💖
-    `.trim();
-
-    // Codificar mensagem para URL
-    const encodedMessage = encodeURIComponent(mensagem);
-    const whatsappUrl = `https://wa.me/5517996077150?text=${encodedMessage}`;
-
-    // Abrir WhatsApp
-    window.open(whatsappUrl, '_blank');
-
-    setIsSubmitted(true);
+  const handleOptionSelect = (questionId: string, optionLabel: string) => {
+    setAnswers(prev => ({ ...prev, [questionId]: optionLabel }));
     setTimeout(() => {
-      setCurrentStep(0);
-      setFormData({
-        destino: '',
-        datas: '',
-        pessoas: '',
-        tipoViagem: '',
-        hospedagem: '',
-        preferencia: '',
-        transporte: '',
-        orcamento: '',
-        especial: '',
-      });
-      setIsSubmitted(false);
-    }, 2000);
+      if (currentStep < QUESTIONS.length) {
+        setCurrentStep(prev => prev + 1);
+      }
+    }, 400);
   };
+
+  const handleFinalSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    const text = `Olá Jackeline! Sou o(a) *${contactInfo.name}* e gostaria de planear uma viagem exclusiva.\n\n` +
+      `✨ *As minhas preferências:*\n` +
+      `🌴 Clima: ${answers['vibe']}\n` +
+      `👥 Companhia: ${answers['company']}\n` +
+      `⏱️ Duração: ${answers['duration']}\n\n` +
+      `Podemos conversar sobre as possibilidades?`;
+
+    const encodedText = encodeURIComponent(text);
+    const whatsappUrl = `https://wa.me/5517996077150?text=${encodedText}`;
+
+    setTimeout(() => {
+      window.open(whatsappUrl, '_blank');
+      setIsSubmitting(false);
+      // Resetar form após envio
+      setCurrentStep(0);
+      setAnswers({});
+      setContactInfo({ name: '', phone: '' });
+    }, 1000);
+  };
+
+  const progress = ((currentStep) / (QUESTIONS.length + 1)) * 100;
 
   return (
-    <section className="py-20 sm:py-32 bg-gradient-to-br from-primary/5 to-secondary/5" id="formulario-section">
-      <div className="container max-w-2xl">
-        <motion.div
-          className="bg-white rounded-2xl shadow-2xl p-8 sm:p-12"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true, margin: '-100px' }}
-        >
-          {/* Header */}
-          <motion.div
-            className="text-center mb-8"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-          >
-            <h2 className="text-2xl sm:text-3xl font-bold mb-2">
-              Questionário Rápido – Dream Travel ✈️
-            </h2>
-            <p className="text-muted-foreground">
-              Oi! 💕 Pra eu montar seu roteiro perfeito, me responde rapidinho 👇
-            </p>
-          </motion.div>
+    <section className="py-32 bg-white relative overflow-hidden" id="concierge">
+      <div className="absolute top-0 right-0 w-1/3 h-full bg-slate-50 rounded-l-[100px] opacity-50 -z-10" />
+      
+      <div className="container px-4 max-w-4xl mx-auto">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl md:text-5xl font-bold font-serif text-slate-900 mb-4">
+            Desenhe a sua <span className="italic text-primary">Jornada</span>
+          </h2>
+          <p className="text-slate-500 text-lg">Responda a 3 breves perguntas e deixe a nossa curadoria fazer o resto.</p>
+        </div>
 
-          {/* Progress Bar */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-foreground">
-                Pergunta {currentStep + 1} de {QUESTIONS.length}
-              </span>
-              <span className="text-sm text-muted-foreground">{Math.round(progress)}%</span>
-            </div>
-            <motion.div
-              className="h-2 bg-border rounded-full overflow-hidden"
+        <div className="bg-white rounded-[2.5rem] shadow-[0_20px_60px_rgb(0,0,0,0.05)] border border-slate-100 p-8 md:p-12 min-h-[450px] flex flex-col relative overflow-hidden">
+          
+          <div className="absolute top-0 left-0 w-full h-1.5 bg-slate-100">
+            <motion.div 
+              className="h-full bg-primary"
               initial={{ width: 0 }}
-              animate={{ width: '100%' }}
-              transition={{ duration: 0.3 }}
-            >
-              <motion.div
-                className="h-full bg-gradient-to-r from-primary to-secondary"
-                initial={{ width: 0 }}
-                animate={{ width: `${progress}%` }}
-                transition={{ duration: 0.5, ease: 'easeOut' }}
-              />
-            </motion.div>
+              animate={{ width: `${progress}%` }}
+              transition={{ duration: 0.5, ease: "easeInOut" }}
+            />
           </div>
 
-          {/* Form */}
-          <AnimatePresence mode="wait">
-            {!isSubmitted ? (
-              <motion.form
-                key={currentStep}
-                onSubmit={handleSubmit}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.3 }}
-              >
-                {/* Question */}
-                <div className="mb-6">
-                  <label className="block text-lg font-semibold text-foreground mb-4">
-                    {currentQuestion.label}
-                  </label>
+          <div className="flex-1 flex flex-col justify-center">
+            <AnimatePresence mode="wait">
+              {currentStep < QUESTIONS.length ? (
+                <motion.div
+                  key={currentStep}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                  className="w-full"
+                >
+                  <span className="text-primary font-bold text-sm tracking-widest uppercase mb-4 block">
+                    Passo 0{currentStep + 1} de 0{QUESTIONS.length}
+                  </span>
+                  <h3 className="text-3xl md:text-4xl font-serif font-bold text-slate-900 mb-10 leading-tight">
+                    {QUESTIONS[currentStep].question}
+                  </h3>
 
-                  {currentQuestion.type === 'text' || currentQuestion.type === 'number' ? (
-                    <input
-                      type={currentQuestion.type}
-                      placeholder={currentQuestion.placeholder}
-                      value={formData[currentQuestion.id as keyof FormData]}
-                      onChange={(e) => handleInputChange(e.target.value)}
-                      className="w-full px-4 py-3 border-2 border-border rounded-lg focus:outline-none focus:border-primary transition-colors"
-                      required
-                    />
-                  ) : (
-                    <select
-                      value={formData[currentQuestion.id as keyof FormData]}
-                      onChange={(e) => handleInputChange(e.target.value)}
-                      className="w-full px-4 py-3 border-2 border-border rounded-lg focus:outline-none focus:border-primary transition-colors"
-                      required
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {QUESTIONS[currentStep].options.map((option) => {
+                      const Icon = option.icon;
+                      const isSelected = answers[QUESTIONS[currentStep].id] === option.label;
+                      
+                      return (
+                        <button
+                          key={option.id}
+                          onClick={() => handleOptionSelect(QUESTIONS[currentStep].id, option.label)}
+                          className={`flex items-center gap-4 p-6 rounded-2xl border-2 transition-all duration-300 text-left group ${
+                            isSelected 
+                              ? 'border-primary bg-primary/5 shadow-md' 
+                              : 'border-slate-100 hover:border-slate-300 hover:bg-slate-50'
+                          }`}
+                        >
+                          <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors ${
+                            isSelected ? 'bg-primary text-white' : 'bg-white text-slate-400 group-hover:text-slate-600 shadow-sm'
+                          }`}>
+                            <Icon className="w-5 h-5" />
+                          </div>
+                          <span className={`font-bold text-lg ${isSelected ? 'text-primary' : 'text-slate-700'}`}>
+                            {option.label}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="final"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5, ease: "easeOut" }}
+                  className="max-w-md mx-auto w-full text-center"
+                >
+                  <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 text-primary">
+                    <CheckCircle2 className="w-10 h-10" />
+                  </div>
+                  <h3 className="text-3xl font-serif font-bold text-slate-900 mb-4">
+                    Tudo pronto!
+                  </h3>
+                  <p className="text-slate-500 mb-8">
+                    Para quem devemos enviar esta curadoria exclusiva?
+                  </p>
+
+                  <form onSubmit={handleFinalSubmit} className="space-y-4 text-left">
+                    <div>
+                      <label className="block text-sm font-bold text-slate-700 mb-2 ml-2">Como prefere ser chamado?</label>
+                      <input 
+                        type="text" 
+                        required
+                        value={contactInfo.name}
+                        onChange={(e) => setContactInfo({...contactInfo, name: e.target.value})}
+                        className="w-full px-6 py-4 rounded-2xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all bg-slate-50 focus:bg-white text-slate-900"
+                        placeholder="O seu nome"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-slate-700 mb-2 ml-2">O seu WhatsApp</label>
+                      <input 
+                        type="tel" 
+                        required
+                        value={contactInfo.phone}
+                        onChange={(e) => setContactInfo({...contactInfo, phone: e.target.value})}
+                        className="w-full px-6 py-4 rounded-2xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all bg-slate-50 focus:bg-white text-slate-900"
+                        placeholder="(00) 00000-0000"
+                      />
+                    </div>
+                    <Button 
+                      type="submit" 
+                      disabled={isSubmitting}
+                      className="w-full h-14 text-lg bg-slate-900 hover:bg-slate-800 text-white rounded-2xl mt-4 group shadow-xl shadow-slate-900/10"
                     >
-                      <option value="">Selecione uma opção</option>
-                      {currentQuestion.options?.map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
-                  )}
-                </div>
-
-                {/* Buttons */}
-                <div className="flex gap-4">
-                  <motion.button
-                    type="button"
-                    onClick={handlePrevious}
-                    disabled={currentStep === 0}
-                    className="flex-1 px-4 py-3 border-2 border-border text-foreground font-semibold rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    ← Voltar
-                  </motion.button>
-
-                  {currentStep < QUESTIONS.length - 1 ? (
-                    <motion.button
-                      type="button"
-                      onClick={handleNext}
-                      className="flex-1 px-4 py-3 bg-primary hover:bg-primary/90 text-white font-semibold rounded-lg flex items-center justify-center gap-2 transition-colors"
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      Próximo <ChevronRight className="w-4 h-4" />
-                    </motion.button>
-                  ) : (
-                    <motion.button
-                      type="submit"
-                      className="flex-1 px-4 py-3 bg-secondary hover:bg-secondary/90 text-primary font-semibold rounded-lg flex items-center justify-center gap-2 transition-colors"
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      Enviar para WhatsApp <Send className="w-4 h-4" />
-                    </motion.button>
-                  )}
-                </div>
-              </motion.form>
-            ) : (
-              <motion.div
-                className="text-center py-8"
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-              >
-                <div className="text-5xl mb-4">✅</div>
-                <h3 className="text-2xl font-bold text-foreground mb-2">
-                  Perfeito! 🎉
-                </h3>
-                <p className="text-muted-foreground mb-4">
-                  Sua mensagem foi enviada para o WhatsApp da Jackeline!
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  Ela vai responder em breve com seu roteiro personalizado 🌍💖
-                </p>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Footer Message */}
-          <motion.p
-            className="text-center text-sm text-muted-foreground mt-8"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-          >
-            ✈️ Dream Travel – Transformando sonhos em viagens reais!
-          </motion.p>
-        </motion.div>
+                      {isSubmitting ? 'A processar roteiro...' : 'Falar com a Curadora'}
+                      {!isSubmitting && <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />}
+                    </Button>
+                  </form>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
       </div>
     </section>
   );
