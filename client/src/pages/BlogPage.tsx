@@ -70,7 +70,6 @@ export default function BlogPage() {
   return (
     <PageTransition>
       <Layout>
-        {/* Hero do Blog */}
         <section className="pt-32 pb-16 bg-slate-50">
           <div className="container px-4 text-center">
             <motion.div 

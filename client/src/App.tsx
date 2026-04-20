@@ -14,31 +14,24 @@ import BlogPage from "./pages/BlogPage";
 import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
 import Admin from "./pages/Admin";
-
+import BlogPostPage from './pages/BlogPostPage';
 
 function Router() {
   return (
     <Switch>
-      <Route path={"/?from_webdev=1"} component={HomePage} />
-      <Route path={"/"} component={HomePage} />
-      <Route path={"/destinos"} component={DestinationsPage} />
-      <Route path={"/destinos/:id"} component={DestinationDetailPage} />
-      <Route path={"/pacotes"} component={PackagesPage} />
-      <Route path={"/blog"} component={BlogPage} />
-      <Route path={"/sobre"} component={AboutPage} />
-      <Route path={"/contato"} component={ContactPage} />
-      <Route path={"/admin"} component={Admin} />
-      <Route path={"/404"} component={NotFound} />
-      {/* Final fallback route */}
+      <Route path="/" component={HomePage} />
+      <Route path="/destinos" component={DestinationsPage} />
+      <Route path="/destinos/:id" component={DestinationDetailPage} />
+      <Route path="/blog" component={BlogPage} />
+      <Route path="/blog/:id" component={BlogPostPage} />
+      <Route path="/pacotes" component={PackagesPage} />
+      <Route path="/admin" component={Admin} />
       <Route component={NotFound} />
     </Switch>
   );
 }
 
-// NOTE: About Theme
-// - First choose a default theme according to your design style (dark or light bg), than change color palette in index.css
-//   to keep consistent foreground/background color across components
-// - If you want to make theme switchable, pass `switchable` ThemeProvider and use `useTheme` hook
+
 
 function App() {
   return (
