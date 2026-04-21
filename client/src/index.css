@@ -1,42 +1,18 @@
-@import "tailwindcss";
-
-@plugin "tailwindcss-animate";
-
-@custom-variant dark (&:is(.dark *));
-
 @theme {
-  --color-border: hsl(240 5.9% 90%);
-  --color-input: hsl(240 5.9% 90%);
-  --color-ring: hsl(215 20.2% 65.1%);
-  --color-background: hsl(0 0% 100%);
-  --color-foreground: hsl(222.2 84% 4.9%);
-
-  --color-primary: hsl(221.2 83.2% 53.3%); 
-  --color-primary-foreground: hsl(210 40% 98%);
+  --color-background: hsl(40 20% 98%); 
+  --color-foreground: #0f172a;
+  --color-primary: #005f8d; 
+  --color-secondary: #c5a059; 
   
-  --color-secondary: hsl(45 93% 47%); 
-  --color-secondary-foreground: hsl(222.2 47.4% 11.2%);
-
-  --color-muted: hsl(210 40% 96.1%);
-  --color-muted-foreground: hsl(215.4 16.3% 46.9%);
-
-  --color-accent: hsl(210 40% 96.1%);
-  --color-accent-foreground: hsl(222.2 47.4% 11.2%);
-
-  --radius-lg: 1.5rem; 
-  --radius-md: 1rem;   
-  --radius-sm: 0.5rem; 
-
   --font-serif: "Instrument Serif", serif;
   --font-sans: "Instrument Sans", sans-serif;
+
+  --shadow-elite: 0 32px 64px -16px rgba(0,0,0,0.1);
 }
 
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground font-sans antialiased;
-    scroll-behavior: smooth;
-  }
+.dark {
+  --color-background: #02040a; 
+  --color-foreground: #f1f5f9;
+  --color-primary: #eab308; 
+  --color-border: rgba(255, 255, 255, 0.05);
 }

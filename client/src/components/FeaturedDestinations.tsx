@@ -7,7 +7,7 @@ const destinations = [
   {
     id: '1',
     name: 'Maldivas: O Refúgio dos Sonhos',
-    description: 'Roteiro exclusivo com bangalôs sobre a água e experiências gastronômicas privativas.',
+    description: 'Roteiro exclusivo com bangalôs sobre a água e experiências gastronómicas privativas.',
     image: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=1200&q=80',
     duration: '7 Noites',
     highlight: 'Destaque Premium',
@@ -40,7 +40,7 @@ export default function FeaturedDestinations() {
   const [, setLocation] = useLocation();
 
   return (
-    <section className="py-32 bg-slate-50" id="destinos">
+    <section className="py-32 bg-background transition-colors duration-1000" id="destinos">
       <div className="container px-4 md:px-8 max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
           <div className="max-w-2xl">
@@ -52,14 +52,14 @@ export default function FeaturedDestinations() {
               <Sparkles className="w-4 h-4" />
               <span>Experiências sob medida</span>
             </motion.div>
-            <h2 className="text-4xl md:text-6xl font-bold font-serif leading-tight text-slate-900">
-              Roteiros que <span className="italic text-primary">inspiram</span>
+            <h2 className="text-4xl md:text-6xl font-bold font-serif leading-tight text-foreground">
+              Roteiros que <span className="italic text-primary font-light">inspiram</span>
             </h2>
           </div>
           <Button 
             variant="ghost" 
             onClick={() => setLocation('/destinos')}
-            className="group text-primary font-bold hover:bg-primary/5 text-lg rounded-full px-6"
+            className="group text-foreground font-bold hover:text-primary hover:bg-primary/5 text-lg rounded-full px-6"
           >
             Ver catálogo 
             <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-2 transition-transform" />
@@ -70,31 +70,27 @@ export default function FeaturedDestinations() {
           {destinations.map((dest, index) => (
             <motion.div
               key={dest.id}
-              onClick={() => setLocation('/contato')}
+              onClick={() => setLocation('/destinos/maldivas-premium')}
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-50px" }}
-              transition={{ 
-                duration: 0.8, 
-                delay: index * 0.15, // Delay em cascata da Skill
-                ease: [0.21, 0.47, 0.32, 0.98] // Curva Bezier Premium
-              }}
-              className={`group relative rounded-[2rem] overflow-hidden cursor-pointer shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.12)] transition-all duration-700 ${
+              transition={{ duration: 0.8, delay: index * 0.15, ease: [0.21, 0.47, 0.32, 0.98] }}
+              className={`group relative rounded-[2.5rem] overflow-hidden cursor-pointer border border-border/50 shadow-elite hover:shadow-2xl transition-all duration-700 ${
                 dest.size === 'large' ? 'md:col-span-2 md:row-span-2' : 'md:col-span-2'
               }`}
             >
               <img
                 src={dest.image}
                 alt={dest.name}
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-[1.5s] group-hover:scale-110"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent opacity-80 group-hover:opacity-100 transition-opacity duration-700" />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-900/20 to-transparent opacity-80 group-hover:opacity-100 transition-opacity duration-700" />
               
               <div className="absolute top-6 left-6 flex gap-3">
-                <span className="bg-white/10 backdrop-blur-xl text-white text-[10px] font-bold px-4 py-1.5 rounded-full border border-white/20 tracking-widest">
+                <span className="bg-white/10 backdrop-blur-xl text-white text-[10px] font-bold px-4 py-2 rounded-full border border-white/20 tracking-widest uppercase">
                   {dest.duration}
                 </span>
-                <span className="bg-primary/90 backdrop-blur-md text-white text-[10px] font-bold px-4 py-1.5 rounded-full uppercase tracking-wider">
+                <span className="bg-primary/90 backdrop-blur-md text-white text-[10px] font-bold px-4 py-2 rounded-full uppercase tracking-wider">
                   {dest.highlight}
                 </span>
               </div>
@@ -110,7 +106,7 @@ export default function FeaturedDestinations() {
                 <p className="text-white/80 text-sm md:text-base font-light leading-relaxed mb-6 line-clamp-2 max-w-md">
                   {dest.description}
                 </p>
-                <div className="flex items-center gap-3 text-primary font-bold text-sm tracking-widest overflow-hidden">
+                <div className="flex items-center gap-3 text-primary font-bold text-sm tracking-widest">
                   <span className="relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[1px] after:bg-primary after:origin-right after:scale-x-0 group-hover:after:scale-x-100 group-hover:after:origin-left after:transition-transform after:duration-500">
                     Descobrir Roteiro
                   </span>
