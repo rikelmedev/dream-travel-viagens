@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Search, MapPin, Calendar, Users } from 'lucide-react';
+import { Search, MapPin, Calendar, Users, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLocation } from 'wouter';
 import Layout from '@/components/Layout';
