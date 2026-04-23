@@ -29,7 +29,7 @@ export default function HomePage() {
     setSEOHead({
       title: 'Dream Travel | Roteiros Desenhados à Mão',
       description: 'Transformamos seus desejos em jornadas exclusivas desenhadas pela Jackeline.',
-      image: '/images/hero-luxury.jpg',
+      image: '/client/public/images/hero-luxury.jpg',
     });
     window.scrollTo(0,0);
   }, []);

@@ -16,8 +16,9 @@ export default function AboutPage() {
 
   useEffect(() => {
     setSEOHead({
-      <img src="/images/jackeline-perfil.jpg" alt="Jackeline - Curadora Dream Travel" className="w-full h-full object-cover" 
-      />
+      title: 'Sobre Dream Travel | Agencia de Viagens de Luxo',
+      description: 'Conheca a historia da Dream Travel e de Jackeline. Mais de 15 anos de experiencia em viagens de luxo e experiencias autenticasao redor do mundo.',
+      image: '/client/public/images/jackeline-perfil.jpg',
     });
   }, []);
 
@@ -74,27 +75,18 @@ export default function AboutPage() {
               variants={itemVariants}
               className="text-lg text-foreground/70 mb-4 leading-relaxed"
             >
-              A Dream Travel Viagens nasceu de uma paixão: transformar sonhos em realidade.
-              Fundada por Jackeline, uma viajante apaixonada com mais de 15 anos de experiência
-              no turismo, a agência surgiu com a missão de oferecer experiências de viagem
-              autênticas e personalizadas.
+              Meu nome é Jackeline, e a minha história começou com um sonho: conhecer o mundo. 
+              Com o tempo, percebi que esse também é o sonho de muitas pessoas — mas que, muitas vezes, falta orientação, planejamento e segurança para torná-lo real.
+              Foi por isso que criei a minha agência: para transformar sonhos em viagens bem planejadas, seguras e inesquecíveis.
             </motion.p>
 
             <motion.p
               variants={itemVariants}
               className="text-lg text-foreground/70 mb-4 leading-relaxed"
             >
-              Cada viagem é uma oportunidade de criar memórias inesquecíveis. Por isso, nos
-              dedicamos a entender os desejos de cada cliente e montar roteiros que vão além
-              das expectativas, com atenção aos detalhes e suporte completo.
-            </motion.p>
-
-            <motion.p
-              variants={itemVariants}
-              className="text-lg text-foreground/70 leading-relaxed"
-            >
-              Hoje, somos referência em viagens de luxo e experiências autênticas, atendendo
-              clientes em todo o Brasil e oferecendo destinos em mais de 50 países.
+              Aqui, cada detalhe é pensado para que você tenha a melhor experiência possível, sem preocupações. Do primeiro atendimento até o seu retorno, o meu compromisso é cuidar de tudo para que você apenas aproveite.
+              Mais do que vender viagens, eu entrego tranquilidade, confiança e experiências que marcam a vida.
+              Se você também sonha em conhecer o mundo, eu estou aqui para te ajudar a dar o primeiro passo
             </motion.p>
           </motion.div>
         </div>
@@ -150,49 +142,6 @@ export default function AboutPage() {
                 <p className="text-foreground/70">{value.desc}</p>
               </motion.div>
             ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* About Jackeline */}
-      <section className="py-12 px-4">
-        <div className="container max-w-3xl">
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-          >
-            <motion.h2
-              variants={itemVariants}
-              className="text-3xl font-bold text-foreground mb-6 font-serif"
-            >
-              Conheça Jackeline
-            </motion.h2>
-
-            <motion.div
-              variants={itemVariants}
-              className="bg-secondary/5 rounded-lg p-8"
-            >
-              <p className="text-lg text-foreground/70 mb-4 leading-relaxed">
-                Jackeline é uma viajante incansável com paixão genuína por descobrir novos
-                destinos e conectar pessoas com experiências transformadoras. Com mais de
-                15 anos de experiência em turismo de luxo, ela conhece pessoalmente cada
-                destino que oferece.
-              </p>
-
-              <p className="text-lg text-foreground/70 mb-4 leading-relaxed">
-                Sua filosofia é simples: toda viagem deve ser uma jornada pessoal, não apenas
-                um passeio. Por isso, ela se dedica a entender os desejos de cada cliente e
-                criar roteiros que superem as expectativas.
-              </p>
-
-              <p className="text-lg text-foreground/70 leading-relaxed">
-                Quando não está planejando viagens, você pode encontrá-la explorando novos
-                destinos, fotografando paisagens incríveis ou compartilhando dicas de viagem
-                em seu blog.
-              </p>
-            </motion.div>
           </motion.div>
         </div>
       </section>
