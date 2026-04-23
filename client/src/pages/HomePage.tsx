@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, Calendar, Users, Baby, ArrowRight, Sparkles, MessageSquare } from 'lucide-react';
+import { MapPin, Calendar, Users, Baby, ArrowRight, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLocation } from 'wouter';
 import Layout from '@/components/Layout';
@@ -9,7 +9,6 @@ import Globe3D from '@/components/Globe3D';
 import FeaturedDestinations from '@/components/FeaturedDestinations';
 import PageTransition from '@/components/PageTransition';
 import AboutJackeline from '@/components/AboutJackeline';
-import WeeklyOffers from '@/components/WeeklyOffers';
 import FormularioQuestionario from '@/components/FormularioQuestionario';
 import { useTheme } from '@/contexts/ThemeContext';
 
@@ -17,6 +16,7 @@ export default function HomePage() {
   const [, setLocation] = useLocation();
   const { isDayTime } = useTheme();
 
+  // Estado para capturar os dados do roteiro
   const [formData, setFormData] = useState({
     destino: '',
     saida: '',
@@ -36,6 +36,7 @@ export default function HomePage() {
 
   const handleRequestItinerary = (e: React.FormEvent) => {
     e.preventDefault();
+    // Mensagem Profissional para o WhatsApp
     const text = `✨ *Solicitação de Roteiro Personalizado* ✨\n\n` +
       `📍 *Destino:* ${formData.destino}\n` +
       `📅 *Saída:* ${formData.saida}\n` +
@@ -71,6 +72,7 @@ export default function HomePage() {
               </p>
             </motion.div>
 
+            {/* FORMULÁRIO DE ORÇAMENTO EDITORIAL */}
             <motion.div 
               initial={{ opacity: 0, scale: 0.98 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -171,7 +173,6 @@ export default function HomePage() {
           />
         </section>
 
-        <WeeklyOffers />
         <AboutJackeline />
         <FeaturedDestinations />
         <Globe3D />
