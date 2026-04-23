@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, Calendar, Users, Baby, ArrowRight, Sparkles } from 'lucide-react';
+import { MapPin, Calendar, Users, ArrowRight, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLocation } from 'wouter';
 import Layout from '@/components/Layout';
@@ -16,32 +16,33 @@ export default function HomePage() {
   const [, setLocation] = useLocation();
   const { isDayTime } = useTheme();
 
-  // Estado para capturar os dados do roteiro
+  // Estado com campos livres para passageiros
   const [formData, setFormData] = useState({
     destino: '',
     saida: '',
     volta: '',
-    adultos: '2',
-    criancas: '0'
+    adultos: '',
+    criancas: ''
   });
 
   useEffect(() => {
     setSEOHead({
       title: 'Dream Travel | Roteiros Desenhados à Mão',
       description: 'Transformamos seus desejos em jornadas exclusivas desenhadas pela Jackeline.',
-      image: '/client/public/images/hero-luxury.jpg',
+      image: '/images/hero-luxury.jpg',
     });
     window.scrollTo(0,0);
   }, []);
 
   const handleRequestItinerary = (e: React.FormEvent) => {
     e.preventDefault();
-    // Mensagem Profissional para o WhatsApp
+    // Mensagem formatada para o WhatsApp
     const text = `✨ *Solicitação de Roteiro Personalizado* ✨\n\n` +
       `📍 *Destino:* ${formData.destino}\n` +
       `📅 *Saída:* ${formData.saida}\n` +
       `📅 *Volta:* ${formData.volta}\n` +
-      `👥 *Passageiros:* ${formData.adultos} Adultos e ${formData.criancas} Crianças\n\n` +
+      `👥 *Adultos:* ${formData.adultos || 'Não informado'}\n` +
+      `👶 *Crianças:* ${formData.criancas || 'Nenhuma'}\n\n` +
       `Gostaria de iniciar o planejamento desta jornada exclusiva!`;
     
     window.open(`https://wa.me/5517996077150?text=${encodeURIComponent(text)}`, '_blank');
@@ -59,10 +60,6 @@ export default function HomePage() {
               animate={{ opacity: 1, y: 0 }}
               className="text-center max-w-5xl mb-12"
             >
-              <div className="flex items-center justify-center gap-2 text-primary font-bold uppercase tracking-[0.4em] text-[10px] mb-6">
-                <Sparkles className="w-4 h-4 fill-primary" />
-                <span>Atendimento Private Concierge</span>
-              </div>
               <h1 className="text-5xl md:text-8xl font-bold font-serif text-white leading-[1.1] mb-6 drop-shadow-2xl">
                 Seu Roteiro <br />
                 <span className="italic font-light text-primary">Desenhado à Mão</span>
@@ -72,7 +69,6 @@ export default function HomePage() {
               </p>
             </motion.div>
 
-            {/* FORMULÁRIO DE ORÇAMENTO EDITORIAL */}
             <motion.div 
               initial={{ opacity: 0, scale: 0.98 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -89,13 +85,13 @@ export default function HomePage() {
                   <input 
                     required
                     type="text" 
-                    placeholder="Para onde deseja ir?" 
+                    placeholder="Para onde?" 
                     className="w-full bg-transparent border-b border-border/50 py-3 outline-none text-foreground font-serif text-2xl focus:border-primary transition-colors placeholder:text-foreground/10"
                     onChange={(e) => setFormData({...formData, destino: e.target.value})}
                   />
                 </div>
 
-                {/* Período (Saída e Volta) */}
+                {/* Período */}
                 <div className="lg:col-span-4 grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <label className="flex items-center gap-2 text-[10px] font-bold text-foreground/40 uppercase tracking-widest ml-1">
@@ -110,7 +106,7 @@ export default function HomePage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="flex items-center gap-2 text-[10px] font-bold text-foreground/40 uppercase tracking-widest ml-1">
+                    <label className="text-[10px] font-bold text-foreground/40 uppercase tracking-widest ml-1">
                        Volta
                     </label>
                     <input 
@@ -129,33 +125,27 @@ export default function HomePage() {
                     <label className="flex items-center gap-2 text-[10px] font-bold text-foreground/40 uppercase tracking-widest ml-1">
                       <Users className="w-3 h-3 text-primary" /> Adultos
                     </label>
-                    <select 
-                      className="w-full bg-transparent border-b border-border/50 py-3 outline-none text-foreground font-serif text-xl cursor-pointer"
+                    <input 
+                      type="text" 
+                      placeholder="Qtd" 
+                      className="w-full bg-transparent border-b border-border/50 py-3 outline-none text-foreground font-serif text-xl focus:border-primary transition-colors"
                       onChange={(e) => setFormData({...formData, adultos: e.target.value})}
-                    >
-                      <option value="1">1 Adulto</option>
-                      <option value="2" selected>2 Adultos</option>
-                      <option value="3">3 Adultos</option>
-                      <option value="4+">4+ Adultos</option>
-                    </select>
+                    />
                   </div>
                   <div className="space-y-2">
-                    <label className="flex items-center gap-2 text-[10px] font-bold text-foreground/40 uppercase tracking-widest ml-1">
-                      <Baby className="w-3 h-3 text-primary" /> Crianças
+                    <label className="text-[10px] font-bold text-foreground/40 uppercase tracking-widest ml-1">
+                       Crianças
                     </label>
-                    <select 
-                      className="w-full bg-transparent border-b border-border/50 py-3 outline-none text-foreground font-serif text-xl cursor-pointer"
+                    <input 
+                      type="text" 
+                      placeholder="Qtd" 
+                      className="w-full bg-transparent border-b border-border/50 py-3 outline-none text-foreground font-serif text-xl focus:border-primary transition-colors"
                       onChange={(e) => setFormData({...formData, criancas: e.target.value})}
-                    >
-                      <option value="0">0</option>
-                      <option value="1">1</option>
-                      <option value="2">2</option>
-                      <option value="3+">3+</option>
-                    </select>
+                    />
                   </div>
                 </div>
 
-                {/* Botão de Orçamento */}
+                {/* Botão */}
                 <div className="lg:col-span-2">
                   <Button type="submit" className="w-full h-16 rounded-2xl bg-primary text-white hover:brightness-110 font-bold shadow-xl shadow-primary/20 group">
                     Solicitar
@@ -168,8 +158,8 @@ export default function HomePage() {
 
           <img 
             src="/images/hero-luxury.jpg" 
-            className="absolute inset-0 w-full h-full object-cover -z-10 transition-transform duration-[10s] scale-105 hover:scale-100"
-            alt="Luxury Destination"
+            className="absolute inset-0 w-full h-full object-cover -z-10"
+            alt="Fundo Dream Travel"
           />
         </section>
 

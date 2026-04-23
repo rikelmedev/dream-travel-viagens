@@ -19,11 +19,10 @@ export default function AboutJackeline() {
             className="relative"
           >
             <div className="relative z-10 rounded-[3rem] overflow-hidden aspect-[4/5] max-w-md mx-auto lg:mx-0 shadow-elite border border-border/50">
-              <img 
-                src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&q=80" 
-                alt="Jackeline - Curadora" 
-                className="w-full h-full object-cover"
-              />
+              <div className="relative z-10 rounded-[3rem] overflow-hidden aspect-[4/5] max-w-md mx-auto lg:mx-0 shadow-elite border border-border/50">
+              
+              <img src="images/jackeline-perfil.jpg" alt="Jackeline - Curadora Dream Travel" className="w-full h-full object-cover"/>
+              
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 to-transparent" />
               <div className="absolute bottom-8 left-8 text-white">
                 <p className="font-serif text-3xl font-bold">Jackeline</p>
@@ -47,7 +46,12 @@ export default function AboutJackeline() {
             </h2>
             
             <p className="text-lg text-foreground/70 leading-relaxed mb-8 font-light">
-              "Acredito que o verdadeiro luxo não está apenas num hotel cinco estrelas, mas sim no acesso ao inacessível. A minha missão é desenhar jornadas que toquem a alma, descobrindo segredos que os guias turísticos não revelam."
+              Meu nome é Jackeline, e a minha história começou com um sonho: conhecer o mundo.
+               Com o tempo, percebi que esse também é o sonho de muitas pessoas — mas que, muitas vezes, falta orientação, planejamento e segurança para torná-lo real.
+               Foi por isso que criei a minha agência: para transformar sonhos em viagens bem planejadas, seguras e inesquecíveis.
+               Aqui, cada detalhe é pensado para que você tenha a melhor experiência possível, sem preocupações. Do primeiro atendimento até o seu retorno, o meu compromisso é cuidar de tudo para que você apenas aproveite.
+               Mais do que vender viagens, eu entrego tranquilidade, confiança e experiências que marcam a vida.
+               Se você também sonha em conhecer o mundo, eu estou aqui para te ajudar a dar o primeiro passo.
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
@@ -63,10 +67,6 @@ export default function AboutJackeline() {
               <div className="flex gap-4">
                 <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                   <HeartHandshake className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                  <h4 className="font-bold text-foreground mb-1">Acesso Exclusivo</h4>
-                  <p className="text-sm text-foreground/60">Parcerias com as propriedades mais reservadas do mundo.</p>
                 </div>
               </div>
             </div>

@@ -4,17 +4,16 @@ import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
-import { MapFormProvider } from "./contexts/MapFormContext";
 import ScrollToTop from "./components/ScrollToTop";
 import HomePage from "./pages/HomePage";
 import DestinationsPage from "./pages/DestinationsPage";
 import DestinationDetailPage from "./pages/DestinationDetailPage";
 import PackagesPage from "./pages/PackagesPage";
 import BlogPage from "./pages/BlogPage";
-import AboutPage from "./pages/AboutPage";
-import ContactPage from "./pages/ContactPage";
 import Admin from "./pages/Admin";
 import BlogPostPage from './pages/BlogPostPage';
+import AboutPage from "./pages/AboutPage";
+import ContactPage from "./pages/ContactPage";
 
 function Router() {
   return (
@@ -26,27 +25,24 @@ function Router() {
       <Route path="/blog/:id" component={BlogPostPage} />
       <Route path="/pacotes" component={PackagesPage} />
       <Route path="/admin" component={Admin} />
+      
+      <Route path="/sobre" component={AboutPage} />
+      <Route path="/contato" component={ContactPage} />
+      
       <Route component={NotFound} />
     </Switch>
   );
 }
 
-
-
 function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider
-        defaultTheme="light"
-        // switchable
-      >
-        <MapFormProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Router />
-            <ScrollToTop />
-          </TooltipProvider>
-        </MapFormProvider>
+      <ThemeProvider defaultTheme="light">
+        <TooltipProvider>
+          <Toaster />
+          <Router />
+          <ScrollToTop />
+        </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );
