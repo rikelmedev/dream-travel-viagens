@@ -156,11 +156,10 @@ export default function HomePage() {
             </motion.div>
           </div>
 
-          <img 
-            src="/images/hero-luxury.jpg" 
-            className="absolute inset-0 w-full h-full object-cover -z-10"
-            alt="Fundo Dream Travel"
-          />
+          <div className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: "url('/images/hero-luxury.jpg')",}} >
+  
+  <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/10 to-black/30" />
+  </div>
         </section>
 
         <AboutJackeline />
