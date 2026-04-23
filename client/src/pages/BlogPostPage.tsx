@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import Layout from '@/components/Layout';
 import { setSEOHead } from '@/components/SEOHead';
 import PageTransition from '@/components/PageTransition';
-
+  
 const MOCK_ARTICLE = {
   id: 'segredo-costa-amalfitana',
   title: 'O Segredo Bem Guardado da Costa Amalfitana',

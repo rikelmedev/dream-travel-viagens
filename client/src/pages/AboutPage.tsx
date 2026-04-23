@@ -16,10 +16,8 @@ export default function AboutPage() {
 
   useEffect(() => {
     setSEOHead({
-      title: 'Sobre Dream Travel | Agencia de Viagens de Luxo',
-      description: 'Conheca a historia da Dream Travel e de Jackeline. Mais de 15 anos de experiencia em viagens de luxo e experiencias autenticasao redor do mundo.',
-      image: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1200&h=630&fit=crop',
-      url: 'https://dreamtravel.com.br/sobre',
+      <img src="/images/jackeline-perfil.jpg" alt="Jackeline - Curadora Dream Travel" className="w-full h-full object-cover" 
+      />
     });
   }, []);
 
