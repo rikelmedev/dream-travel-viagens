@@ -60,11 +60,6 @@ export default function HomePage() {
               animate={{ opacity: 1, y: 0 }}
               className="text-center max-w-4xl mb-12"
             >
-              <div className="flex items-center justify-center gap-2 text-white font-bold uppercase tracking-[0.4em] text-[10px] mb-6 drop-shadow-lg">
-                <Sparkles className="w-3 h-3 text-white" />
-                <span>Private Travel Concierge</span>
-                <Sparkles className="w-3 h-3 text-white" />
-              </div>
               <h1 className="text-5xl md:text-7xl lg:text-[7rem] font-bold font-serif text-white leading-[0.95] mb-8 drop-shadow-2xl">
                 Onde o Luxo <br />
                 <span className="italic font-light text-white/90">Encontra a Alma</span>
