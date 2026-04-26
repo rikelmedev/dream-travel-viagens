@@ -1,30 +1,29 @@
 @import "tailwindcss";
-
 @plugin "tailwindcss-animate";
 
 @custom-variant dark (&:is(.dark *));
 
 @theme {
   /* DIA */
-  --color-background: hsl(40 20% 98%); 
-  --color-foreground: #0f172a;
-  --color-primary: #005f8d; 
-  --color-secondary: #c5a059; 
-  --color-border: rgba(0, 0, 0, 0.1);
+  --color-background: hsl(40 20% 97%);
+  --color-foreground: hsl(223 15% 12%); 
+  --color-primary: hsl(36 35% 58%); 
+  --color-secondary: hsl(40 15% 90%); 
+  --color-border: rgba(15, 23, 42, 0.1);
 
   --font-serif: "Instrument Serif", serif;
   --font-sans: "Instrument Sans", sans-serif;
 
-  /* Sombras */
   --shadow-elite: 0 32px 64px -16px rgba(0,0,0,0.1);
 }
 
 /* NOITE */
 .dark {
-  --color-background: #02040a; 
-  --color-foreground: #f1f5f9;
-  --color-primary: #eab308;
-  --color-border: rgba(255, 255, 255, 0.05);
+  --color-background: hsl(223 15% 8%); 
+  --color-foreground: hsl(40 20% 97%); 
+  --color-primary: hsl(36 35% 58%); 
+  --color-secondary: hsl(223 15% 15%); 
+  --color-border: rgba(255, 255, 255, 0.08);
 }
 
 @layer base {
@@ -32,8 +31,8 @@
     @apply border-border;
   }
   body {
-    /* A transição suave de 1 segundo entre dia e noite */
-    @apply bg-[var(--color-background)] text-[var(--color-foreground)] font-sans antialiased transition-colors duration-1000;
+    /* Transição suave de 1 segundo entre dia e noite */
+    @apply bg-background text-foreground font-sans antialiased transition-colors duration-1000;
     scroll-behavior: smooth;
   }
 }
