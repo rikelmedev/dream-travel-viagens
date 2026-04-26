@@ -1,23 +1,11 @@
-import { ReactNode } from 'react';
-import Navbar from './Navbar';
-import Footer from './Footer';
+import Navbar from "./Navbar";
+import Footer from "./Footer";
 
-/**
- * Layout Component
- * Wrapper para todas as páginas com Navbar e Footer
- */
-
-interface LayoutProps {
-  children: ReactNode;
-}
-
-export default function Layout({ children }: LayoutProps) {
+export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div className="flex flex-col min-h-screen">
       <Navbar />
-      <main className="flex-1 pt-20">
-        {children}
-      </main>
+      <main className="flex-grow">{children}</main>
       <Footer />
     </div>
   );
