@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
 import { Menu, X, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import ThemeToggle from './ThemeToggle';
 import { useTheme } from '@/contexts/ThemeContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -25,8 +26,8 @@ export default function Navbar() {
     ? "bg-transparent pt-6" 
     : "bg-background/80 backdrop-blur-2xl border-b border-border/40 py-4 shadow-sm";
 
-  const textColor = isTransparent ? "text-white" : "text-foreground";
-  const logoColor = isTransparent ? "text-white" : "text-primary";
+  const textColor = "text-foreground hover:text-primary";
+  const logoColor = "text-foreground";
 
   const navLinks = [
     { href: '/', label: 'Início' },
@@ -39,10 +40,10 @@ export default function Navbar() {
     <nav className={`fixed top-0 left-0 w-full z-[100] transition-all duration-500 ease-in-out px-4 md:px-12 ${navBg}`}>
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         
-        {/* LOGO EDITORIAL */}
+        {/* LOGO */}
         <Link href="/">
           <a className={`font-serif text-2xl md:text-3xl font-bold tracking-tighter transition-colors ${logoColor}`}>
-            DREAM<span className="font-light italic opacity-80">TRAVEL</span>
+            DREAM<span className="font-light italic opacity-70">TRAVEL</span>
           </a>
         </Link>
 
@@ -51,33 +52,38 @@ export default function Navbar() {
           <div className="flex gap-8">
             {navLinks.map((link) => (
               <Link key={link.href} href={link.href}>
-                <a className={`text-[10px] uppercase tracking-[0.3em] font-bold transition-all relative group ${textColor} ${location === link.href ? 'opacity-100' : 'opacity-60 hover:opacity-100'}`}>
+                <a className={`text-[10px] uppercase tracking-[0.3em] font-bold transition-all relative group ${textColor} ${location === link.href ? 'opacity-100' : 'opacity-60'}`}>
                   {link.label}
                   <span className="absolute -bottom-1 left-0 w-0 h-px bg-current transition-all duration-300 group-hover:w-full" />
                 </a>
               </Link>
             ))}
           </div>
-          <Button 
-            onClick={() => window.open('https://wa.me/5517996077150', '_blank')}
-            className={`rounded-full h-11 px-8 text-[10px] font-bold uppercase tracking-widest border transition-all ${isTransparent ? 'bg-white/10 text-white border-white/20 hover:bg-white/20' : 'bg-primary text-white'}`}
-          >
-            Consultoria
-          </Button>
+          
+          <div className="flex items-center gap-4">
+            <ThemeToggle />
+            <Button 
+              onClick={() => window.open('https://wa.me/5517996077150', '_blank')}
+              className="rounded-full h-11 px-8 text-[10px] font-bold uppercase tracking-widest bg-primary text-white hover:shadow-lg shadow-primary/20 transition-all"
+            >
+              Consultoria
+            </Button>
+          </div>
         </div>
 
-        {/* BOTÃO MOBILE */}
-        <div className="lg:hidden">
+        {/* MOBILE ACTIONS */}
+        <div className="lg:hidden flex items-center gap-4">
+          <ThemeToggle />
           <button 
             onClick={() => setIsOpen(!isOpen)}
-            className={`w-12 h-12 flex items-center justify-center rounded-full transition-all ${isTransparent ? 'text-white bg-white/10' : 'text-foreground bg-foreground/5'}`}
+            className="w-11 h-11 flex items-center justify-center rounded-full bg-foreground/5 text-foreground"
           >
-            {isOpen ? <X size={24} /> : <Menu size={24} />}
+            {isOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
         </div>
       </div>
 
-      {/* MENU MOBILE EXPANSÍVEL */}
+      {/* MOBILE MENU */}
       <AnimatePresence>
         {isOpen && (
           <motion.div 
@@ -94,11 +100,8 @@ export default function Navbar() {
                   </a>
                 </Link>
               ))}
-              <Button 
-                onClick={() => window.open('https://wa.me/5517996077150', '_blank')}
-                className="w-full h-16 rounded-2xl bg-primary text-white font-bold uppercase tracking-widest text-xs mt-4 shadow-xl"
-              >
-                Falar com a Curadora
+              <Button className="w-full h-16 rounded-2xl bg-primary text-white font-bold uppercase tracking-widest text-xs">
+                Falar com Jackeline
               </Button>
             </div>
           </motion.div>
