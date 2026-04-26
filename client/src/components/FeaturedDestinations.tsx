@@ -1,121 +1,129 @@
 import { motion } from 'framer-motion';
-import { ArrowRight, Sparkles, MapPin } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { useLocation } from 'wouter';
+import { ArrowRight, MapPin, Sparkles } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
-const destinations = [
+const DESTINATIONS = [
   {
-    id: '1',
-    name: 'Maldivas: O Refúgio dos Sonhos',
-    description: 'Roteiro exclusivo com bangalôs sobre a água e experiências gastronómicas privativas.',
-    image: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=1200&q=80',
-    duration: '7 Noites',
-    highlight: 'Destaque Premium',
-    location: 'Maldivas',
-    size: 'large' 
+    id: 'maldivas',
+    title: 'Atol de Baa',
+    country: 'Maldivas',
+    image: 'https://images.unsplash.com/photo-1514282401047-d79a71a590e8?auto=format&fit=crop&w=1200&q=80',
+    span: 'col-span-1 md:col-span-2 md:row-span-2', 
+    height: 'h-[400px] md:h-[620px]',
   },
   {
-    id: '2',
-    name: 'Safari na África do Sul',
-    description: 'Aventura de luxo no Kruger Park com guias especializados.',
-    image: 'https://images.unsplash.com/photo-1516426122078-c23e76319801?w=800&q=80',
-    duration: '10 Noites',
-    highlight: 'Mais Vendido',
-    location: 'África do Sul',
-    size: 'small'
+    id: 'capri',
+    title: 'Ilha de Capri',
+    country: 'Itália',
+    image: 'https://images.unsplash.com/photo-1533090161767-e6ffed986c88?auto=format&fit=crop&w=800&q=80',
+    span: 'col-span-1 md:col-span-2 md:row-span-1', 
+    height: 'h-[300px]',
   },
   {
-    id: '3',
-    name: 'Verão em Positano',
-    description: 'O charme da Costa Amalfitana em hotéis boutique.',
-    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80',
-    duration: '5 Noites',
-    highlight: 'Nova Curadoria',
-    location: 'Itália',
-    size: 'small'
+    id: 'zermatt',
+    title: 'Zermatt',
+    country: 'Suíça',
+    image: 'https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?auto=format&fit=crop&w=600&q=80',
+    span: 'col-span-1 md:col-span-1 md:row-span-1', 
+    height: 'h-[300px]',
   },
+  {
+    id: 'kyoto',
+    title: 'Quioto',
+    country: 'Japão',
+    image: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=600&q=80',
+    span: 'col-span-1 md:col-span-1 md:row-span-1', 
+    height: 'h-[300px]',
+  }
 ];
 
 export default function FeaturedDestinations() {
   const [, setLocation] = useLocation();
 
   return (
-    <section className="py-32 bg-background transition-colors duration-1000" id="destinos">
+    <section className="py-24 md:py-32 bg-background relative">
       <div className="container px-4 md:px-8 max-w-7xl mx-auto">
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
-          <div className="max-w-2xl">
-            <motion.div 
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              className="flex items-center gap-2 text-primary font-semibold uppercase tracking-[0.2em] text-xs mb-4"
-            >
-              <Sparkles className="w-4 h-4" />
-              <span>Experiências sob medida</span>
-            </motion.div>
-            <h2 className="text-4xl md:text-6xl font-bold font-serif leading-tight text-foreground">
-              Roteiros que <span className="italic text-primary font-light">inspiram</span>
-            </h2>
-          </div>
-          <Button 
-            variant="ghost" 
-            onClick={() => setLocation('/destinos')}
-            className="group text-foreground font-bold hover:text-primary hover:bg-primary/5 text-lg rounded-full px-6"
+        
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8">
+          <motion.div 
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            className="max-w-2xl"
           >
-            Ver catálogo 
-            <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-2 transition-transform" />
-          </Button>
+            <div className="flex items-center gap-2 text-primary font-bold uppercase tracking-[0.3em] text-[10px] mb-4">
+              <Sparkles className="w-4 h-4 fill-primary" />
+              <span>O Mundo ao Seu Alcance</span>
+            </div>
+            <h2 className="text-4xl md:text-6xl font-bold font-serif text-foreground leading-[1.1]">
+              A Nossa Coleção de <br />
+              <span className="italic font-light text-foreground/70">Destinos Ímpares</span>
+            </h2>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+          >
+            <Button 
+              variant="outline" 
+              onClick={() => setLocation('/destinos')}
+              className="rounded-full h-14 px-8 border-border/60 hover:bg-foreground hover:text-background transition-all uppercase tracking-widest text-xs font-bold group"
+            >
+              Explorar Portfolio
+              <ArrowRight className="ml-3 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </Button>
+          </motion.div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-8 min-h-[700px]">
-          {destinations.map((dest, index) => (
+        {/* GRELHA BENTO BOX EDITORIAL */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-5">
+          {DESTINATIONS.map((dest, index) => (
             <motion.div
               key={dest.id}
-              onClick={() => setLocation('/destinos/maldivas-premium')}
-              initial={{ opacity: 0, y: 40 }}
+              initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.8, delay: index * 0.15, ease: [0.21, 0.47, 0.32, 0.98] }}
-              className={`group relative rounded-[2.5rem] overflow-hidden cursor-pointer border border-border/50 shadow-elite hover:shadow-2xl transition-all duration-700 ${
-                dest.size === 'large' ? 'md:col-span-2 md:row-span-2' : 'md:col-span-2'
-              }`}
+              transition={{ delay: index * 0.15, duration: 0.8 }}
+              viewport={{ once: true }}
+              onClick={() => setLocation(`/destinos/${dest.id}`)}
+              className={`group relative rounded-[2rem] overflow-hidden cursor-pointer shadow-sm hover:shadow-2xl transition-all duration-700 ${dest.span} ${dest.height}`}
             >
-              <img
-                src={dest.image}
-                alt={dest.name}
+              {/* Imagem com zoom suave no Hover */}
+              <img 
+                src={dest.image} 
+                alt={dest.title} 
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-[1.5s] group-hover:scale-110"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-900/20 to-transparent opacity-80 group-hover:opacity-100 transition-opacity duration-700" />
               
-              <div className="absolute top-6 left-6 flex gap-3">
-                <span className="bg-white/10 backdrop-blur-xl text-white text-[10px] font-bold px-4 py-2 rounded-full border border-white/20 tracking-widest uppercase">
-                  {dest.duration}
-                </span>
-                <span className="bg-primary/90 backdrop-blur-md text-white text-[10px] font-bold px-4 py-2 rounded-full uppercase tracking-wider">
-                  {dest.highlight}
-                </span>
-              </div>
-
-              <div className="absolute bottom-0 left-0 right-0 p-8 md:p-10 text-white translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                <div className="flex items-center gap-2 text-white/70 text-xs mb-3 font-medium uppercase tracking-widest">
-                  <MapPin className="w-3.5 h-3.5 text-primary" />
-                  <span>{dest.location}</span>
-                </div>
-                <h3 className={`font-bold font-serif leading-tight mb-4 ${dest.size === 'large' ? 'text-4xl' : 'text-2xl'}`}>
-                  {dest.name}
-                </h3>
-                <p className="text-white/80 text-sm md:text-base font-light leading-relaxed mb-6 line-clamp-2 max-w-md">
-                  {dest.description}
-                </p>
-                <div className="flex items-center gap-3 text-primary font-bold text-sm tracking-widest">
-                  <span className="relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[1px] after:bg-primary after:origin-right after:scale-x-0 group-hover:after:scale-x-100 group-hover:after:origin-left after:transition-transform after:duration-500">
-                    Descobrir Roteiro
-                  </span>
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform duration-500" />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-500" />
+              
+              {/* Conteúdo de Texto */}
+              <div className="absolute inset-0 p-8 flex flex-col justify-end">
+                <div className="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                  <div className="flex items-center gap-2 mb-2">
+                    <MapPin className="w-3 h-3 text-primary" />
+                    <p className="text-white/80 text-[10px] uppercase tracking-[0.2em] font-bold">
+                      {dest.country}
+                    </p>
+                  </div>
+                  <div className="flex items-end justify-between">
+                    <h3 className="text-3xl md:text-4xl font-serif font-bold text-white leading-none">
+                      {dest.title}
+                    </h3>
+                    
+                    {/* Botão */}
+                    <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500 delay-100 -translate-x-4 group-hover:translate-x-0">
+                      <ArrowRight className="w-5 h-5 text-white" />
+                    </div>
+                  </div>
                 </div>
               </div>
             </motion.div>
           ))}
         </div>
+
       </div>
     </section>
   );

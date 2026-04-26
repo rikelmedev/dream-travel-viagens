@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Sparkles, Search, MapPin } from 'lucide-react';
+import { MapPin, Search, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Layout from '@/components/Layout';
 import { setSEOHead } from '@/components/SEOHead';
@@ -9,90 +9,132 @@ import FeaturedDestinations from '@/components/FeaturedDestinations';
 import PageTransition from '@/components/PageTransition';
 import AboutJackeline from '@/components/AboutJackeline';
 import FormularioQuestionario from '@/components/FormularioQuestionario';
+import { useTheme } from '@/contexts/ThemeContext';
 
 export default function HomePage() {
-  const [formData, setFormData] = useState({ destino: '', saida: '', volta: '', hospedes: '' });
+  const { isDayTime } = useTheme();
+
+  const [formData, setFormData] = useState({
+    destino: '',
+    saida: '',
+    volta: '',
+    hospedes: ''
+  });
 
   useEffect(() => {
     setSEOHead({
-      title: 'Dream Travel | Roteiros Desenhados à Mão',
-      description: 'Experiências exclusivas de luxo com curadoria da Jackeline.',
+      title: 'Dream Travel | Curadoria de Viagens Exclusivas',
+      description: 'Experiências singulares desenhadas milimetricamente para si.',
       image: '/images/hero-luxury.jpg',
     });
+    window.scrollTo(0,0);
   }, []);
+
+  const handleRequestItinerary = (e: React.FormEvent) => {
+    e.preventDefault();
+    const text = `✨ *Solicitação de Roteiro Personalizado* ✨\n\n` +
+      `📍 *Destino:* ${formData.destino}\n` +
+      `📅 *Ida:* ${formData.saida}\n` +
+      `📅 *Volta:* ${formData.volta}\n` +
+      `👥 *Hóspedes:* ${formData.hospedes || 'Não informado'}\n\n` +
+      `Gostaria de iniciar o planejamento desta jornada exclusiva!`;
+    
+    window.open(`https://wa.me/5517996077150?text=${encodeURIComponent(text)}`, '_blank');
+  };
 
   return (
     <PageTransition>
       <Layout>
-        {/* HERO SECTION */}
+        {/* SECÇÃO HERO */}
         <section className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden">
           
-          {/* Textura e Overlay */}
-          <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/70 via-black/30 to-black/80" />
-          <div className="absolute inset-0 z-10 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] mix-blend-overlay pointer-events-none" />
-
-          <div className="container relative z-20 px-4 md:px-6 flex flex-col items-center pt-20">
+          <div className={`absolute inset-0 z-10 transition-opacity duration-1000 ${
+            isDayTime 
+              ? 'bg-gradient-to-b from-black/60 via-black/20 to-black/60' 
+              : 'bg-gradient-to-b from-slate-950/80 via-slate-950/50 to-slate-950/90'
+          }`} />
+          
+          <div className="container relative z-20 px-4 md:px-6 flex flex-col items-center pt-24">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               className="text-center max-w-4xl mb-12"
             >
-              <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/10 mb-8">
-                <Sparkles size={12} className="text-primary fill-primary" />
-                <span className="text-[9px] text-white uppercase tracking-[0.4em] font-bold">Experiências Privada</span>
+              <div className="flex items-center justify-center gap-2 text-white font-bold uppercase tracking-[0.4em] text-[10px] mb-6 drop-shadow-lg">
+                <Sparkles className="w-3 h-3 text-white" />
+                <span>Private Travel Concierge</span>
+                <Sparkles className="w-3 h-3 text-white" />
               </div>
-              <h1 className="text-5xl md:text-8xl lg:text-[8rem] font-serif font-bold text-white leading-[0.9] mb-8">
-                Seu Sonho, <br />
-                <span className="italic font-light text-white/80">Sob Medida.</span>
+              <h1 className="text-5xl md:text-7xl lg:text-[7rem] font-bold font-serif text-white leading-[0.95] mb-8 drop-shadow-2xl">
+                Onde o Luxo <br />
+                <span className="italic font-light text-white/90">Encontra a Alma</span>
               </h1>
             </motion.div>
 
-            {/* FORMULÁRIO RESPONSIVO */}
+            {/* FORMULÁRIO */}
             <motion.div 
-              initial={{ opacity: 0, y: 40 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
+              transition={{ delay: 0.3 }}
               className="w-full max-w-5xl"
             >
-              <form className="bg-slate-900/40 backdrop-blur-3xl border border-white/15 p-2 rounded-[2.5rem] lg:rounded-full flex flex-col lg:flex-row items-center gap-1 shadow-2xl">
+              <form 
+                onSubmit={handleRequestItinerary} 
+                className="bg-black/30 backdrop-blur-2xl border border-white/20 rounded-[2.5rem] lg:rounded-full p-2 flex flex-col lg:flex-row items-center gap-2 lg:gap-0 shadow-[0_30px_60px_rgba(0,0,0,0.5)]"
+              >
                 
-                {/* Input Destino */}
-                <div className="flex-1 w-full flex items-center gap-4 px-8 py-4 hover:bg-white/5 rounded-full transition-all group">
-                  <MapPin size={18} className="text-primary opacity-60" />
+                {/* Destino */}
+                <div className="flex-1 w-full flex items-center gap-4 px-6 py-4 hover:bg-white/10 rounded-[2rem] lg:rounded-full transition-colors cursor-text group">
+                  <MapPin size={18} className="text-white/60 hidden md:block" />
                   <div className="flex-1">
-                    <label className="block text-[8px] font-bold text-white/40 uppercase tracking-widest mb-1">Para onde?</label>
-                    <input required type="text" placeholder="Explore o mundo" className="w-full bg-transparent outline-none text-white font-serif text-lg placeholder:text-white/20" onChange={(e) => setFormData({...formData, destino: e.target.value})} />
+                    <label className="block text-[9px] font-bold text-white/60 uppercase tracking-[0.2em] mb-1">Destino</label>
+                    <input required type="text" placeholder="Para onde?" className="w-full bg-transparent outline-none text-white font-serif text-lg md:text-xl placeholder:text-white/40" onChange={(e) => setFormData({...formData, destino: e.target.value})} />
                   </div>
                 </div>
 
-                <div className="hidden lg:block w-px h-10 bg-white/10" />
+                <div className="hidden lg:block w-px h-10 bg-white/20" /> 
 
-                {/* Datas e Hóspedes */}
-                <div className="w-full lg:w-auto grid grid-cols-2 lg:flex lg:items-center">
-                  <div className="px-8 py-4 hover:bg-white/5 rounded-full transition-all cursor-text border-r border-white/5 lg:border-none">
-                    <label className="block text-[8px] font-bold text-white/40 uppercase tracking-widest mb-1">Ida</label>
-                    <input type="text" placeholder="DD/MM" className="w-20 bg-transparent outline-none text-white font-serif text-lg" />
+                {/* Bloco de Datas (Ida e Volta lado a lado) */}
+                <div className="w-full lg:w-auto flex flex-row items-center">
+                  <div className="flex-1 lg:w-32 px-6 py-4 hover:bg-white/10 rounded-[2rem] lg:rounded-full transition-colors cursor-text group border-r border-white/10 lg:border-none">
+                    <label className="block text-[9px] font-bold text-white/60 uppercase tracking-[0.2em] mb-1">Ida</label>
+                    <input required type="text" placeholder="DD/MM" className="w-full bg-transparent outline-none text-white font-serif text-lg md:text-xl placeholder:text-white/40" onChange={(e) => setFormData({...formData, saida: e.target.value})} />
                   </div>
-                  <div className="px-8 py-4 hover:bg-white/5 rounded-full transition-all cursor-text">
-                    <label className="block text-[8px] font-bold text-white/40 uppercase tracking-widest mb-1">Volta</label>
-                    <input type="text" placeholder="DD/MM" className="w-20 bg-transparent outline-none text-white font-serif text-lg" />
+
+                  <div className="hidden lg:block w-px h-10 bg-white/20" />
+
+                  <div className="flex-1 lg:w-32 px-6 py-4 hover:bg-white/10 rounded-[2rem] lg:rounded-full transition-colors cursor-text group">
+                    <label className="block text-[9px] font-bold text-white/60 uppercase tracking-[0.2em] mb-1">Volta</label>
+                    <input required type="text" placeholder="DD/MM" className="w-full bg-transparent outline-none text-white font-serif text-lg md:text-xl placeholder:text-white/40" onChange={(e) => setFormData({...formData, volta: e.target.value})} />
                   </div>
                 </div>
 
-                {/* Botão de Ação */}
-                <div className="w-full lg:w-auto p-1">
-                  <Button type="submit" className="w-full lg:w-auto h-16 lg:h-16 px-10 rounded-full bg-primary text-white hover:scale-[1.03] active:scale-95 transition-all font-bold text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-primary/20">
-                    Solicitar Orçamento
-                  </Button>
+                <div className="hidden lg:block w-px h-10 bg-white/20" />
+
+                {/* Hóspedes */}
+                <div className="w-full lg:w-40 px-6 py-4 hover:bg-white/10 rounded-[2rem] lg:rounded-full transition-colors cursor-text group">
+                  <label className="block text-[9px] font-bold text-white/60 uppercase tracking-[0.2em] mb-1">Hóspedes</label>
+                  <input type="text" placeholder="Quantos?" className="w-full bg-transparent outline-none text-white font-serif text-lg md:text-xl placeholder:text-white/40" onChange={(e) => setFormData({...formData, hospedes: e.target.value})} />
+                </div>
+
+                {/* Botão */}
+                <div className="w-full lg:w-auto mt-2 lg:mt-0 p-1">
+                   <Button type="submit" className="w-full lg:w-auto h-16 px-8 rounded-[2rem] lg:rounded-full bg-primary text-white hover:scale-105 transition-transform font-bold text-xs uppercase tracking-widest flex items-center justify-center shadow-lg shadow-primary/30">
+                     Solicitar
+                     <Search className="ml-3 w-4 h-4" />
+                   </Button>
                 </div>
               </form>
             </motion.div>
           </div>
 
-          <img src="/images/hero-luxury.jpg" className="absolute inset-0 w-full h-full object-cover z-0 transition-transform duration-[20s] scale-110" alt="Fundo Dream Travel" />
+          <img 
+            src="/images/hero-luxury.jpg" 
+            className="absolute inset-0 w-full h-full object-cover z-0 transition-transform duration-[20s] scale-110 hover:scale-100"
+            alt="Fundo Imersivo Dream Travel"
+          />
         </section>
 
-        {/* Restante das seções adaptadas */}
         <AboutJackeline />
         <FeaturedDestinations />
         <Globe3D />
