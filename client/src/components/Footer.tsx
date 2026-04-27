@@ -1,78 +1,115 @@
 import { Link } from 'wouter';
-import { Instagram, Facebook, Twitter, Phone, Mail } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export default function Footer() {
+  const currentYear = new Date().getFullYear();
+
+  const whatsappMessage = encodeURIComponent("Olá Jackeline, estava a explorar o site da Dream Travel e gostaria de iniciar o planeamento de uma viagem exclusiva com a sua curadoria.");
+  const whatsappLink = `https://wa.me/5517996077150?text=${whatsappMessage}`;
+
   return (
-    <footer className="bg-slate-900 text-slate-300 py-16 border-t border-slate-800">
-      <div className="container px-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-          {/* Coluna 1: Sobre a Marca */}
-          <div className="md:col-span-1">
-            <h3 className="text-2xl font-bold text-white mb-6 font-serif">Dream Travel</h3>
-            <p className="text-slate-400 mb-6 leading-relaxed">
-              Transformando sonhos em experiências inesquecíveis. Nossa missão é desenhar roteiros exclusivos que conectam você à essência de cada destino.
+    <footer className="bg-background pt-24 pb-12 border-t border-border/20 relative overflow-hidden">
+      <div className="container px-4 md:px-8 max-w-7xl mx-auto">
+        
+        {/* SECÇÃO 1: O Convite VIP (Newsletter) */}
+        <div className="flex flex-col items-center text-center mb-24">
+          <div className="flex items-center gap-2 text-primary font-bold uppercase tracking-[0.4em] text-[10px] mb-6">
+            <Sparkles className="w-3 h-3" />
+            <span>O Círculo Restrito</span>
+          </div>
+          <h3 className="text-3xl md:text-5xl font-serif font-bold text-foreground mb-8">
+            Inspiração de alto padrão <br/>
+            <span className="italic font-light text-foreground/70">na sua caixa de entrada.</span>
+          </h3>
+          <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md">
+            <input 
+              type="email" 
+              placeholder="O seu melhor e-mail" 
+              className="flex-1 bg-transparent border-b border-foreground/20 px-4 py-3 text-foreground focus:outline-none focus:border-primary transition-colors placeholder:text-foreground/40 font-light"
+            />
+            <Button className="rounded-full h-12 px-8 bg-primary text-white font-bold uppercase tracking-widest text-[10px] hover:scale-105 transition-transform shadow-lg shadow-primary/20">
+              Descobrir
+            </Button>
+          </div>
+        </div>
+
+        {/* SECÇÃO 2: Navegação e Marca */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-8 mb-16">
+          
+          {/* Marca e Redes Sociais */}
+          <div className="col-span-1 md:col-span-2">
+            <Link href="/">
+              <a className="font-serif text-3xl font-bold tracking-tighter text-foreground block mb-6">
+                DREAM<span className="font-light italic opacity-70">TRAVEL</span>
+              </a>
+            </Link>
+            <p className="text-foreground/60 font-light max-w-sm mb-8 leading-relaxed">
+              Curadoria especializada em roteiros sob medida para viajantes que exigem o extraordinário. Sem pacotes prontos, apenas obras de arte globais.
             </p>
-            <div className="flex gap-4">
-              <a href="#" className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
-                <Instagram className="w-5 h-5" />
+            
+            {/* Redes Sociais */}
+            <div className="flex items-center gap-6 text-[10px] uppercase tracking-widest font-bold text-foreground/80">
+              <a href="https://www.instagram.com/dream_travelviagens/" target="_blank" rel="noreferrer" className="hover:text-primary transition-colors relative group">
+                Instagram
+                <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-primary transition-all group-hover:w-full" />
               </a>
-              <a href="#" className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
-                <Facebook className="w-5 h-5" />
-              </a>
-              <a href="#" className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
-                <Twitter className="w-5 h-5" />
+              <a href={whatsappLink} target="_blank" rel="noreferrer" className="hover:text-primary transition-colors relative group">
+                WhatsApp
+                <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-primary transition-all group-hover:w-full" />
               </a>
             </div>
           </div>
 
-          {/* Coluna 2: Links Rápidos */}
-          <div className="md:col-span-1">
-            <h3 className="text-xl font-bold text-white mb-6 font-serif">Links Rápidos</h3>
-            <ul className="space-y-4">
+          {/* Links de Navegação */}
+          <div>
+            <h4 className="font-bold text-foreground font-serif uppercase tracking-[0.2em] text-[11px] mb-6">Explorar</h4>
+            <ul className="space-y-4 text-sm font-light text-foreground/70">
               <li>
-                <Link href="/" className="hover:text-primary transition-colors">Início</Link>
+                <Link href="/">
+                  <a className="hover:text-primary transition-colors relative group inline-block">Início<span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-primary transition-all group-hover:w-full" /></a>
+                </Link>
               </li>
               <li>
-                <Link href="/destinos" className="hover:text-primary transition-colors">Destinos</Link>
+                <Link href="/destinos">
+                  <a className="hover:text-primary transition-colors relative group inline-block">Portfólio de Destinos<span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-primary transition-all group-hover:w-full" /></a>
+                </Link>
               </li>
               <li>
-                <Link href="/pacotes" className="hover:text-primary transition-colors">Pacotes Especiais</Link>
-              </li>
-              <li>
-                <Link href="/sobre" className="hover:text-primary transition-colors">Quem Somos</Link>
-              </li>
-              <li>
-                <Link href="/contato" className="hover:text-primary transition-colors">Contato</Link>
+                <Link href="/sobre">
+                  <a className="hover:text-primary transition-colors relative group inline-block">A Curadora<span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-primary transition-all group-hover:w-full" /></a>
+                </Link>
               </li>
             </ul>
           </div>
 
-          {/* Coluna 3: Contato Direto */}
-          <div className="md:col-span-1">
-             <h3 className="text-xl font-bold text-white mb-6 font-serif">Fale Conosco</h3>
-             <p className="text-slate-400 mb-6 leading-relaxed">
-               Pronto para planejar sua próxima viagem? Nossos consultores estão disponíveis.
-             </p>
-             <div className="space-y-4">
-               <a href="https://wa.me/5517996077150" target="_blank" rel="noreferrer" className="flex items-center gap-3 hover:text-primary transition-colors">
-                 <Phone className="w-5 h-5 text-primary" />
-                 <span>+55 17 99607-7150</span>
-               </a>
-               <a href="mailto:contato@dreamtravel.com.br" className="flex items-center gap-3 hover:text-primary transition-colors">
-                 <Mail className="w-5 h-5 text-primary" />
-                 <span>contato@dreamtravel.com.br</span>
-               </a>
-             </div>
+          {/* Contatos Rápido */}
+          <div>
+            <h4 className="font-bold text-foreground font-serif uppercase tracking-[0.2em] text-[11px] mb-6">Contato</h4>
+            <ul className="space-y-4 text-sm font-light text-foreground/70">
+              <li>+55 17 99607-7150</li>
+              <li className="pt-4">
+                <Button 
+                  variant="outline" 
+                  onClick={() => window.open(whatsappLink, '_blank')}
+                  className="rounded-full h-12 px-6 border-foreground/20 text-foreground hover:bg-foreground hover:text-background transition-all uppercase tracking-widest text-[9px] font-bold"
+                >
+                  Falar com Jackeline
+                </Button>
+              </li>
+            </ul>
           </div>
         </div>
 
-        <div className="mt-16 pt-8 border-t border-slate-800 text-center text-sm text-slate-500 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p>&copy; {new Date().getFullYear()} Dream Travel. Todos os direitos reservados.</p>
-          <div className="flex gap-4">
-            <Link href="/termos" className="hover:text-white transition-colors">Termos de Uso</Link>
-            <Link href="/privacidade" className="hover:text-white transition-colors">Política de Privacidade</Link>
+        {/* SECÇÃO 3: Assinatura Final (Direitos Autorais) */}
+        <div className="border-t border-border/20 pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-[9px] font-bold uppercase tracking-[0.2em] text-foreground/40">
+          <p>&copy; {currentYear} DREAM TRAVEL</p>
+          <div className="flex gap-6">
+            <a href="#" className="hover:text-primary transition-colors">Políticas de Privacidade</a>
+            <a href="#" className="hover:text-primary transition-colors">Termos de Serviço</a>
           </div>
         </div>
+
       </div>
     </footer>
   );

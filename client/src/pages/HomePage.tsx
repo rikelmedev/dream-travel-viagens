@@ -60,10 +60,10 @@ export default function HomePage() {
               animate={{ opacity: 1, y: 0 }}
               className="text-center max-w-4xl mb-12"
             >
-              <h1 className="text-5xl md:text-7xl lg:text-[7rem] font-bold font-serif text-white leading-[0.95] mb-8 drop-shadow-2xl">
-                Onde o Luxo <br />
-                <span className="italic font-light text-white/90">Encontra a Alma</span>
-              </h1>
+              <h1 className="text-5xl md:text-7xl lg:text-[8rem] font-bold font-serif text-white leading-[0.9] mb-8 drop-shadow-2xl tracking-tight">
+                O Mundo, <br />
+                <span className="italic font-light text-white/90">Desenhado Para Si.</span>
+                </h1>
             </motion.div>
 
             {/* FORMULÁRIO */}
