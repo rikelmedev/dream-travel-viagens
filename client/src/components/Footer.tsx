@@ -87,7 +87,6 @@ export default function Footer() {
           <div>
             <h4 className="font-bold text-foreground font-serif uppercase tracking-[0.2em] text-[11px] mb-6">Contato</h4>
             <ul className="space-y-4 text-sm font-light text-foreground/70">
-              <li>+55 17 99607-7150</li>
               <li className="pt-4">
                 <Button 
                   variant="outline" 

@@ -10,7 +10,7 @@ export default function AboutJackeline() {
       <div className="container px-4 md:px-8 max-w-7xl mx-auto">
         <div className="flex flex-col lg:flex-row gap-16 lg:gap-24 items-center">
           
-          {/* FOTO DA CURADORA*/}
+          {/* FOTO DA FUNDADORA*/}
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
@@ -20,7 +20,7 @@ export default function AboutJackeline() {
           >
             <div className="relative rounded-t-[10rem] rounded-b-[2rem] overflow-hidden border border-border/50 p-2 shadow-2xl bg-white/5">
               <img 
-                src="/images/jackeline.jpg" 
+                src="/images/jackeline-perfil.jpg" 
                 alt="Jackeline - Curadora Dream Travel" 
                 className="w-full h-[600px] object-cover rounded-t-[9.5rem] rounded-b-[1.5rem]"
               />

@@ -45,14 +45,10 @@ export default function HomePage() {
   return (
     <PageTransition>
       <Layout>
-        {/* SECÇÃO HERO */}
+        {/* SECÇÃO HERO  */}
         <section className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden">
           
-          <div className={`absolute inset-0 z-10 transition-opacity duration-1000 ${
-            isDayTime 
-              ? 'bg-gradient-to-b from-black/60 via-black/20 to-black/60' 
-              : 'bg-gradient-to-b from-slate-950/80 via-slate-950/50 to-slate-950/90'
-          }`} />
+          <div className="absolute inset-0 z-10 bg-gradient-to-b from-white/90 via-white/40 to-background" />
           
           <div className="container relative z-20 px-4 md:px-6 flex flex-col items-center pt-24">
             <motion.div
@@ -60,10 +56,16 @@ export default function HomePage() {
               animate={{ opacity: 1, y: 0 }}
               className="text-center max-w-4xl mb-12"
             >
-              <h1 className="text-5xl md:text-7xl lg:text-[8rem] font-bold font-serif text-white leading-[0.9] mb-8 drop-shadow-2xl tracking-tight">
+              <div className="flex items-center justify-center gap-2 text-primary font-bold uppercase tracking-[0.4em] text-[10px] mb-6">
+                <Sparkles className="w-3 h-3 text-primary" />
+                <span>Private Travel Concierge</span>
+                <Sparkles className="w-3 h-3 text-primary" />
+              </div>
+              
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold font-serif text-foreground leading-[1.1] mb-8 tracking-tight">
                 O Mundo, <br />
-                <span className="italic font-light text-white/90">Desenhado Para Si.</span>
-                </h1>
+                <span className="italic font-light text-foreground/70">Desenhado Para Si.</span>
+              </h1>
             </motion.div>
 
             {/* FORMULÁRIO */}
@@ -75,41 +77,41 @@ export default function HomePage() {
             >
               <form 
                 onSubmit={handleRequestItinerary} 
-                className="bg-black/30 backdrop-blur-2xl border border-white/20 rounded-[2.5rem] lg:rounded-full p-2 flex flex-col lg:flex-row items-center gap-2 lg:gap-0 shadow-[0_30px_60px_rgba(0,0,0,0.5)]"
+                className="bg-white/60 backdrop-blur-2xl border border-border/40 rounded-[2.5rem] lg:rounded-full p-2 flex flex-col lg:flex-row items-center gap-2 lg:gap-0 shadow-[0_20px_40px_rgba(0,0,0,0.05)]"
               >
                 
                 {/* Destino */}
-                <div className="flex-1 w-full flex items-center gap-4 px-6 py-4 hover:bg-white/10 rounded-[2rem] lg:rounded-full transition-colors cursor-text group">
-                  <MapPin size={18} className="text-white/60 hidden md:block" />
+                <div className="flex-1 w-full flex items-center gap-4 px-6 py-4 hover:bg-black/5 rounded-[2rem] lg:rounded-full transition-colors cursor-text group">
+                  <MapPin size={18} className="text-foreground/40 hidden md:block" />
                   <div className="flex-1">
-                    <label className="block text-[9px] font-bold text-white/60 uppercase tracking-[0.2em] mb-1">Destino</label>
-                    <input required type="text" placeholder="Para onde?" className="w-full bg-transparent outline-none text-white font-serif text-lg md:text-xl placeholder:text-white/40" onChange={(e) => setFormData({...formData, destino: e.target.value})} />
+                    <label className="block text-[9px] font-bold text-foreground/50 uppercase tracking-[0.2em] mb-1">Destino</label>
+                    <input required type="text" placeholder="Para onde?" className="w-full bg-transparent outline-none text-foreground font-serif text-lg md:text-xl placeholder:text-foreground/30" onChange={(e) => setFormData({...formData, destino: e.target.value})} />
                   </div>
                 </div>
 
-                <div className="hidden lg:block w-px h-10 bg-white/20" /> 
+                <div className="hidden lg:block w-px h-10 bg-border/40" />
 
-                {/* Bloco de Datas (Ida e Volta lado a lado) */}
+                {/* Bloco de Datas */}
                 <div className="w-full lg:w-auto flex flex-row items-center">
-                  <div className="flex-1 lg:w-32 px-6 py-4 hover:bg-white/10 rounded-[2rem] lg:rounded-full transition-colors cursor-text group border-r border-white/10 lg:border-none">
-                    <label className="block text-[9px] font-bold text-white/60 uppercase tracking-[0.2em] mb-1">Ida</label>
-                    <input required type="text" placeholder="DD/MM" className="w-full bg-transparent outline-none text-white font-serif text-lg md:text-xl placeholder:text-white/40" onChange={(e) => setFormData({...formData, saida: e.target.value})} />
+                  <div className="flex-1 lg:w-32 px-6 py-4 hover:bg-black/5 rounded-[2rem] lg:rounded-full transition-colors cursor-text group border-r border-border/20 lg:border-none">
+                    <label className="block text-[9px] font-bold text-foreground/50 uppercase tracking-[0.2em] mb-1">Ida</label>
+                    <input required type="text" placeholder="DD/MM" className="w-full bg-transparent outline-none text-foreground font-serif text-lg md:text-xl placeholder:text-foreground/30" onChange={(e) => setFormData({...formData, saida: e.target.value})} />
                   </div>
 
-                  <div className="hidden lg:block w-px h-10 bg-white/20" />
+                  <div className="hidden lg:block w-px h-10 bg-border/40" />
 
-                  <div className="flex-1 lg:w-32 px-6 py-4 hover:bg-white/10 rounded-[2rem] lg:rounded-full transition-colors cursor-text group">
-                    <label className="block text-[9px] font-bold text-white/60 uppercase tracking-[0.2em] mb-1">Volta</label>
-                    <input required type="text" placeholder="DD/MM" className="w-full bg-transparent outline-none text-white font-serif text-lg md:text-xl placeholder:text-white/40" onChange={(e) => setFormData({...formData, volta: e.target.value})} />
+                  <div className="flex-1 lg:w-32 px-6 py-4 hover:bg-black/5 rounded-[2rem] lg:rounded-full transition-colors cursor-text group">
+                    <label className="block text-[9px] font-bold text-foreground/50 uppercase tracking-[0.2em] mb-1">Volta</label>
+                    <input required type="text" placeholder="DD/MM" className="w-full bg-transparent outline-none text-foreground font-serif text-lg md:text-xl placeholder:text-foreground/30" onChange={(e) => setFormData({...formData, volta: e.target.value})} />
                   </div>
                 </div>
 
-                <div className="hidden lg:block w-px h-10 bg-white/20" />
+                <div className="hidden lg:block w-px h-10 bg-border/40" />
 
                 {/* Hóspedes */}
-                <div className="w-full lg:w-40 px-6 py-4 hover:bg-white/10 rounded-[2rem] lg:rounded-full transition-colors cursor-text group">
-                  <label className="block text-[9px] font-bold text-white/60 uppercase tracking-[0.2em] mb-1">Hóspedes</label>
-                  <input type="text" placeholder="Quantos?" className="w-full bg-transparent outline-none text-white font-serif text-lg md:text-xl placeholder:text-white/40" onChange={(e) => setFormData({...formData, hospedes: e.target.value})} />
+                <div className="w-full lg:w-40 px-6 py-4 hover:bg-black/5 rounded-[2rem] lg:rounded-full transition-colors cursor-text group">
+                  <label className="block text-[9px] font-bold text-foreground/50 uppercase tracking-[0.2em] mb-1">Hóspedes</label>
+                  <input type="text" placeholder="Quantos?" className="w-full bg-transparent outline-none text-foreground font-serif text-lg md:text-xl placeholder:text-foreground/30" onChange={(e) => setFormData({...formData, hospedes: e.target.value})} />
                 </div>
 
                 {/* Botão */}
@@ -125,7 +127,7 @@ export default function HomePage() {
 
           <img 
             src="/images/hero-luxury.jpg" 
-            className="absolute inset-0 w-full h-full object-cover z-0 transition-transform duration-[20s] scale-110 hover:scale-100"
+            className="absolute inset-0 w-full h-full object-cover z-0 transition-transform duration-[20s] scale-110 hover:scale-100 mix-blend-multiply opacity-80"
             alt="Fundo Imersivo Dream Travel"
           />
         </section>
