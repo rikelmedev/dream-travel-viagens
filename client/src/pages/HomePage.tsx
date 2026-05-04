@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, Search, Sparkles } from 'lucide-react';
+import { MapPin, Search, Sparkles, Calendar, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Layout from '@/components/Layout';
 import { setSEOHead } from '@/components/SEOHead';
@@ -9,11 +9,8 @@ import FeaturedDestinations from '@/components/FeaturedDestinations';
 import PageTransition from '@/components/PageTransition';
 import AboutJackeline from '@/components/AboutJackeline';
 import FormularioQuestionario from '@/components/FormularioQuestionario';
-import { useTheme } from '@/contexts/ThemeContext';
 
 export default function HomePage() {
-  const { isDayTime } = useTheme();
-
   const [formData, setFormData] = useState({
     destino: '',
     saida: '',
@@ -45,79 +42,79 @@ export default function HomePage() {
   return (
     <PageTransition>
       <Layout>
-        {/* SECÇÃO HERO  */}
-        <section className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden">
+        <section className="relative h-screen min-h-[700px] flex items-center justify-center overflow-hidden bg-black">
           
-          <div className="absolute inset-0 z-10 bg-gradient-to-b from-white/90 via-white/40 to-background" />
+          <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/60 via-transparent to-black/40" />
           
-          <div className="container relative z-20 px-4 md:px-6 flex flex-col items-center pt-24">
+          <div className="container relative z-20 px-4 md:px-6 flex flex-col items-center">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1 }}
               className="text-center max-w-4xl mb-12"
             >
-              <div className="flex items-center justify-center gap-2 text-primary font-bold uppercase tracking-[0.4em] text-[10px] mb-6">
-                <Sparkles className="w-3 h-3 text-primary" />
-                <span>Private Travel Concierge</span>
-                <Sparkles className="w-3 h-3 text-primary" />
+              <div className="flex items-center justify-center gap-3 text-[#C18D41] font-bold uppercase tracking-[0.5em] text-[10px] mb-6">
+                <div className="h-px w-8 bg-[#C18D41]/50" />
+                <span>Explore</span>
+                <div className="h-px w-8 bg-[#C18D41]/50" />
               </div>
               
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold font-serif text-foreground leading-[1.1] mb-8 tracking-tight">
+              <h1 className="text-6xl md:text-7xl lg:text-8xl font-serif text-white leading-[0.9] mb-8 drop-shadow-2xl">
                 O Mundo, <br />
-                <span className="italic font-light text-foreground/70">Desenhado Para Si.</span>
+                <span className="italic font-light text-[#C18D41]">Desenhado Para Si.</span>
               </h1>
+              <p className="text-white/70 text-lg md:text-xl font-light tracking-wide max-w-2xl mx-auto">
+                Curadoria de experiências extraordinárias para viajantes exigentes.
+              </p>
             </motion.div>
 
-            {/* FORMULÁRIO */}
+            {/* FORMULÁRIO  */}
             <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.4, duration: 0.8 }}
               className="w-full max-w-5xl"
             >
               <form 
                 onSubmit={handleRequestItinerary} 
-                className="bg-white/60 backdrop-blur-2xl border border-border/40 rounded-[2.5rem] lg:rounded-full p-2 flex flex-col lg:flex-row items-center gap-2 lg:gap-0 shadow-[0_20px_40px_rgba(0,0,0,0.05)]"
+                className="bg-black/30 backdrop-blur-xl border border-white/10 rounded-3xl lg:rounded-full p-3 flex flex-col lg:flex-row items-center gap-1 shadow-2xl"
               >
                 
                 {/* Destino */}
-                <div className="flex-1 w-full flex items-center gap-4 px-6 py-4 hover:bg-black/5 rounded-[2rem] lg:rounded-full transition-colors cursor-text group">
-                  <MapPin size={18} className="text-foreground/40 hidden md:block" />
+                <div className="flex-1 w-full flex items-center gap-4 px-8 py-4 hover:bg-white/5 rounded-2xl lg:rounded-full transition-all group">
+                  <MapPin size={20} className="text-[#C18D41]" />
                   <div className="flex-1">
-                    <label className="block text-[9px] font-bold text-foreground/50 uppercase tracking-[0.2em] mb-1">Destino</label>
-                    <input required type="text" placeholder="Para onde?" className="w-full bg-transparent outline-none text-foreground font-serif text-lg md:text-xl placeholder:text-foreground/30" onChange={(e) => setFormData({...formData, destino: e.target.value})} />
+                    <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest mb-1">Destino</label>
+                    <input required type="text" placeholder="Para onde?" className="w-full bg-transparent outline-none text-white font-serif text-lg placeholder:text-white/20" onChange={(e) => setFormData({...formData, destino: e.target.value})} />
                   </div>
                 </div>
 
-                <div className="hidden lg:block w-px h-10 bg-border/40" />
+                <div className="hidden lg:block w-px h-12 bg-white/10 mx-2" />
 
-                {/* Bloco de Datas */}
-                <div className="w-full lg:w-auto flex flex-row items-center">
-                  <div className="flex-1 lg:w-32 px-6 py-4 hover:bg-black/5 rounded-[2rem] lg:rounded-full transition-colors cursor-text group border-r border-border/20 lg:border-none">
-                    <label className="block text-[9px] font-bold text-foreground/50 uppercase tracking-[0.2em] mb-1">Ida</label>
-                    <input required type="text" placeholder="DD/MM" className="w-full bg-transparent outline-none text-foreground font-serif text-lg md:text-xl placeholder:text-foreground/30" onChange={(e) => setFormData({...formData, saida: e.target.value})} />
-                  </div>
-
-                  <div className="hidden lg:block w-px h-10 bg-border/40" />
-
-                  <div className="flex-1 lg:w-32 px-6 py-4 hover:bg-black/5 rounded-[2rem] lg:rounded-full transition-colors cursor-text group">
-                    <label className="block text-[9px] font-bold text-foreground/50 uppercase tracking-[0.2em] mb-1">Volta</label>
-                    <input required type="text" placeholder="DD/MM" className="w-full bg-transparent outline-none text-foreground font-serif text-lg md:text-xl placeholder:text-foreground/30" onChange={(e) => setFormData({...formData, volta: e.target.value})} />
+                {/* Ida */}
+                <div className="flex-1 w-full flex items-center gap-4 px-8 py-4 hover:bg-white/5 rounded-2xl lg:rounded-full transition-all group">
+                  <Calendar size={20} className="text-[#C18D41]" />
+                  <div className="flex-1">
+                    <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest mb-1">Check-in</label>
+                    <input required type="text" placeholder="Data" className="w-full bg-transparent outline-none text-white font-serif text-lg placeholder:text-white/20" onChange={(e) => setFormData({...formData, saida: e.target.value})} />
                   </div>
                 </div>
 
-                <div className="hidden lg:block w-px h-10 bg-border/40" />
+                <div className="hidden lg:block w-px h-12 bg-white/10 mx-2" />
 
                 {/* Hóspedes */}
-                <div className="w-full lg:w-40 px-6 py-4 hover:bg-black/5 rounded-[2rem] lg:rounded-full transition-colors cursor-text group">
-                  <label className="block text-[9px] font-bold text-foreground/50 uppercase tracking-[0.2em] mb-1">Hóspedes</label>
-                  <input type="text" placeholder="Quantos?" className="w-full bg-transparent outline-none text-foreground font-serif text-lg md:text-xl placeholder:text-foreground/30" onChange={(e) => setFormData({...formData, hospedes: e.target.value})} />
+                <div className="flex-1 w-full flex items-center gap-4 px-8 py-4 hover:bg-white/5 rounded-2xl lg:rounded-full transition-all group">
+                  <Users size={20} className="text-[#C18D41]" />
+                  <div className="flex-1">
+                    <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest mb-1">Viajantes</label>
+                    <input type="text" placeholder="Quantos?" className="w-full bg-transparent outline-none text-white font-serif text-lg placeholder:text-white/20" onChange={(e) => setFormData({...formData, hospedes: e.target.value})} />
+                  </div>
                 </div>
 
-                {/* Botão */}
-                <div className="w-full lg:w-auto mt-2 lg:mt-0 p-1">
-                   <Button type="submit" className="w-full lg:w-auto h-16 px-8 rounded-[2rem] lg:rounded-full bg-primary text-white hover:scale-105 transition-transform font-bold text-xs uppercase tracking-widest flex items-center justify-center shadow-lg shadow-primary/30">
-                     Solicitar
+                {/* Botão de Ação */}
+                <div className="w-full lg:w-auto p-1">
+                   <Button type="submit" className="w-full lg:w-auto h-16 px-10 rounded-2xl lg:rounded-full bg-[#C18D41] text-white hover:bg-[#A67632] hover:scale-105 transition-all font-bold text-xs uppercase tracking-[0.2em] flex items-center justify-center shadow-xl shadow-[#C18D41]/20 border border-white/10">
+                     Explorar
                      <Search className="ml-3 w-4 h-4" />
                    </Button>
                 </div>
@@ -127,8 +124,8 @@ export default function HomePage() {
 
           <img 
             src="/images/hero-luxury.jpg" 
-            className="absolute inset-0 w-full h-full object-cover z-0 transition-transform duration-[20s] scale-110 hover:scale-100 mix-blend-multiply opacity-80"
-            alt="Fundo Imersivo Dream Travel"
+            className="absolute inset-0 w-full h-full object-cover z-0 transition-transform duration-[30s] scale-110 hover:scale-105 brightness-110 contrast-110"
+            alt="Destino de Luxo Dream Travel"
           />
         </section>
 
