@@ -55,7 +55,7 @@ export default function HomePage() {
             >
               <div className="flex items-center justify-center gap-3 text-[#C18D41] font-bold uppercase tracking-[0.5em] text-[10px] mb-6">
                 <div className="h-px w-8 bg-[#C18D41]/50" />
-                <span>Explore</span>
+                <span>git addExplore</span>
                 <div className="h-px w-8 bg-[#C18D41]/50" />
               </div>
               
