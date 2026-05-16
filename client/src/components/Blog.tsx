@@ -1,16 +1,8 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calendar, Tag, ChevronRight } from 'lucide-react';
+import { Calendar, Tag, ChevronRight, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import CommentsSection from './CommentsSection';
-
-/**
- * Blog Component
- * Design: Minimalismo Contemporâneo
- * - Grid de posts com imagens
- * - Filtros por categoria
- * - Modal para ler post completo
- */
 
 export interface BlogPost {
   id: string;
@@ -38,8 +30,8 @@ const blogPosts: BlogPost[] = [
   },
   {
     id: '2',
-    title: '🎉 PROMOÇÃO: Viagens para Bali com 30% OFF',
-    excerpt: 'Aproveite nossa promoção especial de março! Pacotes para Bali com desconto imperdível.',
+    title: 'Crônica de Bali: Descontos Especiais de Março',
+    excerpt: 'Aproveite nossa curadoria especial de março Pacotes selecionados para Bali com benefícios exclusivos.',
     content: 'Estamos com uma promoção especial para Bali! Todos os pacotes de viagem para Bali estão com 30% de desconto até o final de março. Inclui: passagem aérea, hospedagem em resort 5 estrelas, tours e atividades. Não perca essa oportunidade! Entre em contato para mais detalhes.',
     category: 'promocao',
     image: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&h=400&fit=crop',
@@ -50,8 +42,8 @@ const blogPosts: BlogPost[] = [
   {
     id: '3',
     title: 'Bate e Volta: Gramado em 2 Dias Saindo de São Paulo',
-    excerpt: 'Perfeito para quem tem pouco tempo! Confira como aproveitar Gramado em apenas 2 dias.',
-    content: 'Gramado é perfeito para um bate e volta! Saindo de São Paulo, você chega em 6 horas. Dia 1: Canela, Cascata do Caracol e Parque Temático. Dia 2: Gramado, Rua Coberta, Chocolate Artesanal e Lago Negro. Dica: leve roupas quentes mesmo em dias quentes! Ótimo para descansar e renovar energias.',
+    excerpt: 'Perfeito para quem possui pouco tempo Confira como aproveitar o melhor de Gramado em um fim de semana imersivo.',
+    content: 'Gramado é perfeito para um bate e volta! Saindo de São Paulo, você chega em 6 hours. Dia 1: Canela, Cascata do Caracol e Parque Temático. Dia 2: Gramado, Rua Coberta, Chocolate Artesanal e Lago Negro. Dica: leve roupas quentes mesmo em dias quentes! Ótimo para descansar e renovar energias.',
     category: 'bate-volta',
     image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=400&fit=crop',
     date: '2026-03-18',
@@ -60,8 +52,8 @@ const blogPosts: BlogPost[] = [
   },
   {
     id: '4',
-    title: '💡 Dica: Como Economizar em Viagens Internacionais',
-    excerpt: 'Aprenda os melhores truques para economizar em suas viagens internacionais sem perder qualidade.',
+    title: 'Como Otimizar o Planejamento em Viagens Internacionais',
+    excerpt: 'Aprenda os melhores segredos para organizar as suas jornadas internacionais mantendo o máximo padrão de conforto.',
     content: 'Aqui estão meus melhores truques para economizar em viagens: 1) Voe em terça ou quarta (mais barato). 2) Reserve hospedagem com cancelamento grátis. 3) Use cartão de crédito com milhas. 4) Viaje na baixa temporada. 5) Procure pacotes all-inclusive. 6) Coma onde os locais comem. Com essas dicas, você economiza até 40% em viagens!',
     category: 'dica',
     image: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&h=400&fit=crop',
@@ -69,36 +61,14 @@ const blogPosts: BlogPost[] = [
     author: 'Jackeline',
     readTime: 6,
   },
-  {
-    id: '5',
-    title: 'Alpes Suíços: Esqui e Gastronomia em Harmonia',
-    excerpt: 'Combine a adrenalina do esqui com a culinária de classe mundial dos Alpes Suíços.',
-    content: 'Os Alpes Suíços oferecem muito mais que esqui! Além das pistas incríveis, você encontra: Fondue tradicional em Zermatt, Raclette em Verbier, Chocolate artesanal em Interlaken. Recomendo: Dia 1-2 Esqui em Verbier, Dia 3 Trem panorâmico Jungfraujoch, Dia 4 Fondue em Zermatt. Experiência gastronômica + adrenalina = perfeito!',
-    category: 'viagem',
-    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=400&fit=crop',
-    date: '2026-03-10',
-    author: 'Jackeline',
-    readTime: 5,
-  },
-  {
-    id: '6',
-    title: 'Promoção: Pacotes para o Carnaval com Entrada Inclusa',
-    excerpt: 'Aproveite nossos pacotes especiais para o Carnaval com entrada garantida nos melhores blocos.',
-    content: 'Temos pacotes especiais para o Carnaval! Inclui: hospedagem, entrada nos blocos mais famosos, transporte, seguro viagem. Destinos: Rio de Janeiro, Salvador, Recife. Aproveite enquanto há vagas! Contato: whatsapp ou email. Promoção válida até 31 de março.',
-    category: 'promocao',
-    image: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&h=400&fit=crop',
-    date: '2026-03-08',
-    author: 'Jackeline',
-    readTime: 3,
-  },
 ];
 
 const categories = [
-  { id: 'all', label: 'Todos', icon: '📰' },
-  { id: 'viagem', label: 'Viagens', icon: '✈️' },
-  { id: 'promocao', label: 'Promoções', icon: '🎉' },
-  { id: 'bate-volta', label: 'Bate e Volta', icon: '🚗' },
-  { id: 'dica', label: 'Dicas', icon: '💡' },
+  { id: 'all', label: 'Todos os Artigos' },
+  { id: 'viagem', label: 'Destinos' },
+  { id: 'promocao', label: 'Oportunidades' },
+  { id: 'bate-volta', label: 'Escapadas' },
+  { id: 'dica', label: 'Segredos de Viagem' },
 ];
 
 interface BlogProps {
@@ -120,134 +90,124 @@ export default function Blog({ onSelectPost }: BlogProps) {
       opacity: 1,
       transition: {
         staggerChildren: 0.1,
-        delayChildren: 0.2,
       },
     },
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
+    hidden: { opacity: 0, y: 30 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.6 },
+      transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] },
     },
   };
 
   return (
-    <section className="py-20 sm:py-32 bg-white">
-      <div className="container">
-        {/* Header */}
-        <motion.div
-          className="text-center mb-16"
-          variants={itemVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-100px' }}
-        >
-          <h2 className="mb-4">Blog da Jackeline 📝</h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Dicas de viagem, promoções exclusivas e histórias incríveis dos destinos que visitei
-          </p>
-        </motion.div>
+    <section className="py-24 bg-white" id="blog">
+      <div className="container px-6 lg:px-12">
+        
+        {/* Título da Seção */}
+        <div className="text-center mb-20">
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <div className="h-px w-8 bg-[#C18D41]/60" />
+            <span className="text-[#C18D41] text-xs uppercase tracking-[0.4em] font-bold">
+              Diário de Bordo
+            </span>
+            <div className="h-px w-8 bg-[#C18D41]/60" />
+          </div>
+          <h2 className="font-serif text-4xl md:text-6xl text-[#05070a] leading-tight">
+            Histórias e <span className="italic font-light text-[#C18D41]">Tendências Globais</span>
+          </h2>
+        </div>
 
-        {/* Category Filter */}
-        <motion.div
-          className="flex flex-wrap justify-center gap-3 mb-12"
-          variants={itemVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-100px' }}
-        >
+        {/* Filtros Editoriais de Categorias */}
+        <div className="flex flex-wrap justify-center gap-2 mb-16 border-b border-gray-100 pb-6">
           {categories.map((category) => (
-            <motion.button
+            <button
               key={category.id}
               onClick={() => setSelectedCategory(category.id)}
-              className={`px-6 py-2 rounded-full font-medium transition-all ${
+              className={`px-6 py-3 text-xs uppercase tracking-[0.2em] font-medium transition-all relative ${
                 selectedCategory === category.id
-                  ? 'bg-primary text-white'
-                  : 'bg-secondary/20 text-foreground hover:bg-secondary/40'
+                  ? 'text-[#C18D41]'
+                  : 'text-gray-400 hover:text-[#05070a]'
               }`}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
             >
-              {category.icon} {category.label}
-            </motion.button>
+              {category.label}
+              {selectedCategory === category.id && (
+                <motion.div
+                  layoutId="activeCategoryBorder"
+                  className="absolute bottom-0 left-4 right-4 h-[2px] bg-[#C18D41]"
+                  transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                />
+              )}
+            </button>
           ))}
-        </motion.div>
+        </div>
 
-        {/* Blog Grid */}
+        {/* Grid de Artigos */}
         <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: '-100px' }}
+          viewport={{ once: true, margin: '-50px' }}
         >
           <AnimatePresence mode="wait">
             {filteredPosts.map((post) => (
               <motion.div
                 key={post.id}
                 variants={itemVariants}
-                initial="hidden"
-                animate="visible"
-                exit="hidden"
-                className="group cursor-pointer"
+                className="group cursor-pointer flex flex-col h-full bg-white rounded-2xl overflow-hidden border border-gray-100/80 hover:border-gray-200 transition-all duration-500 hover:shadow-[0_20px_50px_rgba(5,7,10,0.04)]"
                 onClick={() => {
                   setSelectedPost(post);
                   onSelectPost?.(post);
                 }}
               >
-                <div className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 h-full flex flex-col">
-                  {/* Image */}
-                  <div className="relative h-48 overflow-hidden bg-gray-200">
-                    <img
-                      src={post.image}
-                      alt={post.title}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                {/* Imagem do Artigo */}
+                <div className="relative h-64 overflow-hidden bg-gray-50">
+                  <img
+                    src={post.image}
+                    alt={post.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                  
+                  <span className="absolute bottom-4 left-6 text-[10px] uppercase tracking-widest bg-white/90 backdrop-blur-md text-[#05070a] px-3 py-1.5 rounded-md font-bold shadow-sm">
+                    {categories.find((c) => c.id === post.category)?.label}
+                  </span>
+                </div>
 
-                    {/* Category Badge */}
-                    <div className="absolute top-4 right-4">
-                      <span className="bg-primary text-white px-3 py-1 rounded-full text-xs font-semibold">
-                        {categories.find((c) => c.id === post.category)?.icon}{' '}
-                        {categories.find((c) => c.id === post.category)?.label}
+                {/* Conteúdo do Card */}
+                <div className="p-8 flex-1 flex flex-col justify-between">
+                  <div>
+                    {/* Metadados */}
+                    <div className="flex items-center gap-4 text-[11px] uppercase tracking-widest text-gray-400 mb-4 font-medium">
+                      <span className="flex items-center gap-1.5">
+                        <Calendar className="w-3.5 h-3.5 text-[#C18D41]" />
+                        {new Date(post.date).toLocaleDateString('pt-PT')}
+                      </span>
+                      <span className="flex items-center gap-1.5">
+                        <Tag className="w-3.5 h-3.5 text-[#C18D41]" />
+                        {post.readTime} min leitura
                       </span>
                     </div>
-                  </div>
 
-                  {/* Content */}
-                  <div className="p-6 flex-1 flex flex-col">
-                    {/* Meta */}
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
-                      <div className="flex items-center gap-1">
-                        <Calendar className="w-4 h-4" />
-                        {new Date(post.date).toLocaleDateString('pt-BR')}
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Tag className="w-4 h-4" />
-                        {post.readTime} min
-                      </div>
-                    </div>
-
-                    {/* Title */}
-                    <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors">
+                    {/* Título do Artigo */}
+                    <h3 className="font-serif text-xl md:text-2xl text-[#05070a] mb-3 leading-snug group-hover:text-[#C18D41] transition-colors duration-300">
                       {post.title}
                     </h3>
 
-                    {/* Excerpt */}
-                    <p className="text-foreground/70 text-sm mb-4 flex-1">
+                    {/* Resumo */}
+                    <p className="text-gray-500 text-sm font-light tracking-wide leading-relaxed line-clamp-3 mb-6">
                       {post.excerpt}
                     </p>
+                  </div>
 
-                    {/* CTA */}
-                    <motion.div
-                      className="flex items-center gap-2 text-primary font-semibold text-sm"
-                      whileHover={{ x: 5 }}
-                    >
-                      Ler mais <ChevronRight className="w-4 h-4" />
-                    </motion.div>
+                  {/* Botão de Ação */}
+                  <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-[#C18D41] group-hover:text-[#A67632] transition-colors pt-4 border-t border-gray-50 mt-auto">
+                    Aprofundar Leitura 
+                    <ChevronRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform duration-300" />
                   </div>
                 </div>
               </motion.div>
@@ -255,94 +215,86 @@ export default function Blog({ onSelectPost }: BlogProps) {
           </AnimatePresence>
         </motion.div>
 
-        {/* Post Modal */}
         <AnimatePresence>
           {selectedPost && (
             <>
-              {/* Backdrop */}
+              {/* Plano de Fundo Escuro Translúcido */}
               <motion.div
-                className="fixed inset-0 bg-black/50 z-40"
+                className="fixed inset-0 bg-black/40 backdrop-blur-md z-40"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 onClick={() => setSelectedPost(null)}
               />
 
-              {/* Modal */}
-              <motion.div
-                className="fixed inset-0 z-50 flex items-center justify-center p-4"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                onClick={() => setSelectedPost(null)}
-              >
+              {/* Janela Central do Modal */}
+              <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                 <motion.div
-                  className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
-                  initial={{ scale: 0.9, opacity: 0 }}
+                  className="bg-white rounded-3xl shadow-2xl max-w-3xl w-full max-h-[85vh] overflow-y-auto border border-gray-100"
+                  initial={{ scale: 0.98, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
-                  exit={{ scale: 0.9, opacity: 0 }}
+                  exit={{ scale: 0.98, opacity: 0 }}
+                  transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
                   onClick={(e) => e.stopPropagation()}
                 >
-                  {/* Image */}
-                  <div className="relative h-64 overflow-hidden">
+                  {/* Capa com Botão de Fechar */}
+                  <div className="relative h-80 overflow-hidden bg-gray-50">
                     <img
                       src={selectedPost.image}
                       alt={selectedPost.title}
                       className="w-full h-full object-cover"
                     />
+                    <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-transparent" />
                     <button
                       onClick={() => setSelectedPost(null)}
-                      className="absolute top-4 right-4 bg-white/90 hover:bg-white rounded-full p-2 transition-all"
+                      className="absolute top-6 right-6 bg-black/20 hover:bg-black/40 text-white backdrop-blur-md rounded-full p-2.5 transition-all shadow-md"
                     >
-                      ✕
+                      <X className="w-5 h-5" />
                     </button>
                   </div>
 
-                  {/* Content */}
-                  <div className="p-8">
-                    {/* Meta */}
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
-                      <span>{new Date(selectedPost.date).toLocaleDateString('pt-BR')}</span>
-                      <span>•</span>
-                      <span>{selectedPost.readTime} min de leitura</span>
-                      <span>•</span>
+                  {/* Conteúdo Interno do Artigo */}
+                  <div className="p-8 md:p-12">
+                    <div className="flex flex-wrap items-center gap-4 text-xs uppercase tracking-widest text-gray-400 mb-4 font-medium">
+                      <span>{new Date(selectedPost.date).toLocaleDateString('pt-PT')}</span>
+                      <span className="w-1 h-1 bg-[#C18D41] rounded-full" />
+                      <span>{selectedPost.readTime} min de imersão</span>
+                      <span className="w-1 h-1 bg-[#C18D41] rounded-full" />
                       <span>Por {selectedPost.author}</span>
                     </div>
 
-                    {/* Title */}
-                    <h2 className="text-3xl font-bold text-foreground mb-6">
+                    <h2 className="font-serif text-3xl md:text-5xl text-[#05070a] mb-8 leading-tight">
                       {selectedPost.title}
                     </h2>
 
-                    {/* Content */}
-                    <div className="prose prose-sm max-w-none text-foreground/80 mb-8">
-                      <p className="whitespace-pre-wrap leading-relaxed">
-                        {selectedPost.content}
-                      </p>
+                    <div className="text-gray-600 font-light text-base tracking-wide leading-relaxed mb-10 whitespace-pre-wrap">
+                      {selectedPost.content}
                     </div>
 
-                    {/* Comments Section */}
-                    <CommentsSection
-                      postId={selectedPost.id}
-                      postTitle={selectedPost.title}
-                    />
+                    {/* Espaço de Comentários Integrado */}
+                    <div className="border-t border-gray-100 pt-8 mb-8">
+                      <CommentsSection
+                        postId={selectedPost.id}
+                        postTitle={selectedPost.title}
+                      />
+                    </div>
 
-                    {/* CTA */}
-                    <div className="flex gap-4 pt-6 border-t border-border mt-8">
+                    {/* Ações Inferiores */}
+                    <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-100">
                       <Button
                         variant="outline"
                         onClick={() => setSelectedPost(null)}
-                        className="flex-1"
+                        className="flex-1 rounded-xl h-12 uppercase tracking-widest text-xs font-bold border-gray-200 text-gray-500 hover:bg-gray-50"
                       >
-                        Fechar
+                        Retornar ao Diário
                       </Button>
-                      <Button className="flex-1 bg-primary hover:bg-primary/90">
-                        Falar com Jackeline ✈️
+                      <Button className="flex-1 rounded-xl h-12 uppercase tracking-widest text-xs font-bold bg-[#C18D41] text-white hover:bg-[#A67632] shadow-lg shadow-[#C18D41]/10">
+                        Desenhar Roteiro Conosco
                       </Button>
                     </div>
                   </div>
                 </motion.div>
-              </motion.div>
+              </div>
             </>
           )}
         </AnimatePresence>
