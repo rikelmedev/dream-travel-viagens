@@ -1,236 +1,147 @@
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { MapPin, Star, Filter } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useLocation } from 'wouter';
-import { setSEOHead } from '@/components/SEOHead';
-
-/**
- * DestinationsPage
- * Página de catálogo de destinos
- * Design: Minimalismo Contemporâneo
- */
-
-interface Destination {
-  id: string;
-  name: string;
-  country: string;
-  image: string;
-  category: 'praia' | 'montanha' | 'cidade' | 'aventura';
-  rating: number;
-  description: string;
-}
-
-const destinations: Destination[] = [
-  {
-    id: '1',
-    name: 'Maldivas',
-    country: 'Maldivas',
-    image: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&h=400&fit=crop',
-    category: 'praia',
-    rating: 4.9,
-    description: 'Paraíso tropical com praias de areia branca e águas cristalinas',
-  },
-  {
-    id: '2',
-    name: 'Bali',
-    country: 'Indonésia',
-    image: 'https://images.unsplash.com/photo-1537225228614-b4fad34a0b60?w=600&h=400&fit=crop',
-    category: 'praia',
-    rating: 4.8,
-    description: 'Ilha exótica com templos, praias e cultura vibrante',
-  },
-  {
-    id: '3',
-    name: 'Alpes Suíços',
-    country: 'Suíça',
-    image: 'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=600&h=400&fit=crop',
-    category: 'montanha',
-    rating: 4.7,
-    description: 'Montanhas majestosas, trilhas e paisagens de tirar o fôlego',
-  },
-  {
-    id: '4',
-    name: 'Paris',
-    country: 'França',
-    image: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&h=400&fit=crop',
-    category: 'cidade',
-    rating: 4.9,
-    description: 'A cidade do amor com museus, arte e gastronomia de classe mundial',
-  },
-  {
-    id: '5',
-    name: 'Patagônia',
-    country: 'Argentina',
-    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=400&fit=crop',
-    category: 'aventura',
-    rating: 4.8,
-    description: 'Paisagens selvagens, glaciares e trilhas de trekking épicas',
-  },
-  {
-    id: '6',
-    name: 'Tailândia',
-    country: 'Tailândia',
-    image: 'https://images.unsplash.com/photo-1552520514-5fefe8c9ef14?w=600&h=400&fit=crop',
-    category: 'praia',
-    rating: 4.7,
-    description: 'Praias paradisíacas, templos antigos e vida noturna vibrante',
-  },
-];
-
-const categories = [
-  { id: 'all', label: 'Todos' },
-  { id: 'praia', label: 'Praia' },
-  { id: 'montanha', label: 'Montanha' },
-  { id: 'cidade', label: 'Cidade' },
-  { id: 'aventura', label: 'Aventura' },
-];
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { MapPin, ArrowRight, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useLocation } from "wouter";
+import { setSEOHead } from "@/components/SEOHead";
 
 export default function DestinationsPage() {
   const [, setLocation] = useLocation();
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [destinations, setDestinations] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     setSEOHead({
-      title: 'Destinos de Viagem | Dream Travel',
-      description: 'Explore nossos destinos incriveis ao redor do mundo. Maldivas, Bali, Alpes Suicos, Paris e muito mais. Pacotes personalizados para cada tipo de viagem.',
-      image: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=1200&h=630&fit=crop',
-      url: 'https://dreamtravel.com.br/destinos',
+      title: "Destinos Exclusivos | Dream Travel",
+      description: "Explore o nosso portfolio de destinos globais com curadoria de alto padrao.",
     });
+
+    fetch("/api/destinations")
+      .then(res => res.json())
+      .then(data => {
+        setDestinations(data);
+        setIsLoading(false);
+      })
+      .catch(err => {
+        console.error(err);
+        setIsLoading(false);
+      });
   }, []);
 
+  const categories = [
+    { id: "all", label: "Colecao Completa" },
+    { id: "praia", label: "Refugios Costeiros" },
+    { id: "montanha", label: "Retiros Alpinos" },
+    { id: "cidade", label: "Imersao Urbana" },
+    { id: "aventura", label: "Jornadas Epicas" },
+  ];
+
   const filtered = destinations.filter(
-    (d) => selectedCategory === 'all' || d.category === selectedCategory
+    (d) => selectedCategory === "all" || d.category === selectedCategory || (d.category === undefined && selectedCategory === "all")
   );
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.4 },
-    },
-  };
-
   return (
-    <div className="min-h-screen bg-white">
-      {/* Header */}
-      <section className="bg-gradient-to-r from-primary/10 to-secondary/10 py-12 px-4">
-        <div className="container">
-          <h1 className="text-4xl font-bold text-foreground mb-2 font-serif">
-            Nossos Destinos
+    <div className="min-h-screen bg-[#FAF9F6]">
+      <section className="pt-40 pb-20 px-6 lg:px-12 border-b border-gray-200/50">
+        <div className="container max-w-7xl mx-auto">
+          <div className="flex items-center gap-4 mb-8">
+            <div className="h-px w-12 bg-[#C18D41]/50" />
+            <span className="text-[#C18D41] text-[10px] uppercase tracking-[0.5em] font-bold">
+              Portfolio Global
+            </span>
+          </div>
+          <h1 className="text-5xl md:text-7xl font-bold text-[#05070a] mb-6 font-serif leading-[1.1]">
+            Destinos <span className="italic font-light text-[#C18D41]">Singulares</span>
           </h1>
-          <p className="text-lg text-muted-foreground">
-            Explore os melhores destinos do mundo
+          <p className="text-xl text-gray-500 font-light max-w-2xl leading-relaxed">
+            Descubra os locais mais fascinantes do planeta sob a otica da alta curadoria.
           </p>
         </div>
       </section>
 
-      {/* Filters */}
-      <section className="py-8 px-4 border-b border-border">
-        <div className="container">
-          <div className="flex items-center gap-4 overflow-x-auto pb-4">
-            <Filter className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+      <section className="py-10 px-6 lg:px-12 sticky top-0 z-40 bg-[#FAF9F6]/90 backdrop-blur-xl border-b border-gray-200/50">
+        <div className="container max-w-7xl mx-auto">
+          <div className="flex items-center gap-8 overflow-x-auto pb-4 scrollbar-hide">
             {categories.map((cat) => (
               <button
                 key={cat.id}
                 onClick={() => setSelectedCategory(cat.id)}
-                className={`px-4 py-2 rounded-full font-medium transition-all flex-shrink-0 ${
-                  selectedCategory === cat.id
-                    ? 'bg-primary text-white'
-                    : 'bg-secondary/20 text-foreground hover:bg-secondary/40'
+                className={`text-[11px] uppercase tracking-[0.2em] font-bold transition-all whitespace-nowrap relative pb-2 ${
+                  selectedCategory === cat.id ? "text-[#C18D41]" : "text-gray-400 hover:text-[#05070a]"
                 }`}
               >
                 {cat.label}
+                {selectedCategory === cat.id && (
+                  <motion.div
+                    layoutId="activeFilter"
+                    className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#C18D41]"
+                  />
+                )}
               </button>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Grid */}
-      <section className="py-12 px-4">
-        <div className="container">
-          <motion.div
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            <AnimatePresence mode="wait">
-              {filtered.map((dest) => (
-                <motion.div
-                  key={dest.id}
-                  variants={itemVariants}
-                  className="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow cursor-pointer group"
-                  onClick={() => setLocation(`/destinos/${dest.id}`)}
-                >
-                  {/* Image */}
-                  <div className="relative overflow-hidden h-48">
-                    <img
-                      src={dest.image}
-                      alt={dest.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                    />
-                    <div className="absolute top-4 right-4 bg-white rounded-full px-3 py-1 flex items-center gap-1 shadow-lg">
-                      <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                      <span className="font-semibold text-foreground">{dest.rating}</span>
+      <section className="py-24 px-6 lg:px-12">
+        <div className="container max-w-7xl mx-auto">
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center py-32">
+              <Loader2 className="w-8 h-8 animate-spin text-[#C18D41] mb-6" />
+              <p className="font-serif text-2xl text-[#05070a] italic">Mapeando coordenados globais...</p>
+            </div>
+          ) : (
+            <motion.div
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+            >
+              <AnimatePresence mode="wait">
+                {filtered.map((dest) => (
+                  <motion.div
+                    key={dest.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ duration: 0.6 }}
+                    onClick={() => setLocation(`/destinos/${dest.id}`)}
+                    className="group cursor-pointer flex flex-col h-full bg-white rounded-[2rem] overflow-hidden border border-gray-100 hover:shadow-2xl transition-all duration-700"
+                  >
+                    <div className="relative h-80 overflow-hidden bg-gray-100">
+                      <img
+                        src={dest.image}
+                        alt={dest.title || dest.name}
+                        className="w-full h-full object-cover transition-transform duration-[10s] group-hover:scale-110"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#05070a]/80 via-transparent to-transparent opacity-60" />
+                      <div className="absolute bottom-6 left-6 flex items-center gap-2 text-[9px] font-bold uppercase tracking-[0.3em] text-white">
+                        <MapPin className="w-3 h-3 text-[#C18D41]" />
+                        {dest.location || dest.country || "Explorar"}
+                      </div>
                     </div>
-                  </div>
 
-                  {/* Content */}
-                  <div className="p-6">
-                    <div className="flex items-start justify-between mb-2">
-                      <h3 className="text-xl font-bold text-foreground font-serif">
-                        {dest.name}
+                    <div className="p-10 flex flex-col flex-1">
+                      <h3 className="text-3xl font-serif font-bold text-[#05070a] mb-4 group-hover:text-[#C18D41] transition-colors">
+                        {dest.title || dest.name}
                       </h3>
+                      <p className="text-sm font-light text-gray-500 leading-relaxed mb-8 flex-1 line-clamp-3">
+                        {dest.description || "Descubra uma experiencia exclusiva com a curadoria detalhada da nossa equipe especialista."}
+                      </p>
+                      
+                      <div className="flex items-center justify-between pt-6 border-t border-gray-100">
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-[#05070a]">
+                          Aprofundar
+                        </span>
+                        <ArrowRight className="w-4 h-4 text-[#C18D41] group-hover:translate-x-2 transition-transform" />
+                      </div>
                     </div>
-
-                    <div className="flex items-center gap-1 text-muted-foreground mb-3">
-                      <MapPin className="w-4 h-4" />
-                      <span className="text-sm">{dest.country}</span>
-                    </div>
-
-                    <p className="text-foreground/70 text-sm mb-4">
-                      {dest.description}
-                    </p>
-
-              <div className="space-y-2">
-                <Button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setLocation(`/destinos/${dest.id}`);
-                  }}
-                  className="w-full bg-secondary hover:bg-secondary/90 text-foreground"
-                >
-                  Ver Detalhes
-                </Button>
-                <Button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setLocation('/contato');
-                  }}
-                  className="w-full bg-primary hover:bg-primary/90 text-white"
-                >
-                  Montar Roteiro
-                </Button>
-              </div>
-                  </div>
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </motion.div>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </motion.div>
+          )}
         </div>
       </section>
     </div>
