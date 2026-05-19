@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
 import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import ThemeToggle from './ThemeToggle';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Navbar() {
@@ -66,7 +65,6 @@ export default function Navbar() {
           </div>
           
           <div className="flex items-center gap-6">
-            <ThemeToggle />
             <Button 
               onClick={() => window.open('https://wa.me/5517996077150', '_blank')}
               className="rounded-full h-12 px-8 text-[10px] font-bold uppercase tracking-widest bg-[#C18D41] text-white hover:bg-[#A67632] hover:scale-105 transition-all shadow-lg shadow-[#C18D41]/20 border border-white/10"
@@ -78,7 +76,6 @@ export default function Navbar() {
 
         {/* MOBILE ACTIONS */}
         <div className="lg:hidden flex items-center gap-5">
-          <ThemeToggle />
           <button 
             onClick={() => setIsOpen(!isOpen)}
             className="w-12 h-12 flex items-center justify-center rounded-full bg-white/5 text-white border border-white/10 hover:bg-white/10 transition-colors"
