@@ -52,7 +52,7 @@ export default function DestinationsPage() {
             </span>
           </div>
           <h1 className="text-5xl md:text-7xl font-bold text-[#05070a] mb-6 font-serif leading-[1.1]">
-            Destinos <span className="italic font-light text-[#C18D41]">Singulares</span>
+            Destinos <span className="italic font-light text-[#C18D41]"></span>
           </h1>
           <p className="text-xl text-gray-500 font-light max-w-2xl leading-relaxed">
             Descubra os locais mais fascinantes do planeta sob a otica da alta curadoria.
