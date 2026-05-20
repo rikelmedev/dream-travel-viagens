@@ -10,7 +10,7 @@ const FALLBACK_DATA: Record<string, any> = {
   maldivas: {
     title: "Atol de Baa",
     country: "Maldivas",
-    heroImage: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=1600&q=80",
+    heroImage: "/images/maldivas.jpg",
     description: "Um santuário de águas cristalinas e recifes de coral protegidos pela UNESCO. Onde o tempo para e o horizonte se funde com o oceano.",
     highlights: ["Resorts Private Island", "Jantares sob as estrelas", "Mergulho com Raias-Manta"],
     details: "O Atol de Baa oferece uma das experiências mais exclusivas do mundo. Com uma curadoria de resorts que definem o conceito de barefoot luxury, cada detalhe é desenhado para a sua desconexão total.",
@@ -20,12 +20,32 @@ const FALLBACK_DATA: Record<string, any> = {
   capri: {
     title: "Ilha de Capri",
     country: "Itália",
-    heroImage: "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=1600&q=80",
+    heroImage: "/images/capri.jpg",
     description: "O glamour eterno do Mediterrâneo. Entre rochedos dramáticos e vilas históricas, Capri é o destino de quem busca elegância e sofisticação à beira-mar.",
     highlights: ["Passeios de Riva Privados", "Visita à Gruta Azul", "Aperitivos na Piazzetta"],
     details: "Explore a costa Amalfitana a bordo de um iate privado e perca-se pelas ruelas perfumadas por limoeiros. Uma jornada onde a herança romana encontra a alta-sociedade moderna.",
     duration: "5 a 7 dias",
     season: "Maio a Setembro"
+  },
+  zermatt: {
+    title: "Zermatt",
+    country: "Suíça",
+    heroImage: "/images/zermatt.jpg", 
+    description: "Aos pés do Matterhorn, Zermatt redefine o luxo alpino. Um refúgio livre de carros, onde a neve é eterna e o serviço é impecável.",
+    highlights: ["Ski-in/Ski-out de Luxo", "Heliskiing Privado", "Gastronomia Michelin na Montanha"],
+    details: "Desfrute de spas de classe mundial com vista para os picos nevados e chalés que combinam rusticidade com tecnologia de ponta. O destino definitivo para os amantes do inverno.",
+    duration: "6 a 8 dias",
+    season: "Dezembro a Março"
+  },
+  kyoto: {
+    title: "Quioto",
+    country: "Japão",
+    heroImage: "/images/kyoto.jpg",
+    description: "O coração espiritual do Japão. Uma imersão profunda em tradições milenares, templos zen e o refinamento absoluto da hospitalidade Omotenashi.",
+    highlights: ["Cerimônia do Chá Privada", "Hospedagem em Ryokans de Elite", "Jantares Kaiseki"],
+    details: "Caminhe por jardins desenhados há séculos e viva experiências culturais restritas. Quioto não é apenas uma cidade, é uma lição sobre estética e paz interior.",
+    duration: "4 a 6 dias",
+    season: "Março (Sakura) ou Outubro"
   }
 };
 
