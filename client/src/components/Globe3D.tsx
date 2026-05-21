@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MapPin, ArrowRight, X, Loader2, Globe2, Compass } from 'lucide-react';
+import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
-import { useLocation } from 'wouter';
 import Globe from 'react-globe.gl';
 
 const ARC_DATA = [
@@ -17,7 +17,6 @@ export default function Globe3D() {
   const [activeLocation, setActiveLocation] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
-  const [, setLocation] = useLocation();
 
   useEffect(() => {
     const updateSize = () => {
@@ -28,6 +27,8 @@ export default function Globe3D() {
     };
     window.addEventListener('resize', updateSize);
     updateSize();
+    // Redundância para garantir o tamanho exato na montagem
+    setTimeout(updateSize, 100);
     return () => window.removeEventListener('resize', updateSize);
   }, []);
 
@@ -84,33 +85,26 @@ export default function Globe3D() {
             width={dimensions.width}
             height={dimensions.height}
             backgroundColor="rgba(0,0,0,0)"
-            
-            // Textura clara e elegante
             globeImageUrl="//unpkg.com/three-globe/example/img/earth-blue-marble.jpg" 
             bumpImageUrl="//unpkg.com/three-globe/example/img/earth-topology.png"
-            
             atmosphereColor="#C18D41"
             atmosphereAltitude={0.15}
-            
             arcsData={ARC_DATA}
             arcColor="color"
             arcDashLength={0.4}
             arcDashGap={4}
             arcDashAnimateTime={2000}
             arcStroke={0.5}
-            
             ringsData={activeLocation ? [{ lat: activeLocation.lat, lng: activeLocation.lng }] : []}
             ringColor={() => '#C18D41'}
             ringMaxRadius={5}
             ringPropagationSpeed={3}
-            
             onGlobeClick={({ lat, lng }) => fetchRealTimeLocationData(lat, lng)}
           />
         )}
       </div>
 
-      {/* Interface de Controle */}
-      <div className="absolute top-8 left-8 z-10 hidden md:block">
+      <div className="absolute top-8 left-8 z-10 hidden md:block pointer-events-none">
         <div className="backdrop-blur-xl bg-white/70 border border-gray-200/60 p-6 rounded-3xl shadow-sm">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-1.5 h-1.5 rounded-full animate-pulse bg-[#C18D41]" />
@@ -126,12 +120,11 @@ export default function Globe3D() {
         </div>
       </div>
 
-      <div className="absolute top-8 left-1/2 -translate-x-1/2 backdrop-blur-md bg-white/80 border border-gray-200/60 px-8 py-4 rounded-full flex items-center gap-3 z-10 shadow-sm">
+      <div className="absolute top-8 left-1/2 -translate-x-1/2 backdrop-blur-md bg-white/80 border border-gray-200/60 px-8 py-4 rounded-full flex items-center gap-3 z-10 shadow-sm pointer-events-none">
         <Compass className="w-4 h-4 text-[#C18D41] animate-pulse" />
-        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#05070a]">Explore o Globo</span>
+        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#05070a]">Toque num local do Globo</span>
       </div>
 
-      {/* Painel Lateral */}
       <AnimatePresence>
         {(activeLocation || isLoading) && (
           <motion.div
@@ -147,7 +140,7 @@ export default function Globe3D() {
               </div>
             ) : (
               <>
-                <div className="relative h-72">
+                <div className="relative h-72 shrink-0">
                   <img src={activeLocation.image} className="w-full h-full object-cover grayscale-[10%] contrast-[1.05]" alt="" />
                   <div className="absolute inset-0 bg-gradient-to-t from-white via-white/20 to-transparent" />
                   <button 
@@ -158,25 +151,34 @@ export default function Globe3D() {
                   </button>
                 </div>
                 
-                <div className="p-10 flex flex-col flex-1">
-                  <div className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-[0.3em] mb-4 text-[#C18D41]">
+                <div className="p-10 flex flex-col flex-1 overflow-hidden">
+                  <div className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-[0.3em] mb-4 text-[#C18D41] shrink-0">
                     <MapPin className="w-3 h-3" />
                     <span>{activeLocation.country}</span>
                   </div>
-                  <h3 className="text-4xl font-serif font-bold mb-4 leading-tight text-[#05070a]">
+                  <h3 className="text-4xl font-serif font-bold mb-4 leading-tight text-[#05070a] shrink-0">
                     {activeLocation.name}
                   </h3>
-                  <p className="text-sm font-light leading-relaxed mb-8 flex-1 text-gray-500">
-                    {activeLocation.description}
-                  </p>
                   
-                  <Button 
-                    onClick={() => setLocation('/contato')}
-                    className="w-full h-14 font-bold uppercase tracking-[0.2em] text-[10px] rounded-2xl transition-all duration-500 group bg-[#05070a] text-white hover:bg-[#C18D41] shadow-lg shadow-[#05070a]/10"
-                  >
-                    Desenhar Roteiro
-                    <ArrowRight className="ml-3 w-4 h-4 group-hover:translate-x-2 transition-transform" />
-                  </Button>
+                  {/* Container da descrição com scroll para evitar quebra em textos da Wikipedia longos */}
+                  <div className="flex-1 overflow-y-auto mb-8 pr-2 scrollbar-thin scrollbar-thumb-gray-200">
+                    <p className="text-sm font-light leading-relaxed text-gray-500">
+                      {activeLocation.description}
+                    </p>
+                  </div>
+                  
+                  <div className="shrink-0 mt-auto">
+                    <Link href="/contato">
+                      <a className="w-full block">
+                        <Button 
+                          className="w-full h-14 font-bold uppercase tracking-[0.2em] text-[10px] rounded-2xl transition-all duration-500 group bg-[#05070a] text-white hover:bg-[#C18D41] shadow-lg shadow-[#05070a]/10"
+                        >
+                          Desenhar Roteiro
+                          <ArrowRight className="ml-3 w-4 h-4 group-hover:translate-x-2 transition-transform" />
+                        </Button>
+                      </a>
+                    </Link>
+                  </div>
                 </div>
               </>
             )}
