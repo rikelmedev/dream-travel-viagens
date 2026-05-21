@@ -1,24 +1,20 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, Phone, MapPin, Send } from 'lucide-react';
+import { Mail, Phone, Send, Sparkles, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { setSEOHead } from '@/components/SEOHead';
-
-/**
- * ContactPage
- * Página de contato com formulário
- * Design: Minimalismo Contemporâneo
- */
+import Layout from '@/components/Layout';
+import PageTransition from '@/components/PageTransition';
 
 export default function ContactPage() {
   useEffect(() => {
     setSEOHead({
-      title: 'Contato | Dream Travel Viagens',
-      description: 'Entre em contato com a Dream Travel. Fale com nossos consultores e comece a planejar sua viagem dos sonhos. Suporte 24 horas.',
-      image: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1200&h=630&fit=crop',
+      title: 'Consultoria Privada | Dream Travel',
+      description: 'Inicie o diálogo com a nossa curadora e comece a desenhar a sua próxima jornada exclusiva.',
       url: 'https://dreamtravel.com.br/contato',
     });
+    window.scrollTo(0, 0);
   }, []);
 
   const [formData, setFormData] = useState({
@@ -34,16 +30,15 @@ export default function ContactPage() {
     e.preventDefault();
 
     if (!formData.name || !formData.email || !formData.message) {
-      toast.error('Por favor, preencha todos os campos obrigatórios');
+      toast.error('Por favor, preencha os campos essenciais para podermos prosseguir.');
       return;
     }
 
     setIsSubmitting(true);
 
-    // Simular envio
     setTimeout(() => {
       const whatsappNumber = '5517996077150';
-      const message = `Olá Jackeline! 👋\n\nNome: ${formData.name}\nEmail: ${formData.email}\nTelefone: ${formData.phone}\nAssunto: ${formData.subject}\n\nMensagem:\n${formData.message}`;
+      const message = `🌟 *Solicitação de Consultoria* 🌟\n\n*Nome:* ${formData.name}\n*Email:* ${formData.email}\n*Telefone:* ${formData.phone}\n*Destino/Assunto:* ${formData.subject}\n\n*Visão da Viagem:*\n${formData.message}`;
       const encodedMessage = encodeURIComponent(message);
       const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
 
@@ -51,266 +46,206 @@ export default function ContactPage() {
 
       setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
       setIsSubmitting(false);
-      toast.success('Redirecionando para WhatsApp! 📱');
-    }, 500);
-  };
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.4 },
-    },
+      toast.success('Redirecionando para o nosso Concierge VIP no WhatsApp.');
+    }, 800);
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Header */}
-      <section className="bg-gradient-to-r from-primary/10 to-secondary/10 py-12 px-4">
-        <div className="container">
-          <h1 className="text-4xl font-bold text-foreground mb-2 font-serif">
-            Entre em Contato
-          </h1>
-          <p className="text-lg text-muted-foreground">
-            Estamos aqui para ajudar a planejar sua próxima viagem
-          </p>
-        </div>
-      </section>
-
-      {/* Content */}
-      <section className="py-12 px-4">
-        <div className="container">
-          <motion.div
-            className="grid grid-cols-1 lg:grid-cols-3 gap-8"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            {/* Contact Info */}
-            <motion.div variants={itemVariants} className="space-y-6">
-              <h2 className="text-2xl font-bold text-foreground font-serif">
-                Informações de Contato
-              </h2>
-
-              {[
-                {
-                  icon: Phone,
-                  title: 'Telefone',
-                  value: '(17) 99607-7150',
-                  link: 'tel:+5517996077150',
-                },
-                {
-                  icon: Mail,
-                  title: 'Email',
-                  value: 'jackeline@dreamtravel.com.br',
-                  link: 'mailto:jackeline@dreamtravel.com.br',
-                },
-                {
-                  icon: MapPin,
-                  title: 'Localização',
-                  value: 'São Paulo, Brasil',
-                  link: null,
-                },
-              ].map((item, idx) => (
-                <motion.div
-                  key={idx}
-                  variants={itemVariants}
-                  className="flex gap-4"
-                >
-                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <item.icon className="w-6 h-6 text-primary" />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-foreground">{item.title}</p>
-                    {item.link ? (
-                      <a
-                        href={item.link}
-                        className="text-primary hover:underline"
-                      >
-                        {item.value}
-                      </a>
-                    ) : (
-                      <p className="text-muted-foreground">{item.value}</p>
-                    )}
-                  </div>
-                </motion.div>
-              ))}
-
-              {/* Social */}
-              <motion.div variants={itemVariants} className="pt-6 border-t border-border">
-                <p className="font-semibold text-foreground mb-4">Redes Sociais</p>
-                <div className="flex gap-4">
-                  {[
-                    { name: 'Instagram', url: '#' },
-                    { name: 'Facebook', url: '#' },
-                    { name: 'WhatsApp', url: 'https://wa.me/5517996077150' },
-                  ].map((social, idx) => (
-                    <a
-                      key={idx}
-                      href={social.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-colors"
-                    >
-                      {social.name[0]}
-                    </a>
-                  ))}
+    <PageTransition>
+      <Layout>
+        <div className="min-h-screen bg-[#FAF9F6] pb-24">
+          
+          {/* HERO SECTION */}
+          <section className="pt-40 pb-16 px-6 lg:px-12 text-center">
+            <div className="container max-w-4xl mx-auto">
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              >
+                <div className="flex items-center justify-center gap-4 mb-8">
+                  <div className="h-px w-12 bg-[#C18D41]/50" />
+                  <span className="text-[#C18D41] text-[10px] uppercase tracking-[0.5em] font-bold flex items-center gap-2">
+                    <Sparkles className="w-3 h-3" /> Atendimento Exclusivo
+                  </span>
+                  <div className="h-px w-12 bg-[#C18D41]/50" />
                 </div>
+                <h1 className="text-5xl md:text-7xl font-bold text-[#05070a] mb-6 font-serif leading-[1.1]">
+                  Inicie o seu <br />
+                  <span className="italic font-light text-[#C18D41]">Diálogo</span>
+                </h1>
+                <p className="text-xl text-gray-500 font-light max-w-2xl mx-auto leading-relaxed">
+                  Permita-nos conhecer a sua visão. A nossa equipa está pronta para transformar os seus desejos num roteiro milimetricamente orquestrado.
+                </p>
               </motion.div>
-            </motion.div>
+            </div>
+          </section>
 
-            {/* Form */}
-            <motion.form
-              onSubmit={handleSubmit}
-              className="lg:col-span-2 bg-secondary/5 rounded-lg p-8"
-              variants={itemVariants}
-            >
-              <h2 className="text-2xl font-bold text-foreground mb-6 font-serif">
-                Envie uma Mensagem
-              </h2>
+          {/* SPLIT CONTENT */}
+          <section className="py-12 px-6 lg:px-12">
+            <div className="container max-w-6xl mx-auto">
+              <div className="bg-white rounded-[3rem] border border-gray-100 shadow-2xl shadow-gray-200/40 overflow-hidden flex flex-col lg:flex-row">
+                
+                {/* INFO COLUMN  */}
+                <div className="lg:w-2/5 bg-[#05070a] p-12 md:p-16 text-white relative overflow-hidden flex flex-col justify-between">
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-[#C18D41]/10 blur-[80px] rounded-full pointer-events-none" />
+                  
+                  <div className="relative z-10 mb-16">
+                    <h3 className="text-3xl font-serif font-bold mb-6">Contactos <br/><span className="italic text-[#C18D41] font-light">Diretos</span></h3>
+                    <p className="text-white/60 font-light leading-relaxed mb-12">
+                      A nossa curadoria atua globalmente, acompanhando os nossos clientes em todos os fusos horários.
+                    </p>
 
-              <div className="space-y-4">
-                {/* Name */}
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
-                    Nome *
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, name: e.target.value })
-                    }
-                    placeholder="Seu nome"
-                    className="w-full px-4 py-2 rounded-lg border border-border bg-white text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                    disabled={isSubmitting}
-                  />
+                    <div className="space-y-8">
+                      <div className="group flex items-start gap-5">
+                        <div className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center shrink-0 group-hover:bg-[#C18D41]/20 group-hover:border-[#C18D41]/50 transition-colors">
+                          <Phone className="w-4 h-4 text-[#C18D41]" />
+                        </div>
+                        <div>
+                          <p className="text-[9px] uppercase tracking-widest text-white/40 font-bold mb-1">WhatsApp & Telefone</p>
+                          <a href="tel:+5517996077150" className="text-lg font-light hover:text-[#C18D41] transition-colors tracking-wide">
+                            +55 (17) 99607-7150
+                          </a>
+                        </div>
+                      </div>
+
+                      <div className="group flex items-start gap-5">
+                        <div className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center shrink-0 group-hover:bg-[#C18D41]/20 group-hover:border-[#C18D41]/50 transition-colors">
+                          <Mail className="w-4 h-4 text-[#C18D41]" />
+                        </div>
+                        <div>
+                          <p className="text-[9px] uppercase tracking-widest text-white/40 font-bold mb-1">E-mail Principal</p>
+                          <a href="mailto:jackeline@dreamtravel.com.br" className="text-lg font-light hover:text-[#C18D41] transition-colors tracking-wide">
+                            jackeline@dreamtravel.com.br
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="relative z-10 pt-12 border-t border-white/10">
+                    <p className="text-[9px] uppercase tracking-widest text-white/40 font-bold mb-6">Siga a nossa jornada</p>
+                    <div className="flex gap-4">
+                      {['Instagram', 'Facebook', 'LinkedIn'].map((social) => (
+                        <a 
+                          key={social} 
+                          href="#" 
+                          className="text-xs font-bold uppercase tracking-widest text-white hover:text-[#C18D41] transition-colors"
+                        >
+                          {social}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
                 </div>
 
-                {/* Email */}
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
-                    Email *
-                  </label>
-                  <input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) =>
-                      setFormData({ ...formData, email: e.target.value })
-                    }
-                    placeholder="seu@email.com"
-                    className="w-full px-4 py-2 rounded-lg border border-border bg-white text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                    disabled={isSubmitting}
-                  />
+                {/* FORM COLUMN */}
+                <div className="lg:w-3/5 p-12 md:p-16">
+                  <h2 className="text-2xl font-serif font-bold text-[#05070a] mb-10">
+                    Solicitar Consultoria
+                  </h2>
+
+                  <form onSubmit={handleSubmit} className="space-y-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      <div className="relative group">
+                        <input
+                          type="text"
+                          required
+                          value={formData.name}
+                          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                          className="w-full bg-transparent border-b border-gray-200 py-4 text-sm font-light text-[#05070a] focus:outline-none focus:border-[#C18D41] transition-colors peer placeholder-transparent"
+                          placeholder="Nome"
+                          id="name"
+                        />
+                        <label htmlFor="name" className="absolute left-0 top-4 text-sm font-light text-gray-400 transition-all peer-focus:-top-3 peer-focus:text-[10px] peer-focus:text-[#C18D41] peer-focus:font-bold peer-focus:uppercase peer-focus:tracking-widest peer-valid:-top-3 peer-valid:text-[10px] peer-valid:uppercase peer-valid:tracking-widest">
+                          O seu nome
+                        </label>
+                      </div>
+
+                      <div className="relative group">
+                        <input
+                          type="email"
+                          required
+                          value={formData.email}
+                          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                          className="w-full bg-transparent border-b border-gray-200 py-4 text-sm font-light text-[#05070a] focus:outline-none focus:border-[#C18D41] transition-colors peer placeholder-transparent"
+                          placeholder="Email"
+                          id="email"
+                        />
+                        <label htmlFor="email" className="absolute left-0 top-4 text-sm font-light text-gray-400 transition-all peer-focus:-top-3 peer-focus:text-[10px] peer-focus:text-[#C18D41] peer-focus:font-bold peer-focus:uppercase peer-focus:tracking-widest peer-valid:-top-3 peer-valid:text-[10px] peer-valid:uppercase peer-valid:tracking-widest">
+                          E-mail de contacto
+                        </label>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      <div className="relative group">
+                        <input
+                          type="tel"
+                          value={formData.phone}
+                          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                          className="w-full bg-transparent border-b border-gray-200 py-4 text-sm font-light text-[#05070a] focus:outline-none focus:border-[#C18D41] transition-colors peer placeholder-transparent"
+                          placeholder="Telefone"
+                          id="phone"
+                        />
+                        <label htmlFor="phone" className="absolute left-0 top-4 text-sm font-light text-gray-400 transition-all peer-focus:-top-3 peer-focus:text-[10px] peer-focus:text-[#C18D41] peer-focus:font-bold peer-focus:uppercase peer-focus:tracking-widest peer-valid:-top-3 peer-valid:text-[10px] peer-valid:uppercase peer-valid:tracking-widest">
+                          Telefone / WhatsApp
+                        </label>
+                      </div>
+
+                      <div className="relative group">
+                        <input
+                          type="text"
+                          value={formData.subject}
+                          onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                          className="w-full bg-transparent border-b border-gray-200 py-4 text-sm font-light text-[#05070a] focus:outline-none focus:border-[#C18D41] transition-colors peer placeholder-transparent"
+                          placeholder="Assunto"
+                          id="subject"
+                        />
+                        <label htmlFor="subject" className="absolute left-0 top-4 text-sm font-light text-gray-400 transition-all peer-focus:-top-3 peer-focus:text-[10px] peer-focus:text-[#C18D41] peer-focus:font-bold peer-focus:uppercase peer-focus:tracking-widest peer-valid:-top-3 peer-valid:text-[10px] peer-valid:uppercase peer-valid:tracking-widest">
+                          Destino em mente
+                        </label>
+                      </div>
+                    </div>
+
+                    <div className="relative group pt-4">
+                      <textarea
+                        required
+                        value={formData.message}
+                        onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                        className="w-full bg-transparent border-b border-gray-200 py-4 text-sm font-light text-[#05070a] focus:outline-none focus:border-[#C18D41] transition-colors peer placeholder-transparent resize-none h-32"
+                        placeholder="Mensagem"
+                        id="message"
+                      />
+                      <label htmlFor="message" className="absolute left-0 top-4 text-sm font-light text-gray-400 transition-all peer-focus:-top-6 peer-focus:text-[10px] peer-focus:text-[#C18D41] peer-focus:font-bold peer-focus:uppercase peer-focus:tracking-widest peer-valid:-top-6 peer-valid:text-[10px] peer-valid:uppercase peer-valid:tracking-widest">
+                        Partilhe a sua visão para esta viagem...
+                      </label>
+                    </div>
+
+                    <div className="pt-6">
+                      <Button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="w-full md:w-auto h-16 px-12 bg-[#05070a] hover:bg-[#C18D41] text-white rounded-2xl uppercase tracking-[0.2em] text-[10px] font-bold transition-all shadow-xl shadow-[#05070a]/10 flex items-center justify-center gap-3 group"
+                      >
+                        {isSubmitting ? (
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          <>
+                            Enviar Pedido <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </form>
                 </div>
 
-                {/* Phone */}
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
-                    Telefone
-                  </label>
-                  <input
-                    type="tel"
-                    value={formData.phone}
-                    onChange={(e) =>
-                      setFormData({ ...formData, phone: e.target.value })
-                    }
-                    placeholder="(11) 99999-9999"
-                    className="w-full px-4 py-2 rounded-lg border border-border bg-white text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                    disabled={isSubmitting}
-                  />
-                </div>
-
-                {/* Subject */}
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
-                    Assunto
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.subject}
-                    onChange={(e) =>
-                      setFormData({ ...formData, subject: e.target.value })
-                    }
-                    placeholder="Assunto da mensagem"
-                    className="w-full px-4 py-2 rounded-lg border border-border bg-white text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                    disabled={isSubmitting}
-                  />
-                </div>
-
-                {/* Message */}
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
-                    Mensagem *
-                  </label>
-                  <textarea
-                    value={formData.message}
-                    onChange={(e) =>
-                      setFormData({ ...formData, message: e.target.value })
-                    }
-                    placeholder="Escreva sua mensagem aqui..."
-                    rows={5}
-                    className="w-full px-4 py-2 rounded-lg border border-border bg-white text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none"
-                    disabled={isSubmitting}
-                  />
-                </div>
-
-                {/* Submit */}
-                <Button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full bg-primary hover:bg-primary/90 text-white flex items-center justify-center gap-2"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      Enviando...
-                    </>
-                  ) : (
-                    <>
-                      <Send className="w-4 h-4" />
-                      Enviar via WhatsApp
-                    </>
-                  )}
-                </Button>
               </div>
-            </motion.form>
-          </motion.div>
-        </div>
-      </section>
+            </div>
+          </section>
 
-      {/* Map Section */}
-      <section className="py-12 px-4 bg-secondary/5">
-        <div className="container">
-          <h2 className="text-2xl font-bold text-foreground mb-8 text-center font-serif">
-            Nos Encontre
-          </h2>
-          <div className="w-full h-96 bg-gray-200 rounded-lg overflow-hidden">
-            <iframe
-              width="100%"
-              height="100%"
-              frameBorder={0}
-              title="Dream Travel Location"
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3656.4382254511147!2d-46.6560521!3d-23.5505199!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94ce59c8da0aa0a1%3A0x6ff3e00d18250e4d!2sSão%20Paulo%2C%20SP!5e0!3m2!1spt-BR!2sbr!4v1234567890"
-              allowFullScreen={true}
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-            />
-          </div>
         </div>
-      </section>
-    </div>
+      </Layout>
+    </PageTransition>
   );
 }
