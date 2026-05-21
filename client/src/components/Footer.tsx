@@ -51,6 +51,7 @@ export default function Footer() {
         {/* SECÇÃO 2: Navegação e Marca */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-16 md:gap-8 mb-24">
           
+          {/* Marca e Descrição */}
           <motion.div 
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
