@@ -7,7 +7,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Lista de destinos exclusivos para alimentar o frontend
-const destinations = [
+let destinations = [
   {
     id: 1,
     title: "Atol de Baa",
