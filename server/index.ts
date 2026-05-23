@@ -50,12 +50,25 @@ async function startServer() {
   const app = express();
   const server = createServer(app);
 
-  // Ativando parser para requisições com dados em formato json
   app.use(express.json());
 
-  // Rota da API antes do gerenciador estático para interceptar os pedidos corretamente
+  // GET: Listar Destinos
   app.get("/api/destinations", (_req, res) => {
     res.json(destinations);
+  });
+
+  // POST: Adicionar Novo Destino (Ligação com o Painel Admin)
+  app.post("/api/destinations", (req, res) => {
+    const newDestination = { ...req.body, id: Date.now() };
+    destinations.push(newDestination);
+    res.status(201).json(newDestination);
+  });
+
+  // DELETE: Remover Destino
+  app.delete("/api/destinations/:id", (req, res) => {
+    const { id } = req.params;
+    destinations = destinations.filter(d => d.id !== parseInt(id));
+    res.status(204).send();
   });
 
   const staticPath =
