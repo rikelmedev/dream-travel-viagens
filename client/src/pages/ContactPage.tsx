@@ -126,7 +126,7 @@ export default function ContactPage() {
                   <div className="relative z-10 pt-12 border-t border-white/10">
                     <p className="text-[9px] uppercase tracking-widest text-white/40 font-bold mb-6">Siga a nossa jornada</p>
                     <div className="flex gap-4">
-                      {['Instagram', 'Facebook', 'LinkedIn'].map((social) => (
+                      {['Instagram', 'Facebook'].map((social) => (
                         <a 
                           key={social} 
                           href="#" 
