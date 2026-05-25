@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageCircle, Send, User } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/painel/button';
 import { toast } from 'sonner';
 
 /**

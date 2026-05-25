@@ -1,5 +1,5 @@
 import { Link } from 'wouter';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/painel/button';
 import { motion } from 'framer-motion';
 import { Lock } from 'lucide-react';
 

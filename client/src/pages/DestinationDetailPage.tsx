@@ -1,7 +1,7 @@
 import { useParams, useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { MapPin, Calendar, CheckCircle2, ArrowLeft, Sparkles, Plane, Info, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/painel/button";
 import Layout from "@/components/Layout";
 import PageTransition from "@/components/PageTransition";
 import { useEffect, useState } from "react";

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, Phone, Send, Sparkles, ArrowRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/painel/button';
 import { toast } from 'sonner';
 import { setSEOHead } from '@/components/SEOHead';
 import Layout from '@/components/Layout';

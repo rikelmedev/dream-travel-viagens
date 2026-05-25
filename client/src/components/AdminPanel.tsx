@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Map, BookOpen, Settings, LogOut, 
   Plus, Edit2, Trash2, TrendingUp, Eye, Key, MapPin, Search
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/painel/button';
 import { useLocation } from 'wouter';
 
 export default function AdminPanel() {
@@ -20,9 +20,26 @@ export default function AdminPanel() {
   ];
 
   const handleLogout = () => {
-    // Lógica de logout aqui
     setLocation('/');
   };
+
+  // Função para buscar dados do servidor
+const fetchData = async (endpoint: string) => {
+  try {
+    const response = await fetch(`/api/${endpoint}`);
+    return await response.json();
+  } catch (error) {
+    console.error(`Erro ao buscar ${endpoint}:`, error);
+    return [];
+  }
+};
+//Para a aba de destinos (que você chamou de 'packages' ou 'destinations')
+useEffect(() => {
+  if (activeTab === 'destinations') {
+    fetchData('destinations').then(data => {
+    });
+  }
+}, [activeTab]);
 
   return (
     <div className="flex h-screen bg-[#FAF9F6] font-sans selection:bg-[#C18D41]/20 overflow-hidden">

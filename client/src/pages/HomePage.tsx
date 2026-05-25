@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { MapPin, Search, Sparkles, Calendar, Users } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/painel/button';
 import Layout from '@/components/Layout';
 import { setSEOHead } from '@/components/SEOHead';
 import Globe3D from '@/components/Globe3D';

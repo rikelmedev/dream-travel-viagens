@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { motion } from 'framer-motion';
 import { Calendar, MapPin, ArrowLeft, Share2, Bookmark } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/painel/button';
 import Layout from '@/components/Layout';
 import { setSEOHead } from '@/components/SEOHead';
 import PageTransition from '@/components/PageTransition';

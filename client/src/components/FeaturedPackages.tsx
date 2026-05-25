@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { ArrowRight, MapPin } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/painel/button';
 import { useLocation } from 'wouter';
 
 const packages = [

@@ -5,7 +5,7 @@ import {
   MapPin, Clock, Calendar, MessageSquare, 
   ChevronDown, Sparkles, Loader2 
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/painel/button';
 
 export default function ClientDashboard() {
   const [expandedDay, setExpandedDay] = useState<number | null>(1);

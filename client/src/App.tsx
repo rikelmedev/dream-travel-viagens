@@ -1,5 +1,5 @@
-import { Toaster } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
+import { Toaster } from "@/components/painel/sonner";
+import { TooltipProvider } from "@/components/painel/tooltip";
 import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -22,7 +22,6 @@ import ClientDashboard from "./pages/ClientDashboard";
 function Router() {
   return (
     <Switch>
-      {/* Rotas Públicas */}
       <Route path="/" component={HomePage} />
       <Route path="/destinos" component={DestinationsPage} />
       <Route path="/destinos/:id" component={DestinationDetailPage} />
@@ -37,7 +36,6 @@ function Router() {
       <Route path="/viplogin" component={VipLogin} />
       <Route path="/dashboard" component={ClientDashboard} />
       
-      {/* Rota de Erro */}
       <Route component={NotFound} />
     </Switch>
   );

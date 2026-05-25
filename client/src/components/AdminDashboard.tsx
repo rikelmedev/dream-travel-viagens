@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Package, BookOpen, Image, Settings, LogOut, Plus, Edit2, Trash2, Save } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/painel/button';
 import { toast } from 'sonner';
 import ImageUpload from '@/components/ImageUpload';
 
@@ -75,7 +75,7 @@ export default function AdminDashboard() {
     setEditingPackage(newPackage);
   };
 
-  const handleSavePackage = () => {
+  const publicarJournal = () => {
     if (editingPackage) {
       setPackages(packages.map(p => p.id === editingPackage.id ? editingPackage : p));
       setEditingPackage(null);
@@ -257,7 +257,7 @@ export default function AdminDashboard() {
                     />
                     <div className="flex gap-2">
                       <Button
-                        onClick={handleSavePackage}
+                        onClick={publicarJournal}
                         className="bg-primary hover:bg-primary/90 text-white flex items-center gap-2"
                       >
                         <Save className="w-4 h-4" />

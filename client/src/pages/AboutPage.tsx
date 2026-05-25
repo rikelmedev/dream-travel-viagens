@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Compass, ShieldCheck, Gem, ArrowRight, Quote } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/painel/button';
 import { useLocation } from 'wouter';
 import { setSEOHead } from '@/components/SEOHead';
 import Layout from '@/components/Layout';

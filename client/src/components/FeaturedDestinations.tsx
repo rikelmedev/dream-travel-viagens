@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Star, ArrowRight, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/painel/button";
 
 const FeaturedDestinations = () => {
   const [destinations, setDestinations] = useState<any[]>([]);

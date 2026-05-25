@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MapPin, ArrowRight, X, Loader2, Globe2, Compass } from 'lucide-react';
 import { Link } from 'wouter';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/painel/button';
 import Globe from 'react-globe.gl';
 
 const ARC_DATA = [
