@@ -7,8 +7,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 let destinations = [
-  {
-    id: 1,
+  { id: 1,
     title: "Atol de Baa",
     location: "Maldivas",
     image: "/images/maldivas.jpg",
@@ -16,8 +15,8 @@ let destinations = [
     rating: 5.0,
     size: "large",
   },
-  {
-    id: 2,
+  
+  { id: 2,
     title: "Ilha de Capri",
     location: "Itália",
     image: "/images/capri.jpg",
@@ -25,8 +24,8 @@ let destinations = [
     rating: 4.9,
     size: "medium",
   },
-  {
-    id: 3,
+  
+  { id: 3,
     title: "Zermatt",
     location: "Suíça",
     image: "/images/zermatt.jpg",
@@ -34,8 +33,8 @@ let destinations = [
     rating: 4.8,
     size: "small",
   },
-  {
-    id: 4,
+  
+  { id: 4,
     title: "Quioto",
     location: "Japão",
     image: "/images/kyoto.jpg",
@@ -47,8 +46,6 @@ let destinations = [
 
 async function startServer() {
   const app = express();
-  const server = createServer(app);
-
   app.use(express.json());
 
   // GET: Listar Destinos
@@ -58,10 +55,10 @@ async function startServer() {
 
   // POST: Adicionar Novo Destino (Ligação com o Painel Admin)
   app.post("/api/destinations", (req, res) => {
-    const newDestination = { ...req.body, id: Date.now() };
-    destinations.push(newDestination);
-    res.status(201).json(newDestination);
-  });
+    const newDest = { ...req.body, id: Date.now() };
+    destinations.push(newDest);
+    res.status(201).json(newDest);
+  }); 
 
   // DELETE: Remover Destino
   app.delete("/api/destinations/:id", (req, res) => {
@@ -70,6 +67,7 @@ async function startServer() {
     res.status(204).send();
   });
 
+  
   const staticPath =
     process.env.NODE_ENV === "production"
       ? path.resolve(__dirname, "public")
