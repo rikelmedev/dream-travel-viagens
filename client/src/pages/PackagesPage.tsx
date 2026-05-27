@@ -5,10 +5,6 @@ import { Button } from '@/components/painel/button';
 import { useLocation } from 'wouter';
 import { setSEOHead } from '@/components/SEOHead';
 
- * PackagesPage
- * Página de pacotes de viagem pré-montados
- * Design: Minimalismo Contemporâneo
- */
 
 interface Package {
   id: string;
@@ -74,8 +70,9 @@ const categories = [
   { id: 'lua-de-mel', label: 'Lua de Mel' },
   { id: 'familia', label: 'Família' },
   { id: 'aventura', label: 'Aventura' },
-  { id: 'relaxo', label: 'Relaxo' },
+  { id: 'relaxo', label: 'R elaxo' },
 ];
+
 
 export default function PackagesPage() {
   const [, setLocation] = useLocation();
