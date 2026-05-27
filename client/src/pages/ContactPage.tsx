@@ -218,7 +218,7 @@ export default function ContactPage() {
                         id="message"
                       />
                       <label htmlFor="message" className="absolute left-0 top-4 text-sm font-light text-gray-400 transition-all peer-focus:-top-6 peer-focus:text-[10px] peer-focus:text-[#C18D41] peer-focus:font-bold peer-focus:uppercase peer-focus:tracking-widest peer-valid:-top-6 peer-valid:text-[10px] peer-valid:uppercase peer-valid:tracking-widest">
-                        Partilhe a sua visão para esta viagem...
+                        Compartilhe a sua visão para esta viagem...
                       </label>
                     </div>
 
