@@ -1,70 +1,51 @@
 import express from "express";
-import { createServer } from "http";
 import path from "path";
 import { fileURLToPath } from "url";
+import { eq } from "drizzle-orm";
+import { db } from "./db";
+import { destinations, insertDestinationSchema } from "./schema";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-let destinations = [
-  { id: 1,
-    title: "Atol de Baa",
-    location: "Maldivas",
-    image: "/images/maldivas.jpg",
-    price: "8.500",
-    rating: 5.0,
-    size: "large",
-  },
-  
-  { id: 2,
-    title: "Ilha de Capri",
-    location: "Itália",
-    image: "/images/capri.jpg",
-    price: "12.200",
-    rating: 4.9,
-    size: "medium",
-  },
-  
-  { id: 3,
-    title: "Zermatt",
-    location: "Suíça",
-    image: "/images/zermatt.jpg",
-    price: "9.800",
-    rating: 4.8,
-    size: "small",
-  },
-  
-  { id: 4,
-    title: "Quioto",
-    location: "Japão",
-    image: "/images/kyoto.jpg",
-    price: "7.400",
-    rating: 5.0,
-    size: "small",
-  },
-];
 
 async function startServer() {
   const app = express();
   app.use(express.json());
 
-  // GET: Listar Destinos
-  app.get("/api/destinations", (_req, res) => {
-    res.json(destinations);
+  app.get("/api/destinations", async (_req, res) => {
+    try {
+      const rows = await db.select().from(destinations);
+      res.json(rows);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Erro ao buscar destinos" });
+    }
   });
 
-  // POST: Adicionar Novo Destino (Ligação com o Painel Admin)
-  app.post("/api/destinations", (req, res) => {
-    const newDest = { ...req.body, id: Date.now() };
-    destinations.push(newDest);
-    res.status(201).json(newDest);
-  }); 
+  app.post("/api/destinations", async (req, res) => {
+    try {
+      const parsed = insertDestinationSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({ error: parsed.error.flatten() });
+      }
+      const [created] = await db.insert(destinations).values(parsed.data).returning();
+      res.status(201).json(created);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Erro ao criar destino" });
+    }
+  });
 
-  // DELETE: Remover Destino
-  app.delete("/api/destinations/:id", (req, res) => {
-    const { id } = req.params;
-    destinations = destinations.filter(d => d.id !== parseInt(id));
-    res.status(204).send();
+  app.delete("/api/destinations/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id, 10);
+      if (isNaN(id)) return res.status(400).json({ error: "ID inválido" });
+      await db.delete(destinations).where(eq(destinations.id, id));
+      res.status(204).send();
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Erro ao remover destino" });
+    }
   });
 
   
@@ -81,7 +62,7 @@ async function startServer() {
 
   const port = process.env.PORT || 3000;
 
-  server.listen(port, () => {
+  app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}/`);
   });
 }
