@@ -16,8 +16,15 @@ import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
 
 import Admin from "./pages/Admin";
+import AdminLogin from "./pages/AdminLogin";
 import VipLogin from "./pages/VipLogin";
 import ClientDashboard from "./pages/ClientDashboard";
+import { AdminAuthProvider, useAdminAuth } from "./contexts/AdminAuthContext";
+
+function ProtectedAdmin() {
+  const { isAdmin } = useAdminAuth();
+  return isAdmin ? <Admin /> : <AdminLogin />;
+}
 
 function Router() {
   return (
@@ -30,12 +37,12 @@ function Router() {
       <Route path="/pacotes" component={PackagesPage} />
       <Route path="/sobre" component={AboutPage} />
       <Route path="/contato" component={ContactPage} />
-      
-      {/* Rotas de Sistema & Área Reservada */}
-      <Route path="/admin" component={Admin} />
+
+      {/* Rotas de Sistema & Area Reservada */}
+      <Route path="/admin" component={ProtectedAdmin} />
       <Route path="/viplogin" component={VipLogin} />
       <Route path="/dashboard" component={ClientDashboard} />
-      
+
       <Route component={NotFound} />
     </Switch>
   );
@@ -44,13 +51,15 @@ function Router() {
 function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider defaultTheme="light">
-        <TooltipProvider>
-          <Toaster />
-          <Router />
-          <ScrollToTop />
-        </TooltipProvider>
-      </ThemeProvider>
+      <AdminAuthProvider>
+        <ThemeProvider defaultTheme="light">
+          <TooltipProvider>
+            <Toaster />
+            <Router />
+            <ScrollToTop />
+          </TooltipProvider>
+        </ThemeProvider>
+      </AdminAuthProvider>
     </ErrorBoundary>
   );
 }

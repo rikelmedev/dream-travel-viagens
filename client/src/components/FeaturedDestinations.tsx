@@ -11,7 +11,7 @@ const FeaturedDestinations = () => {
     fetch("/api/destinations")
       .then((res) => res.json())
       .then((data) => {
-        setDestinations(data);
+        setDestinations(Array.isArray(data) ? data : []);
         setLoading(false);
       })
       .catch((err) => {

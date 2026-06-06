@@ -3,11 +3,13 @@ import { Link, useLocation } from 'wouter';
 import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/painel/button';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAdminAuth } from '@/contexts/AdminAuthContext';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [location] = useLocation();
+  const { isAdmin } = useAdminAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -64,7 +66,14 @@ export default function Navbar() {
           </div>
           
           <div className="flex items-center gap-6 pl-4 border-l border-white/10">
-            <Button 
+            {isAdmin && (
+              <Link href="/admin">
+                <a className="text-[10px] uppercase tracking-[0.3em] font-bold text-[#C18D41] hover:text-[#A67632] transition-colors opacity-80 hover:opacity-100">
+                  Admin
+                </a>
+              </Link>
+            )}
+            <Button
               onClick={() => window.open('https://wa.me/5517996077150', '_blank')}
               className="rounded-full h-12 px-8 text-[10px] font-bold uppercase tracking-widest bg-[#C18D41] text-white hover:bg-[#A67632] hover:scale-105 transition-all shadow-lg shadow-[#C18D41]/20 border border-transparent"
             >

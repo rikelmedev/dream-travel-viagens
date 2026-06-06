@@ -4,7 +4,7 @@
   "type": "module",
   "license": "MIT",
   "scripts": {
-    "dev": "vite --host",
+    "dev": "concurrently \"vite --host\" \"tsx watch --env-file=.env server/index.ts\"",
     "build": "vite build",
     "start": "cross-env NODE_ENV=production node dist/index.js",
     "preview": "vite preview --host",
@@ -81,6 +81,7 @@
     "@vitejs/plugin-react": "^5.0.4",
     "add": "^2.0.6",
     "autoprefixer": "^10.4.20",
+    "concurrently": "^10.0.3",
     "cross-env": "^10.1.0",
     "drizzle-kit": "^0.31.10",
     "esbuild": "^0.25.0",
