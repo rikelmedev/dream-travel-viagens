@@ -5,6 +5,6 @@ export default defineConfig({
   schema: "./server/schema.ts",
   dialect: "postgresql",
   dbCredentials: {
-    url: "postgresql://postgres:Amoradoripandora@1@db.zcsmyqypwojcrhubqalf.supabase.co:5432/postgres",
+    url: "postgresql://postgres.zcsmyqypwojcrhubqalf:Amoradoripandora@aws-1-sa-east-1.pooler.supabase.com:6543/postgres",
   },
 });
