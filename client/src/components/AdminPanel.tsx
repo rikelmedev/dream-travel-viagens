@@ -1,324 +1,666 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard, Map, BookOpen, Settings,
-  Plus, Trash2, Key, Loader2, X
+  Plus, Trash2, Key, Loader2, X, Upload,
+  Globe, FileText, Users, ToggleLeft, ToggleRight,
+  LogOut, Eye, EyeOff, Copy, Check
 } from 'lucide-react';
 import { Button } from '@/components/painel/button';
 import { toast } from 'sonner';
+import { uploadImage } from '@/lib/supabase';
+import { useAdminAuth } from '@/contexts/AdminAuthContext';
+import { useLocation } from 'wouter';
+
+// ── Types ──────────────────────────────────────────────────────────────────
 
 interface Destination {
-  id: number;
-  title: string;
-  location: string;
-  image: string;
-  price: string;
-  rating: number;
-  size: string;
+  id: number; title: string; location: string;
+  image: string; price: string; rating: number; size: string;
+}
+interface Post {
+  id: number; title: string; slug: string; cover_image: string | null;
+  category: string | null; content: string; status: string | null;
+  created_at: string | null;
+}
+interface VipCode {
+  id: number; code: string; client_name: string;
+  notes: string | null; is_active: boolean | null; created_at: string | null;
+}
+interface Stats {
+  destinations: number; postsPublished: number;
+  postsDraft: number; vipActive: number; vipTotal: number;
 }
 
-const EMPTY_FORM = {
-  title: '',
-  location: '',
-  image: '',
-  price: '',
-  rating: 5.0,
-  size: 'medium',
-};
+// ── Helpers ────────────────────────────────────────────────────────────────
+
+function slugify(text: string) {
+  return text.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+}
+
+function generateCode(name: string) {
+  const base = name.trim().split(' ')[0].toUpperCase().replace(/[^A-Z]/g, '');
+  return `${base}${new Date().getFullYear()}`;
+}
+
+// ── Image Upload Button ────────────────────────────────────────────────────
+
+function ImageUploadField({
+  label, value, onChange, folder
+}: {
+  label: string;
+  value: string;
+  onChange: (url: string) => void;
+  folder: 'destinations' | 'blog';
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+
+  const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const url = await uploadImage(file, folder);
+      onChange(url);
+      toast.success('Imagem carregada com sucesso');
+    } catch (err: any) {
+      toast.error('Erro ao fazer upload: ' + err.message);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  return (
+    <div>
+      <label className="text-xs font-bold uppercase tracking-widest text-gray-400 block mb-2">{label}</label>
+      <div
+        onClick={() => inputRef.current?.click()}
+        className="w-full border-2 border-dashed border-gray-200 rounded-xl p-4 cursor-pointer hover:border-[#C18D41]/50 transition-colors group"
+      >
+        {value ? (
+          <div className="flex items-center gap-3">
+            <img src={value} alt="preview" className="w-16 h-12 object-cover rounded-lg" />
+            <span className="text-xs text-gray-500 truncate flex-1">{value.split('/').pop()}</span>
+            <span className="text-[10px] text-[#C18D41] font-bold uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">Alterar</span>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center py-3 gap-2">
+            {uploading
+              ? <Loader2 className="w-5 h-5 animate-spin text-[#C18D41]" />
+              : <Upload className="w-5 h-5 text-gray-300 group-hover:text-[#C18D41] transition-colors" />
+            }
+            <span className="text-xs text-gray-400">{uploading ? 'A carregar...' : 'Clique para selecionar imagem'}</span>
+          </div>
+        )}
+      </div>
+      <input ref={inputRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
+    </div>
+  );
+}
+
+// ── Main Component ─────────────────────────────────────────────────────────
 
 export default function AdminPanel() {
+  const { logout } = useAdminAuth();
+  const [, setLocation] = useLocation();
   const [activeTab, setActiveTab] = useState('dashboard');
+
+  const [stats, setStats] = useState<Stats | null>(null);
   const [destinations, setDestinations] = useState<Destination[]>([]);
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [vipCodes, setVipCodes] = useState<VipCode[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [showModal, setShowModal] = useState(false);
-  const [form, setForm] = useState(EMPTY_FORM);
+
+  // Modals
+  const [showDestModal, setShowDestModal] = useState(false);
+  const [showPostModal, setShowPostModal] = useState(false);
+  const [showVipModal, setShowVipModal] = useState(false);
+
+  // Forms
+  const DEST_EMPTY = { title: '', location: '', image: '', price: '', rating: 5.0, size: 'medium' };
+  const POST_EMPTY = { title: '', slug: '', cover_image: '', category: 'Viagem', content: '', status: 'draft' };
+  const VIP_EMPTY = { code: '', client_name: '', notes: '' };
+
+  const [destForm, setDestForm] = useState(DEST_EMPTY);
+  const [postForm, setPostForm] = useState(POST_EMPTY);
+  const [vipForm, setVipForm] = useState(VIP_EMPTY);
   const [saving, setSaving] = useState(false);
+  const [copied, setCopied] = useState<number | null>(null);
 
   const sidebarLinks = [
     { id: 'dashboard', label: 'Visao Geral', icon: LayoutDashboard },
-    { id: 'vip', label: 'Acessos VIP', icon: Key },
     { id: 'destinations', label: 'Catalogo', icon: Map },
-    { id: 'journal', label: 'Journal (Blog)', icon: BookOpen },
+    { id: 'blog', label: 'Blog', icon: BookOpen },
+    { id: 'vip', label: 'Acessos VIP', icon: Key },
     { id: 'settings', label: 'Configuracoes', icon: Settings },
   ];
 
-  const loadData = async () => {
+  // ── Loaders ──────────────────────────────────────────────────────────────
+
+  const loadStats = async () => {
+    const res = await fetch('/api/stats');
+    const data = await res.json();
+    setStats(data);
+  };
+
+  const loadDestinations = async () => {
     setIsLoading(true);
-    try {
-      const res = await fetch('/api/destinations');
-      const data = await res.json();
-      setDestinations(Array.isArray(data) ? data : []);
-    } catch {
-      toast.error('Erro ao conectar com servidor');
-    } finally {
-      setIsLoading(false);
-    }
+    const res = await fetch('/api/destinations');
+    setDestinations(Array.isArray(await res.json()) ? await (await fetch('/api/destinations')).json() : []);
+    setIsLoading(false);
   };
 
-  const removeDestination = async (id: number) => {
-    try {
-      await fetch(`/api/destinations/${id}`, { method: 'DELETE' });
-      setDestinations((prev) => prev.filter((d) => d.id !== id));
-      toast.success('Registo eliminado');
-    } catch {
-      toast.error('Falha ao eliminar');
-    }
+  const loadPosts = async () => {
+    setIsLoading(true);
+    const res = await fetch('/api/posts');
+    const data = await res.json();
+    setPosts(Array.isArray(data) ? data : []);
+    setIsLoading(false);
   };
 
-  const handleCreate = async (e: React.FormEvent) => {
+  const loadVipCodes = async () => {
+    setIsLoading(true);
+    const res = await fetch('/api/vip-codes');
+    const data = await res.json();
+    setVipCodes(Array.isArray(data) ? data : []);
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
+    if (activeTab === 'dashboard') loadStats();
+    if (activeTab === 'destinations') loadDestinations();
+    if (activeTab === 'blog') loadPosts();
+    if (activeTab === 'vip') loadVipCodes();
+  }, [activeTab]);
+
+  // ── Actions: Destinations ─────────────────────────────────────────────────
+
+  const createDestination = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
     try {
       const res = await fetch('/api/destinations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, rating: Number(form.rating) }),
+        body: JSON.stringify({ ...destForm, rating: Number(destForm.rating) }),
       });
-
-      if (!res.ok) {
-        const err = await res.json();
-        toast.error('Erro: ' + JSON.stringify(err.error));
-        return;
-      }
-
-      const created: Destination = await res.json();
-      setDestinations((prev) => [...prev, created]);
-      toast.success('Destino criado com sucesso');
-      setShowModal(false);
-      setForm(EMPTY_FORM);
-    } catch {
-      toast.error('Falha ao criar destino');
-    } finally {
-      setSaving(false);
-    }
+      if (!res.ok) { toast.error('Erro ao criar destino'); return; }
+      const created = await res.json();
+      setDestinations(prev => [...prev, created]);
+      toast.success('Destino criado');
+      setShowDestModal(false);
+      setDestForm(DEST_EMPTY);
+      loadStats();
+    } finally { setSaving(false); }
   };
 
-  useEffect(() => {
-    if (activeTab === 'destinations') loadData();
-  }, [activeTab]);
+  const deleteDestination = async (id: number) => {
+    await fetch(`/api/destinations/${id}`, { method: 'DELETE' });
+    setDestinations(prev => prev.filter(d => d.id !== id));
+    toast.success('Destino removido');
+    loadStats();
+  };
+
+  // ── Actions: Posts ────────────────────────────────────────────────────────
+
+  const createPost = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      const payload = { ...postForm, slug: postForm.slug || slugify(postForm.title) };
+      const res = await fetch('/api/posts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) { toast.error('Erro ao criar post'); return; }
+      const created = await res.json();
+      setPosts(prev => [...prev, created]);
+      toast.success('Post criado');
+      setShowPostModal(false);
+      setPostForm(POST_EMPTY);
+      loadStats();
+    } finally { setSaving(false); }
+  };
+
+  const togglePostStatus = async (post: Post) => {
+    const newStatus = post.status === 'published' ? 'draft' : 'published';
+    const res = await fetch(`/api/posts/${post.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: newStatus }),
+    });
+    const updated = await res.json();
+    setPosts(prev => prev.map(p => p.id === post.id ? updated : p));
+    toast.success(newStatus === 'published' ? 'Post publicado' : 'Movido para rascunho');
+    loadStats();
+  };
+
+  const deletePost = async (id: number) => {
+    await fetch(`/api/posts/${id}`, { method: 'DELETE' });
+    setPosts(prev => prev.filter(p => p.id !== id));
+    toast.success('Post removido');
+    loadStats();
+  };
+
+  // ── Actions: VIP ─────────────────────────────────────────────────────────
+
+  const createVipCode = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      const res = await fetch('/api/vip-codes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(vipForm),
+      });
+      if (!res.ok) { toast.error('Erro ao criar codigo'); return; }
+      const created = await res.json();
+      setVipCodes(prev => [...prev, created]);
+      toast.success('Codigo VIP criado');
+      setShowVipModal(false);
+      setVipForm(VIP_EMPTY);
+      loadStats();
+    } finally { setSaving(false); }
+  };
+
+  const toggleVipCode = async (id: number) => {
+    const res = await fetch(`/api/vip-codes/${id}/toggle`, { method: 'PATCH' });
+    const updated = await res.json();
+    setVipCodes(prev => prev.map(v => v.id === id ? updated : v));
+    toast.success(updated.is_active ? 'Codigo ativado' : 'Codigo desativado');
+    loadStats();
+  };
+
+  const deleteVipCode = async (id: number) => {
+    await fetch(`/api/vip-codes/${id}`, { method: 'DELETE' });
+    setVipCodes(prev => prev.filter(v => v.id !== id));
+    toast.success('Codigo removido');
+    loadStats();
+  };
+
+  const copyCode = (id: number, code: string) => {
+    navigator.clipboard.writeText(code);
+    setCopied(id);
+    setTimeout(() => setCopied(null), 2000);
+  };
+
+  const handleLogout = () => {
+    logout();
+    setLocation('/');
+  };
+
+  // ── Render ────────────────────────────────────────────────────────────────
 
   return (
-    <div className="flex h-screen bg-[#FAF9F6] font-sans selection:bg-[#C18D41]/20 overflow-hidden">
+    <div className="flex h-screen bg-[#FAF9F6] font-sans overflow-hidden">
 
       {/* Sidebar */}
-      <aside className="w-72 bg-[#05070a] border-r border-white/5 hidden md:flex flex-col relative overflow-hidden">
-        <div className="p-8 pb-4 relative z-10">
+      <aside className="w-72 bg-[#05070a] hidden md:flex flex-col">
+        <div className="p-8 flex-1">
           <div className="flex items-center gap-4 mb-12">
-            <div className="w-12 h-12 bg-[#C18D41] rounded-xl flex items-center justify-center text-white font-serif font-bold text-2xl shadow-lg shadow-[#C18D41]/20">
-              D
-            </div>
+            <div className="w-12 h-12 bg-[#C18D41] rounded-xl flex items-center justify-center text-white font-serif font-bold text-2xl shadow-lg shadow-[#C18D41]/20">D</div>
             <div>
               <h1 className="font-serif font-bold text-white text-xl">Dream Travel</h1>
-              <p className="text-[9px] text-[#C18D41] font-bold uppercase tracking-[0.3em] mt-2">Control Room</p>
+              <p className="text-[9px] text-[#C18D41] font-bold uppercase tracking-[0.3em] mt-1">Control Room</p>
             </div>
           </div>
-          <nav className="space-y-3">
-            {sidebarLinks.map((link) => {
-              const Icon = link.icon;
-              return (
-                <button
-                  key={link.id}
-                  onClick={() => setActiveTab(link.id)}
-                  className={`w-full flex items-center gap-4 px-5 py-4 rounded-2xl transition-all font-bold text-[10px] uppercase tracking-widest ${
-                    activeTab === link.id ? 'bg-white/10 text-white' : 'text-white/40 hover:text-white'
-                  }`}
-                >
-                  <Icon className="w-4 h-4" /> {link.label}
-                </button>
-              );
-            })}
+          <nav className="space-y-2">
+            {sidebarLinks.map(({ id, label, icon: Icon }) => (
+              <button key={id} onClick={() => setActiveTab(id)}
+                className={`w-full flex items-center gap-4 px-5 py-4 rounded-2xl transition-all font-bold text-[10px] uppercase tracking-widest ${activeTab === id ? 'bg-white/10 text-white' : 'text-white/40 hover:text-white hover:bg-white/5'}`}>
+                <Icon className="w-4 h-4" /> {label}
+              </button>
+            ))}
           </nav>
+        </div>
+        <div className="p-8 border-t border-white/5">
+          <button onClick={handleLogout}
+            className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl text-white/30 hover:text-white hover:bg-white/5 transition-all font-bold text-[10px] uppercase tracking-widest">
+            <LogOut className="w-4 h-4" /> Sair
+          </button>
         </div>
       </aside>
 
       {/* Main */}
       <main className="flex-1 overflow-y-auto">
-        <div className="max-w-6xl mx-auto p-16">
-          <header className="flex justify-between items-end mb-16">
+        <div className="max-w-6xl mx-auto p-10 lg:p-16">
+
+          {/* Header */}
+          <header className="flex justify-between items-end mb-12">
             <h2 className="text-4xl font-bold font-serif text-[#05070a]">
-              {sidebarLinks.find((l) => l.id === activeTab)?.label}
+              {sidebarLinks.find(l => l.id === activeTab)?.label}
             </h2>
             {activeTab === 'destinations' && (
-              <Button
-                onClick={() => setShowModal(true)}
-                className="bg-[#05070a] hover:bg-[#C18D41] text-white rounded-2xl px-6 h-12"
-              >
+              <Button onClick={() => setShowDestModal(true)} className="bg-[#05070a] hover:bg-[#C18D41] text-white rounded-2xl px-6 h-12">
                 <Plus className="w-4 h-4 mr-2" /> Novo Destino
+              </Button>
+            )}
+            {activeTab === 'blog' && (
+              <Button onClick={() => setShowPostModal(true)} className="bg-[#05070a] hover:bg-[#C18D41] text-white rounded-2xl px-6 h-12">
+                <Plus className="w-4 h-4 mr-2" /> Novo Post
+              </Button>
+            )}
+            {activeTab === 'vip' && (
+              <Button onClick={() => setShowVipModal(true)} className="bg-[#05070a] hover:bg-[#C18D41] text-white rounded-2xl px-6 h-12">
+                <Plus className="w-4 h-4 mr-2" /> Novo Acesso
               </Button>
             )}
           </header>
 
           <AnimatePresence mode="wait">
-            {activeTab === 'destinations' && (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                {isLoading ? (
-                  <div className="flex justify-center p-20">
-                    <Loader2 className="animate-spin w-8 h-8" />
-                  </div>
-                ) : destinations.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-24 text-gray-400 gap-4">
-                    <Map className="w-10 h-10 opacity-30" />
-                    <p className="text-sm font-medium">Nenhum destino cadastrado ainda.</p>
-                    <Button
-                      onClick={() => setShowModal(true)}
-                      variant="outline"
-                      className="mt-2 rounded-2xl"
-                    >
-                      <Plus className="w-4 h-4 mr-2" /> Adicionar primeiro destino
-                    </Button>
-                  </div>
+
+            {/* ── DASHBOARD ── */}
+            {activeTab === 'dashboard' && (
+              <motion.div key="dashboard" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                {!stats ? (
+                  <div className="flex justify-center p-20"><Loader2 className="animate-spin w-8 h-8 text-gray-300" /></div>
                 ) : (
-                  <table className="w-full bg-white rounded-2xl shadow-sm border border-gray-100">
-                    <thead>
-                      <tr className="border-b border-gray-100 text-xs text-gray-400 uppercase tracking-widest">
-                        <th className="p-6 text-left font-semibold">Destino</th>
-                        <th className="p-6 text-left font-semibold">Localizacao</th>
-                        <th className="p-6 text-left font-semibold">Preco</th>
-                        <th className="p-6 text-left font-semibold">Rating</th>
-                        <th className="p-6 text-left font-semibold">Tamanho</th>
-                        <th className="p-6" />
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {destinations.map((dest) => (
-                        <tr key={dest.id} className="border-b border-gray-50 last:border-0">
-                          <td className="p-6 font-bold text-[#05070a]">{dest.title}</td>
-                          <td className="p-6 text-gray-500">{dest.location}</td>
-                          <td className="p-6 text-gray-500">€ {dest.price}</td>
-                          <td className="p-6 text-gray-500">{dest.rating}</td>
-                          <td className="p-6 text-gray-500 capitalize">{dest.size}</td>
-                          <td className="p-6 text-right">
-                            <button
-                              onClick={() => removeDestination(dest.id)}
-                              className="text-red-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-lg transition-colors"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+                    {[
+                      { label: 'Destinos', value: stats.destinations, icon: Globe, color: 'text-blue-500', bg: 'bg-blue-50' },
+                      { label: 'Posts Publicados', value: stats.postsPublished, icon: Eye, color: 'text-green-500', bg: 'bg-green-50' },
+                      { label: 'Rascunhos', value: stats.postsDraft, icon: FileText, color: 'text-amber-500', bg: 'bg-amber-50' },
+                      { label: 'Acessos VIP Ativos', value: stats.vipActive, icon: Users, color: 'text-purple-500', bg: 'bg-purple-50' },
+                    ].map(({ label, value, icon: Icon, color, bg }) => (
+                      <div key={label} className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
+                        <div className={`w-12 h-12 ${bg} rounded-2xl flex items-center justify-center mb-5`}>
+                          <Icon className={`w-5 h-5 ${color}`} />
+                        </div>
+                        <p className="text-4xl font-serif font-bold text-[#05070a]">{value}</p>
+                        <p className="text-xs text-gray-400 font-semibold uppercase tracking-widest mt-2">{label}</p>
+                      </div>
+                    ))}
+                  </div>
                 )}
               </motion.div>
             )}
+
+            {/* ── CATALOGO ── */}
+            {activeTab === 'destinations' && (
+              <motion.div key="destinations" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                {isLoading ? (
+                  <div className="flex justify-center p-20"><Loader2 className="animate-spin w-8 h-8 text-gray-300" /></div>
+                ) : destinations.length === 0 ? (
+                  <EmptyState icon={Map} label="Nenhum destino cadastrado" onAdd={() => setShowDestModal(true)} />
+                ) : (
+                  <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-gray-100">
+                          <th className="p-6 text-left text-xs text-gray-400 font-bold uppercase tracking-widest">Destino</th>
+                          <th className="p-6 text-left text-xs text-gray-400 font-bold uppercase tracking-widest">Local</th>
+                          <th className="p-6 text-left text-xs text-gray-400 font-bold uppercase tracking-widest">Preco</th>
+                          <th className="p-6 text-left text-xs text-gray-400 font-bold uppercase tracking-widest">Rating</th>
+                          <th className="p-6" />
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {destinations.map(dest => (
+                          <tr key={dest.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors">
+                            <td className="p-6">
+                              <div className="flex items-center gap-4">
+                                <img src={dest.image} alt={dest.title} className="w-12 h-10 object-cover rounded-xl bg-gray-100" />
+                                <span className="font-bold text-[#05070a]">{dest.title}</span>
+                              </div>
+                            </td>
+                            <td className="p-6 text-gray-500 text-sm">{dest.location}</td>
+                            <td className="p-6 text-gray-500 text-sm">€ {dest.price}</td>
+                            <td className="p-6 text-gray-500 text-sm">{dest.rating}</td>
+                            <td className="p-6 text-right">
+                              <button onClick={() => deleteDestination(dest.id)} className="text-red-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-xl transition-colors">
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </motion.div>
+            )}
+
+            {/* ── BLOG ── */}
+            {activeTab === 'blog' && (
+              <motion.div key="blog" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                {isLoading ? (
+                  <div className="flex justify-center p-20"><Loader2 className="animate-spin w-8 h-8 text-gray-300" /></div>
+                ) : posts.length === 0 ? (
+                  <EmptyState icon={BookOpen} label="Nenhum post criado" onAdd={() => setShowPostModal(true)} />
+                ) : (
+                  <div className="space-y-3">
+                    {posts.map(post => (
+                      <div key={post.id} className="bg-white rounded-2xl border border-gray-100 p-6 flex items-center gap-5 hover:shadow-sm transition-shadow">
+                        {post.cover_image
+                          ? <img src={post.cover_image} alt={post.title} className="w-16 h-12 object-cover rounded-xl flex-shrink-0" />
+                          : <div className="w-16 h-12 bg-gray-100 rounded-xl flex-shrink-0 flex items-center justify-center"><BookOpen className="w-4 h-4 text-gray-300" /></div>
+                        }
+                        <div className="flex-1 min-w-0">
+                          <p className="font-bold text-[#05070a] truncate">{post.title}</p>
+                          <p className="text-xs text-gray-400 mt-1">{post.category} · {post.created_at ? new Date(post.created_at).toLocaleDateString('pt-BR') : ''}</p>
+                        </div>
+                        <div className="flex items-center gap-3 flex-shrink-0">
+                          <span className={`text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full ${post.status === 'published' ? 'bg-green-50 text-green-600' : 'bg-amber-50 text-amber-600'}`}>
+                            {post.status === 'published' ? 'Publicado' : 'Rascunho'}
+                          </span>
+                          <button onClick={() => togglePostStatus(post)} title={post.status === 'published' ? 'Mover para rascunho' : 'Publicar'}
+                            className="text-gray-400 hover:text-[#C18D41] p-2 rounded-xl hover:bg-[#C18D41]/10 transition-colors">
+                            {post.status === 'published' ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                          </button>
+                          <button onClick={() => deletePost(post.id)} className="text-red-400 hover:text-red-600 p-2 rounded-xl hover:bg-red-50 transition-colors">
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </motion.div>
+            )}
+
+            {/* ── VIP ── */}
+            {activeTab === 'vip' && (
+              <motion.div key="vip" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                {isLoading ? (
+                  <div className="flex justify-center p-20"><Loader2 className="animate-spin w-8 h-8 text-gray-300" /></div>
+                ) : vipCodes.length === 0 ? (
+                  <EmptyState icon={Key} label="Nenhum acesso VIP criado" onAdd={() => setShowVipModal(true)} />
+                ) : (
+                  <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-gray-100">
+                          <th className="p-6 text-left text-xs text-gray-400 font-bold uppercase tracking-widest">Cliente</th>
+                          <th className="p-6 text-left text-xs text-gray-400 font-bold uppercase tracking-widest">Codigo</th>
+                          <th className="p-6 text-left text-xs text-gray-400 font-bold uppercase tracking-widest">Notas</th>
+                          <th className="p-6 text-left text-xs text-gray-400 font-bold uppercase tracking-widest">Status</th>
+                          <th className="p-6" />
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {vipCodes.map(vip => (
+                          <tr key={vip.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors">
+                            <td className="p-6 font-bold text-[#05070a]">{vip.client_name}</td>
+                            <td className="p-6">
+                              <div className="flex items-center gap-2">
+                                <code className="bg-gray-100 text-[#05070a] font-mono text-sm px-3 py-1 rounded-lg">{vip.code}</code>
+                                <button onClick={() => copyCode(vip.id, vip.code)} className="text-gray-400 hover:text-[#C18D41] transition-colors p-1">
+                                  {copied === vip.id ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
+                                </button>
+                              </div>
+                            </td>
+                            <td className="p-6 text-gray-400 text-sm">{vip.notes || '—'}</td>
+                            <td className="p-6">
+                              <span className={`text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full ${vip.is_active ? 'bg-green-50 text-green-600' : 'bg-gray-100 text-gray-400'}`}>
+                                {vip.is_active ? 'Ativo' : 'Inativo'}
+                              </span>
+                            </td>
+                            <td className="p-6">
+                              <div className="flex items-center justify-end gap-2">
+                                <button onClick={() => toggleVipCode(vip.id)} title={vip.is_active ? 'Desativar' : 'Ativar'}
+                                  className="text-gray-400 hover:text-[#C18D41] p-2 rounded-xl hover:bg-[#C18D41]/10 transition-colors">
+                                  {vip.is_active ? <ToggleRight className="w-4 h-4" /> : <ToggleLeft className="w-4 h-4" />}
+                                </button>
+                                <button onClick={() => deleteVipCode(vip.id)} className="text-red-400 hover:text-red-600 p-2 rounded-xl hover:bg-red-50 transition-colors">
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </motion.div>
+            )}
+
           </AnimatePresence>
         </div>
       </main>
 
-      {/* Modal de criacao */}
-      <AnimatePresence>
-        {showModal && (
+      {/* ── Modal: Novo Destino ── */}
+      <Modal open={showDestModal} onClose={() => setShowDestModal(false)} title="Novo Destino">
+        <form onSubmit={createDestination} className="space-y-5">
+          <ImageUploadField label="Imagem do Destino" value={destForm.image} folder="destinations"
+            onChange={url => setDestForm(f => ({ ...f, image: url }))} />
+          <Field label="Titulo" required value={destForm.title} onChange={v => setDestForm(f => ({ ...f, title: v }))} placeholder="Ex: Atol de Baa" />
+          <Field label="Localizacao" required value={destForm.location} onChange={v => setDestForm(f => ({ ...f, location: v }))} placeholder="Ex: Maldivas" />
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="Preco (EUR)" required value={destForm.price} onChange={v => setDestForm(f => ({ ...f, price: v }))} placeholder="Ex: 8.500" />
+            <Field label="Rating" required type="number" value={String(destForm.rating)} onChange={v => setDestForm(f => ({ ...f, rating: parseFloat(v) }))} />
+          </div>
+          <div>
+            <label className="text-xs font-bold uppercase tracking-widest text-gray-400 block mb-2">Tamanho do Card</label>
+            <select value={destForm.size} onChange={e => setDestForm(f => ({ ...f, size: e.target.value }))}
+              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#C18D41]/40 bg-white">
+              <option value="small">Pequeno</option>
+              <option value="medium">Medio</option>
+              <option value="large">Grande</option>
+            </select>
+          </div>
+          <SubmitButton saving={saving} label="Criar Destino" />
+        </form>
+      </Modal>
+
+      {/* ── Modal: Novo Post ── */}
+      <Modal open={showPostModal} onClose={() => setShowPostModal(false)} title="Novo Post" wide>
+        <form onSubmit={createPost} className="space-y-5">
+          <ImageUploadField label="Imagem de Capa" value={postForm.cover_image} folder="blog"
+            onChange={url => setPostForm(f => ({ ...f, cover_image: url }))} />
+          <Field label="Titulo" required value={postForm.title}
+            onChange={v => setPostForm(f => ({ ...f, title: v, slug: slugify(v) }))} placeholder="Ex: 10 Razoes para Visitar as Maldivas" />
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="Categoria" value={postForm.category} onChange={v => setPostForm(f => ({ ...f, category: v }))} placeholder="Ex: Viagem, Dicas" />
+            <div>
+              <label className="text-xs font-bold uppercase tracking-widest text-gray-400 block mb-2">Status</label>
+              <select value={postForm.status} onChange={e => setPostForm(f => ({ ...f, status: e.target.value }))}
+                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#C18D41]/40 bg-white">
+                <option value="draft">Rascunho</option>
+                <option value="published">Publicado</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label className="text-xs font-bold uppercase tracking-widest text-gray-400 block mb-2">Conteudo</label>
+            <textarea required rows={8} value={postForm.content}
+              onChange={e => setPostForm(f => ({ ...f, content: e.target.value }))}
+              placeholder="Escreva o conteudo do post aqui..."
+              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#C18D41]/40 resize-none" />
+          </div>
+          <SubmitButton saving={saving} label="Criar Post" />
+        </form>
+      </Modal>
+
+      {/* ── Modal: Novo Acesso VIP ── */}
+      <Modal open={showVipModal} onClose={() => setShowVipModal(false)} title="Novo Acesso VIP">
+        <form onSubmit={createVipCode} className="space-y-5">
+          <Field label="Nome do Cliente" required value={vipForm.client_name}
+            onChange={v => setVipForm(f => ({ ...f, client_name: v, code: generateCode(v) }))}
+            placeholder="Ex: Joana Silva" />
+          <Field label="Codigo de Acesso" required value={vipForm.code}
+            onChange={v => setVipForm(f => ({ ...f, code: v.toUpperCase() }))}
+            placeholder="Ex: JOANA2026" />
+          <div>
+            <label className="text-xs font-bold uppercase tracking-widest text-gray-400 block mb-2">Notas (opcional)</label>
+            <textarea rows={3} value={vipForm.notes}
+              onChange={e => setVipForm(f => ({ ...f, notes: e.target.value }))}
+              placeholder="Ex: Pacote lua de mel, valido ate dezembro"
+              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#C18D41]/40 resize-none" />
+          </div>
+          <p className="text-xs text-gray-400 bg-gray-50 rounded-xl p-4">
+            O codigo e gerado automaticamente com base no nome. Voce pode editar antes de salvar.
+          </p>
+          <SubmitButton saving={saving} label="Criar Acesso VIP" />
+        </form>
+      </Modal>
+
+    </div>
+  );
+}
+
+// ── Shared Sub-components ──────────────────────────────────────────────────
+
+function Modal({ open, onClose, title, children, wide }: {
+  open: boolean; onClose: () => void; title: string; children: React.ReactNode; wide?: boolean;
+}) {
+  return (
+    <AnimatePresence>
+      {open && (
+        <motion.div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-6"
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          onClick={onClose}>
           <motion.div
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-6"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setShowModal(false)}
-          >
-            <motion.div
-              className="bg-white rounded-3xl shadow-2xl w-full max-w-lg p-10 relative"
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <button
-                onClick={() => setShowModal(false)}
-                className="absolute top-6 right-6 text-gray-400 hover:text-gray-700 transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-
-              <h3 className="font-serif text-2xl font-bold text-[#05070a] mb-8">Novo Destino</h3>
-
-              <form onSubmit={handleCreate} className="space-y-5">
-                <div>
-                  <label className="text-xs font-bold uppercase tracking-widest text-gray-400 block mb-2">Titulo</label>
-                  <input
-                    required
-                    value={form.title}
-                    onChange={(e) => setForm({ ...form, title: e.target.value })}
-                    placeholder="Ex: Atol de Baa"
-                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#C18D41]/40"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-xs font-bold uppercase tracking-widest text-gray-400 block mb-2">Localizacao</label>
-                  <input
-                    required
-                    value={form.location}
-                    onChange={(e) => setForm({ ...form, location: e.target.value })}
-                    placeholder="Ex: Maldivas"
-                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#C18D41]/40"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-xs font-bold uppercase tracking-widest text-gray-400 block mb-2">URL da Imagem</label>
-                  <input
-                    required
-                    value={form.image}
-                    onChange={(e) => setForm({ ...form, image: e.target.value })}
-                    placeholder="Ex: /images/maldivas.jpg"
-                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#C18D41]/40"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-xs font-bold uppercase tracking-widest text-gray-400 block mb-2">Preco (EUR)</label>
-                    <input
-                      required
-                      value={form.price}
-                      onChange={(e) => setForm({ ...form, price: e.target.value })}
-                      placeholder="Ex: 8.500"
-                      className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#C18D41]/40"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-xs font-bold uppercase tracking-widest text-gray-400 block mb-2">Rating</label>
-                    <input
-                      required
-                      type="number"
-                      min={1}
-                      max={5}
-                      step={0.1}
-                      value={form.rating}
-                      onChange={(e) => setForm({ ...form, rating: parseFloat(e.target.value) })}
-                      className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#C18D41]/40"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="text-xs font-bold uppercase tracking-widest text-gray-400 block mb-2">Tamanho do Card</label>
-                  <select
-                    value={form.size}
-                    onChange={(e) => setForm({ ...form, size: e.target.value })}
-                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#C18D41]/40 bg-white"
-                  >
-                    <option value="small">Pequeno</option>
-                    <option value="medium">Medio</option>
-                    <option value="large">Grande</option>
-                  </select>
-                </div>
-
-                <Button
-                  type="submit"
-                  disabled={saving}
-                  className="w-full bg-[#05070a] hover:bg-[#C18D41] text-white rounded-2xl h-12 mt-2 transition-colors"
-                >
-                  {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Plus className="w-4 h-4 mr-2" />}
-                  {saving ? 'A guardar...' : 'Criar Destino'}
-                </Button>
-              </form>
-            </motion.div>
+            className={`bg-white rounded-3xl shadow-2xl w-full ${wide ? 'max-w-2xl' : 'max-w-lg'} p-10 relative max-h-[90vh] overflow-y-auto`}
+            initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
+            onClick={e => e.stopPropagation()}>
+            <button onClick={onClose} className="absolute top-6 right-6 text-gray-400 hover:text-gray-700 transition-colors">
+              <X className="w-5 h-5" />
+            </button>
+            <h3 className="font-serif text-2xl font-bold text-[#05070a] mb-8">{title}</h3>
+            {children}
           </motion.div>
-        )}
-      </AnimatePresence>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+function Field({ label, value, onChange, placeholder, required, type }: {
+  label: string; value: string; onChange: (v: string) => void;
+  placeholder?: string; required?: boolean; type?: string;
+}) {
+  return (
+    <div>
+      <label className="text-xs font-bold uppercase tracking-widest text-gray-400 block mb-2">{label}</label>
+      <input type={type || 'text'} required={required} value={value}
+        onChange={e => onChange(e.target.value)} placeholder={placeholder}
+        className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#C18D41]/40" />
+    </div>
+  );
+}
+
+function SubmitButton({ saving, label }: { saving: boolean; label: string }) {
+  return (
+    <Button type="submit" disabled={saving}
+      className="w-full bg-[#05070a] hover:bg-[#C18D41] text-white rounded-2xl h-12 mt-2 transition-colors">
+      {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Plus className="w-4 h-4 mr-2" />}
+      {saving ? 'A guardar...' : label}
+    </Button>
+  );
+}
+
+function EmptyState({ icon: Icon, label, onAdd }: { icon: any; label: string; onAdd: () => void }) {
+  return (
+    <div className="flex flex-col items-center justify-center py-24 text-gray-400 gap-4">
+      <Icon className="w-10 h-10 opacity-20" />
+      <p className="text-sm font-medium">{label}</p>
+      <Button onClick={onAdd} variant="outline" className="mt-2 rounded-2xl">
+        <Plus className="w-4 h-4 mr-2" /> Adicionar
+      </Button>
     </div>
   );
 }
