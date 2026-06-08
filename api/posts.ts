@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { db } from '../server/db';
-import { posts, insertPostSchema } from '../server/schema';
+import { db } from './_lib/db';
+import { posts, insertPostSchema } from './_lib/schema';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'GET') {
