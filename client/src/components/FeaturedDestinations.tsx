@@ -97,7 +97,7 @@ const FeaturedDestinations = () => {
                     </div>
                     <div className="text-right">
                       <span className="text-[9px] uppercase tracking-widest text-white/50 block">A partir de</span>
-                      <span className="text-lg font-serif">€ {dest.price}</span>
+                      <span className="text-lg font-serif">R$ {dest.price}</span>
                     </div>
                   </div>
                 </div>

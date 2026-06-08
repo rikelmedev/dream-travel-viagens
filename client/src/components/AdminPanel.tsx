@@ -119,7 +119,7 @@ export default function AdminPanel() {
   const [showVipModal, setShowVipModal] = useState(false);
 
   // Forms
-  const DEST_EMPTY = { title: '', location: '', image: '', price: '', rating: 5.0, size: 'medium' };
+  const DEST_EMPTY = { title: '', location: '', description: '', image: '', price: '', rating: 5.0, category: 'praia', size: 'medium' };
   const POST_EMPTY = { title: '', slug: '', cover_image: '', category: 'Viagem', content: '', status: 'draft' };
   const VIP_EMPTY = { code: '', client_name: '', notes: '' };
 
@@ -523,24 +523,43 @@ export default function AdminPanel() {
       </main>
 
       {/* ── Modal: Novo Destino ── */}
-      <Modal open={showDestModal} onClose={() => setShowDestModal(false)} title="Novo Destino">
+      <Modal open={showDestModal} onClose={() => setShowDestModal(false)} title="Novo Destino" wide>
         <form onSubmit={createDestination} className="space-y-5">
-          <ImageUploadField label="Imagem do Destino" value={destForm.image} folder="destinations"
+          <ImageUploadField label="Foto do Destino" value={destForm.image} folder="destinations"
             onChange={url => setDestForm(f => ({ ...f, image: url }))} />
-          <Field label="Titulo" required value={destForm.title} onChange={v => setDestForm(f => ({ ...f, title: v }))} placeholder="Ex: Atol de Baa" />
-          <Field label="Localizacao" required value={destForm.location} onChange={v => setDestForm(f => ({ ...f, location: v }))} placeholder="Ex: Maldivas" />
+          <Field label="Nome do Destino" required value={destForm.title} onChange={v => setDestForm(f => ({ ...f, title: v }))} placeholder="Ex: Atol de Baa" />
           <div className="grid grid-cols-2 gap-4">
+            <Field label="Pais / Regiao" required value={destForm.location} onChange={v => setDestForm(f => ({ ...f, location: v }))} placeholder="Ex: Maldivas" />
             <Field label="Preco (R$)" required value={destForm.price} onChange={v => setDestForm(f => ({ ...f, price: v }))} placeholder="Ex: 8.500" />
-            <Field label="Rating" required type="number" value={String(destForm.rating)} onChange={v => setDestForm(f => ({ ...f, rating: parseFloat(v) }))} />
           </div>
           <div>
-            <label className="text-xs font-bold uppercase tracking-widest text-gray-400 block mb-2">Tamanho do Card</label>
-            <select value={destForm.size} onChange={e => setDestForm(f => ({ ...f, size: e.target.value }))}
-              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#C18D41]/40">
-              <option value="small">Pequeno</option>
-              <option value="medium">Medio</option>
-              <option value="large">Grande</option>
-            </select>
+            <label className="text-xs font-bold uppercase tracking-widest text-gray-400 block mb-2">Descricao Curta</label>
+            <textarea rows={3} value={destForm.description}
+              onChange={e => setDestForm(f => ({ ...f, description: e.target.value }))}
+              placeholder="Ex: Paraiso isolado no Oceano Indico, com lagoas cristalinas e recifes de coral intocados."
+              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 bg-white placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#C18D41]/40 resize-none" />
+          </div>
+          <div className="grid grid-cols-3 gap-4">
+            <Field label="Rating (1-5)" required type="number" value={String(destForm.rating)} onChange={v => setDestForm(f => ({ ...f, rating: parseFloat(v) }))} placeholder="Ex: 4.9" />
+            <div>
+              <label className="text-xs font-bold uppercase tracking-widest text-gray-400 block mb-2">Categoria</label>
+              <select value={destForm.category} onChange={e => setDestForm(f => ({ ...f, category: e.target.value }))}
+                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#C18D41]/40">
+                <option value="praia">Refugios Costeiros</option>
+                <option value="montanha">Retiros Alpinos</option>
+                <option value="cidade">Imersao Urbana</option>
+                <option value="aventura">Jornadas Epicas</option>
+              </select>
+            </div>
+            <div>
+              <label className="text-xs font-bold uppercase tracking-widest text-gray-400 block mb-2">Tamanho do Card</label>
+              <select value={destForm.size} onChange={e => setDestForm(f => ({ ...f, size: e.target.value }))}
+                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#C18D41]/40">
+                <option value="small">Pequeno (1x1)</option>
+                <option value="medium">Medio (2x1)</option>
+                <option value="large">Grande (2x2)</option>
+              </select>
+            </div>
           </div>
           <SubmitButton saving={saving} label="Criar Destino" />
         </form>

@@ -6,9 +6,11 @@ export const destinations = pgTable("destinations", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
   location: text("location").notNull(),
+  description: text("description"),
   image: text("image").notNull(),
   price: text("price").notNull(),
   rating: real("rating").notNull(),
+  category: text("category").default("praia"),
   size: text("size").default("medium"),
 });
 
