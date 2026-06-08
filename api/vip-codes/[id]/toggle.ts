@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { eq } from 'drizzle-orm';
-import { db } from '../../_lib/db';
-import { vipCodes } from '../../_lib/schema';
+import { db } from '../../_lib/db.js';
+import { vipCodes } from '../../_lib/schema.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'PATCH') return res.status(405).json({ error: 'Metodo nao permitido' });
