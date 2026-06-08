@@ -407,7 +407,7 @@ export default function AdminPanel() {
                               </div>
                             </td>
                             <td className="p-6 text-gray-500 text-sm">{dest.location}</td>
-                            <td className="p-6 text-gray-500 text-sm">€ {dest.price}</td>
+                            <td className="p-6 text-gray-500 text-sm">R$ {dest.price}</td>
                             <td className="p-6 text-gray-500 text-sm">{dest.rating}</td>
                             <td className="p-6 text-right">
                               <button onClick={() => deleteDestination(dest.id)} className="text-red-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-xl transition-colors">
@@ -530,13 +530,13 @@ export default function AdminPanel() {
           <Field label="Titulo" required value={destForm.title} onChange={v => setDestForm(f => ({ ...f, title: v }))} placeholder="Ex: Atol de Baa" />
           <Field label="Localizacao" required value={destForm.location} onChange={v => setDestForm(f => ({ ...f, location: v }))} placeholder="Ex: Maldivas" />
           <div className="grid grid-cols-2 gap-4">
-            <Field label="Preco (EUR)" required value={destForm.price} onChange={v => setDestForm(f => ({ ...f, price: v }))} placeholder="Ex: 8.500" />
+            <Field label="Preco (R$)" required value={destForm.price} onChange={v => setDestForm(f => ({ ...f, price: v }))} placeholder="Ex: 8.500" />
             <Field label="Rating" required type="number" value={String(destForm.rating)} onChange={v => setDestForm(f => ({ ...f, rating: parseFloat(v) }))} />
           </div>
           <div>
             <label className="text-xs font-bold uppercase tracking-widest text-gray-400 block mb-2">Tamanho do Card</label>
             <select value={destForm.size} onChange={e => setDestForm(f => ({ ...f, size: e.target.value }))}
-              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#C18D41]/40 bg-white">
+              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#C18D41]/40">
               <option value="small">Pequeno</option>
               <option value="medium">Medio</option>
               <option value="large">Grande</option>
@@ -558,7 +558,7 @@ export default function AdminPanel() {
             <div>
               <label className="text-xs font-bold uppercase tracking-widest text-gray-400 block mb-2">Status</label>
               <select value={postForm.status} onChange={e => setPostForm(f => ({ ...f, status: e.target.value }))}
-                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#C18D41]/40 bg-white">
+                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#C18D41]/40">
                 <option value="draft">Rascunho</option>
                 <option value="published">Publicado</option>
               </select>
@@ -569,7 +569,7 @@ export default function AdminPanel() {
             <textarea required rows={8} value={postForm.content}
               onChange={e => setPostForm(f => ({ ...f, content: e.target.value }))}
               placeholder="Escreva o conteudo do post aqui..."
-              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#C18D41]/40 resize-none" />
+              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 bg-white placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#C18D41]/40 resize-none" />
           </div>
           <SubmitButton saving={saving} label="Criar Post" />
         </form>
@@ -589,7 +589,7 @@ export default function AdminPanel() {
             <textarea rows={3} value={vipForm.notes}
               onChange={e => setVipForm(f => ({ ...f, notes: e.target.value }))}
               placeholder="Ex: Pacote lua de mel, valido ate dezembro"
-              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#C18D41]/40 resize-none" />
+              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 bg-white placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#C18D41]/40 resize-none" />
           </div>
           <p className="text-xs text-gray-400 bg-gray-50 rounded-xl p-4">
             O codigo e gerado automaticamente com base no nome. Voce pode editar antes de salvar.
@@ -638,7 +638,7 @@ function Field({ label, value, onChange, placeholder, required, type }: {
       <label className="text-xs font-bold uppercase tracking-widest text-gray-400 block mb-2">{label}</label>
       <input type={type || 'text'} required={required} value={value}
         onChange={e => onChange(e.target.value)} placeholder={placeholder}
-        className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#C18D41]/40" />
+        className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 bg-white placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#C18D41]/40" />
     </div>
   );
 }
