@@ -1,4 +1,4 @@
-import { pgTable, text, serial, real, boolean, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, real, boolean, timestamp, jsonb } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
 // Tabela de destinos
@@ -47,3 +47,23 @@ export const vipCodes = pgTable("vip_codes", {
 
 export const insertVipCodeSchema = createInsertSchema(vipCodes);
 export const selectVipCodeSchema = createSelectSchema(vipCodes);
+
+// Tabela de roteiros VIP
+export const itineraries = pgTable("itineraries", {
+  id: serial("id").primaryKey(),
+  vip_code: text("vip_code").notNull().unique(),
+  destination: text("destination").notNull(),
+  image_url: text("image_url"),
+  start_date: text("start_date"),
+  flight_detail: text("flight_detail"),
+  flight_sub: text("flight_sub"),
+  hotel_detail: text("hotel_detail"),
+  hotel_sub: text("hotel_sub"),
+  transfer_detail: text("transfer_detail"),
+  transfer_sub: text("transfer_sub"),
+  days: jsonb("days").$type<{ day: number; title: string; description: string; location: string }[]>().default([]),
+  created_at: timestamp("created_at").defaultNow(),
+});
+
+export const insertItinerarySchema = createInsertSchema(itineraries);
+export const selectItinerarySchema = createSelectSchema(itineraries);

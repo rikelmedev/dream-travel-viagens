@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Map, BookOpen, Settings,
   Plus, Trash2, Key, Loader2, X, Upload,
   Globe, FileText, Users, ToggleLeft, ToggleRight,
-  LogOut, Eye, EyeOff, Copy, Check
+  LogOut, Eye, EyeOff, Copy, Check, Route, Pencil
 } from 'lucide-react';
 import { Button } from '@/components/painel/button';
 import { toast } from 'sonner';
@@ -30,6 +30,14 @@ interface VipCode {
 interface Stats {
   destinations: number; postsPublished: number;
   postsDraft: number; vipActive: number; vipTotal: number;
+}
+interface ItineraryDay { day: number; title: string; description: string; location: string; }
+interface Itinerary {
+  id: number; vip_code: string; destination: string; image_url: string | null;
+  start_date: string | null; flight_detail: string | null; flight_sub: string | null;
+  hotel_detail: string | null; hotel_sub: string | null;
+  transfer_detail: string | null; transfer_sub: string | null;
+  days: ItineraryDay[];
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -117,21 +125,30 @@ export default function AdminPanel() {
   const [destinations, setDestinations] = useState<Destination[]>([]);
   const [posts, setPosts] = useState<Post[]>([]);
   const [vipCodes, setVipCodes] = useState<VipCode[]>([]);
+  const [itineraries, setItineraries] = useState<Itinerary[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   // Modals
   const [showDestModal, setShowDestModal] = useState(false);
   const [showPostModal, setShowPostModal] = useState(false);
   const [showVipModal, setShowVipModal] = useState(false);
+  const [showItineraryModal, setShowItineraryModal] = useState(false);
+  const [editingItinerary, setEditingItinerary] = useState<Itinerary | null>(null);
 
   // Forms
   const DEST_EMPTY = { title: '', location: '', description: '', image: '', price: '', rating: 5.0, category: 'praia', size: 'medium' };
   const POST_EMPTY = { title: '', slug: '', excerpt: '', cover_image: '', category: 'Viagem', location: '', content: '', status: 'draft', featured: false };
   const VIP_EMPTY = { code: '', client_name: '', notes: '' };
+  const ITIN_EMPTY = {
+    vip_code: '', destination: '', image_url: '', start_date: '',
+    flight_detail: '', flight_sub: '', hotel_detail: '', hotel_sub: '',
+    transfer_detail: '', transfer_sub: '', days: [] as ItineraryDay[],
+  };
 
   const [destForm, setDestForm] = useState(DEST_EMPTY);
   const [postForm, setPostForm] = useState(POST_EMPTY);
   const [vipForm, setVipForm] = useState(VIP_EMPTY);
+  const [itinForm, setItinForm] = useState(ITIN_EMPTY);
   const [saving, setSaving] = useState(false);
   const [copied, setCopied] = useState<number | null>(null);
 
@@ -140,6 +157,7 @@ export default function AdminPanel() {
     { id: 'destinations', label: 'Catalogo', icon: Map },
     { id: 'blog', label: 'Blog', icon: BookOpen },
     { id: 'vip', label: 'Acessos VIP', icon: Key },
+    { id: 'itineraries', label: 'Roteiros VIP', icon: Route },
     { id: 'settings', label: 'Configuracoes', icon: Settings },
   ];
 
@@ -174,11 +192,20 @@ export default function AdminPanel() {
     setIsLoading(false);
   };
 
+  const loadItineraries = async () => {
+    setIsLoading(true);
+    const res = await fetch('/api/itineraries');
+    const data = await res.json();
+    setItineraries(Array.isArray(data) ? data : []);
+    setIsLoading(false);
+  };
+
   useEffect(() => {
     if (activeTab === 'dashboard') loadStats();
     if (activeTab === 'destinations') loadDestinations();
     if (activeTab === 'blog') loadPosts();
     if (activeTab === 'vip') loadVipCodes();
+    if (activeTab === 'itineraries') loadItineraries();
   }, [activeTab]);
 
   // ── Actions: Destinations ─────────────────────────────────────────────────
@@ -293,6 +320,74 @@ export default function AdminPanel() {
     setTimeout(() => setCopied(null), 2000);
   };
 
+  // ── Actions: Itineraries ──────────────────────────────────────────────────
+
+  const openNewItinerary = () => {
+    setEditingItinerary(null);
+    setItinForm(ITIN_EMPTY);
+    setShowItineraryModal(true);
+  };
+
+  const openEditItinerary = (itin: Itinerary) => {
+    setEditingItinerary(itin);
+    setItinForm({
+      vip_code: itin.vip_code, destination: itin.destination,
+      image_url: itin.image_url || '', start_date: itin.start_date || '',
+      flight_detail: itin.flight_detail || '', flight_sub: itin.flight_sub || '',
+      hotel_detail: itin.hotel_detail || '', hotel_sub: itin.hotel_sub || '',
+      transfer_detail: itin.transfer_detail || '', transfer_sub: itin.transfer_sub || '',
+      days: itin.days || [],
+    });
+    setShowItineraryModal(true);
+  };
+
+  const saveItinerary = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      const payload = { ...itinForm, vip_code: itinForm.vip_code.toUpperCase() };
+      let res: Response;
+      if (editingItinerary) {
+        res = await fetch(`/api/itineraries/${editingItinerary.vip_code}`, {
+          method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload),
+        });
+      } else {
+        res = await fetch('/api/itineraries', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload),
+        });
+      }
+      if (!res.ok) { const e = await res.json(); toast.error(e.error || 'Erro ao salvar roteiro'); return; }
+      toast.success(editingItinerary ? 'Roteiro atualizado' : 'Roteiro criado');
+      setShowItineraryModal(false);
+      loadItineraries();
+    } catch { toast.error('Erro de ligacao'); }
+    finally { setSaving(false); }
+  };
+
+  const deleteItinerary = async (vip_code: string) => {
+    if (!confirm(`Remover roteiro de ${vip_code}?`)) return;
+    await fetch(`/api/itineraries/${vip_code}`, { method: 'DELETE' });
+    setItineraries(prev => prev.filter(i => i.vip_code !== vip_code));
+    toast.success('Roteiro removido');
+  };
+
+  const addDay = () => {
+    const nextDay = (itinForm.days.length > 0 ? Math.max(...itinForm.days.map(d => d.day)) : 0) + 1;
+    setItinForm(f => ({ ...f, days: [...f.days, { day: nextDay, title: '', description: '', location: '' }] }));
+  };
+
+  const updateDay = (index: number, field: keyof ItineraryDay, value: string | number) => {
+    setItinForm(f => {
+      const days = [...f.days];
+      days[index] = { ...days[index], [field]: value };
+      return { ...f, days };
+    });
+  };
+
+  const removeDay = (index: number) => {
+    setItinForm(f => ({ ...f, days: f.days.filter((_, i) => i !== index) }));
+  };
+
   const handleLogout = () => {
     logout();
     setLocation('/');
@@ -352,6 +447,11 @@ export default function AdminPanel() {
             {activeTab === 'vip' && (
               <Button onClick={() => setShowVipModal(true)} className="bg-[#05070a] hover:bg-[#C18D41] text-white rounded-2xl px-6 h-12">
                 <Plus className="w-4 h-4 mr-2" /> Novo Acesso
+              </Button>
+            )}
+            {activeTab === 'itineraries' && (
+              <Button onClick={openNewItinerary} className="bg-[#05070a] hover:bg-[#C18D41] text-white rounded-2xl px-6 h-12">
+                <Plus className="w-4 h-4 mr-2" /> Novo Roteiro
               </Button>
             )}
           </header>
@@ -524,6 +624,53 @@ export default function AdminPanel() {
               </motion.div>
             )}
 
+            {/* ── Itineraries ── */}
+            {activeTab === 'itineraries' && (
+              <motion.div key="itineraries" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                {isLoading ? (
+                  <div className="flex justify-center p-20"><Loader2 className="animate-spin w-8 h-8 text-gray-300" /></div>
+                ) : itineraries.length === 0 ? (
+                  <EmptyState icon={Route} label="Nenhum roteiro criado" onAdd={openNewItinerary} />
+                ) : (
+                  <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-gray-100">
+                          <th className="p-6 text-left text-xs text-gray-400 font-bold uppercase tracking-widest">Cliente (Codigo VIP)</th>
+                          <th className="p-6 text-left text-xs text-gray-400 font-bold uppercase tracking-widest">Destino</th>
+                          <th className="p-6 text-left text-xs text-gray-400 font-bold uppercase tracking-widest">Partida</th>
+                          <th className="p-6 text-left text-xs text-gray-400 font-bold uppercase tracking-widest">Dias</th>
+                          <th className="p-6" />
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {itineraries.map(itin => (
+                          <tr key={itin.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors">
+                            <td className="p-6">
+                              <code className="bg-gray-100 text-[#05070a] font-mono text-sm px-3 py-1 rounded-lg">{itin.vip_code}</code>
+                            </td>
+                            <td className="p-6 font-bold text-[#05070a]">{itin.destination}</td>
+                            <td className="p-6 text-gray-400 text-sm">{itin.start_date || '—'}</td>
+                            <td className="p-6 text-gray-400 text-sm">{itin.days?.length || 0} dias</td>
+                            <td className="p-6">
+                              <div className="flex items-center justify-end gap-2">
+                                <button onClick={() => openEditItinerary(itin)} className="text-gray-400 hover:text-[#C18D41] p-2 rounded-xl hover:bg-[#C18D41]/10 transition-colors">
+                                  <Pencil className="w-4 h-4" />
+                                </button>
+                                <button onClick={() => deleteItinerary(itin.vip_code)} className="text-red-400 hover:text-red-600 p-2 rounded-xl hover:bg-red-50 transition-colors">
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </motion.div>
+            )}
+
           </AnimatePresence>
         </div>
       </main>
@@ -677,6 +824,73 @@ export default function AdminPanel() {
         </form>
       </Modal>
 
+      {/* ── Modal: Roteiro VIP ── */}
+      <Modal open={showItineraryModal} onClose={() => setShowItineraryModal(false)} title={editingItinerary ? `Roteiro — ${editingItinerary.vip_code}` : 'Novo Roteiro VIP'} wide>
+        <form onSubmit={saveItinerary} className="space-y-6">
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="Codigo VIP do Cliente" required value={itinForm.vip_code} onChange={v => setItinForm(f => ({ ...f, vip_code: v.toUpperCase() }))} placeholder="Ex: JOANA2026" disabled={!!editingItinerary} />
+            <Field label="Destino" required value={itinForm.destination} onChange={v => setItinForm(f => ({ ...f, destination: v }))} placeholder="Ex: Costa Amalfitana" />
+          </div>
+          <Field label="Data de Partida" value={itinForm.start_date} onChange={v => setItinForm(f => ({ ...f, start_date: v }))} placeholder="Ex: 15 de Junho, 2026" />
+          <Field label="URL da Imagem de Capa (opcional)" value={itinForm.image_url} onChange={v => setItinForm(f => ({ ...f, image_url: v }))} placeholder="https://..." />
+
+          <div className="border-t border-gray-100 pt-4">
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Logistica</p>
+            <div className="grid grid-cols-2 gap-3">
+              <Field label="Voo — Companhia/Numero" value={itinForm.flight_detail} onChange={v => setItinForm(f => ({ ...f, flight_detail: v }))} placeholder="Ex: TAP TP123" />
+              <Field label="Voo — Detalhe" value={itinForm.flight_sub} onChange={v => setItinForm(f => ({ ...f, flight_sub: v }))} placeholder="Ex: Gate B5" />
+              <Field label="Hotel — Nome" value={itinForm.hotel_detail} onChange={v => setItinForm(f => ({ ...f, hotel_detail: v }))} placeholder="Ex: Belmond Hotel Caruso" />
+              <Field label="Hotel — Quarto" value={itinForm.hotel_sub} onChange={v => setItinForm(f => ({ ...f, hotel_sub: v }))} placeholder="Ex: Suite Panoramica" />
+              <Field label="Transfer — Veiculo" value={itinForm.transfer_detail} onChange={v => setItinForm(f => ({ ...f, transfer_detail: v }))} placeholder="Ex: Mercedes Classe S" />
+              <Field label="Transfer — Tipo" value={itinForm.transfer_sub} onChange={v => setItinForm(f => ({ ...f, transfer_sub: v }))} placeholder="Ex: Motorista Particular" />
+            </div>
+          </div>
+
+          <div className="border-t border-gray-100 pt-4">
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Cronograma</p>
+              <button type="button" onClick={addDay} className="text-[10px] text-[#C18D41] font-bold uppercase tracking-widest hover:underline flex items-center gap-1">
+                <Plus className="w-3 h-3" /> Adicionar Dia
+              </button>
+            </div>
+            <div className="space-y-4">
+              {itinForm.days.map((day, idx) => (
+                <div key={idx} className="bg-gray-50 rounded-2xl p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-[#C18D41] uppercase tracking-widest">Dia {day.day}</span>
+                    <button type="button" onClick={() => removeDay(idx)} className="text-red-400 hover:text-red-600">
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                  <Field label="Titulo do Dia" value={day.title} onChange={v => updateDay(idx, 'title', v)} placeholder="Ex: Chegada e Imersao" />
+                  <div>
+                    <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-1">Descricao</label>
+                    <textarea
+                      rows={2}
+                      value={day.description}
+                      onChange={e => updateDay(idx, 'description', e.target.value)}
+                      placeholder="Descricao das atividades do dia..."
+                      className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#C18D41]/20 resize-none"
+                    />
+                  </div>
+                  <Field label="Localizacao" value={day.location} onChange={v => updateDay(idx, 'location', v)} placeholder="Ex: Positano, Italia" />
+                </div>
+              ))}
+              {itinForm.days.length === 0 && (
+                <p className="text-sm text-gray-400 text-center py-4">Nenhum dia adicionado ainda.</p>
+              )}
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
+            <Button type="button" variant="ghost" onClick={() => setShowItineraryModal(false)}>Cancelar</Button>
+            <Button type="submit" disabled={saving} className="bg-[#C18D41] text-white">
+              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : (editingItinerary ? 'Salvar Alteracoes' : 'Criar Roteiro')}
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
     </div>
   );
 }
@@ -708,16 +922,16 @@ function Modal({ open, onClose, title, children, wide }: {
   );
 }
 
-function Field({ label, value, onChange, placeholder, required, type }: {
+function Field({ label, value, onChange, placeholder, required, type, disabled }: {
   label: string; value: string; onChange: (v: string) => void;
-  placeholder?: string; required?: boolean; type?: string;
+  placeholder?: string; required?: boolean; type?: string; disabled?: boolean;
 }) {
   return (
     <div>
       <label className="text-xs font-bold uppercase tracking-widest text-gray-400 block mb-2">{label}</label>
-      <input type={type || 'text'} required={required} value={value}
+      <input type={type || 'text'} required={required} value={value} disabled={disabled}
         onChange={e => onChange(e.target.value)} placeholder={placeholder}
-        className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 bg-white placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#C18D41]/40" />
+        className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 bg-white placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#C18D41]/40 disabled:bg-gray-50 disabled:text-gray-400" />
     </div>
   );
 }
