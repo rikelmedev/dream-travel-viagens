@@ -104,7 +104,7 @@ export default function DestinationDetailPage() {
             <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}>
               <div className="flex items-center gap-4 text-[#C18D41] font-bold uppercase tracking-[0.5em] text-[10px] mb-6">
                 <MapPin className="w-4 h-4" />
-                <span>{destination.country}</span>
+                <span>{destination.country || destination.location}</span>
               </div>
               <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif font-bold text-[#05070a] leading-[1.1]">
                 {destination.title || destination.name}
@@ -130,9 +130,11 @@ export default function DestinationDetailPage() {
                     {destination.description}
                   </p>
                   
-                  <p className="text-lg text-[#05070a]/60 font-light leading-loose pt-6">
-                    {destination.details}
-                  </p>
+                  {destination.details && (
+                    <p className="text-lg text-[#05070a]/60 font-light leading-loose pt-6">
+                      {destination.details}
+                    </p>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10 pt-12 border-t border-gray-200">
@@ -169,7 +171,10 @@ export default function DestinationDetailPage() {
                   <h3 className="text-4xl font-serif font-bold text-white mb-10 leading-tight">Experiências <br/><span className="italic text-[#C18D41] font-light">Exclusivas</span></h3>
                   
                   <ul className="space-y-6 mb-14">
-                    {(destination.highlights || []).map((item: string, i: number) => (
+                    {(destination.highlights && destination.highlights.length > 0
+                      ? destination.highlights
+                      : ['Curadoria personalizada', 'Atendimento exclusivo', 'Roteiro sob medida']
+                    ).map((item: string, i: number) => (
                       <li key={i} className="flex items-center gap-5 text-white/80">
                         <CheckCircle2 className="text-[#C18D41] w-5 h-5 shrink-0" />
                         <span className="font-light tracking-wide">{item}</span>
