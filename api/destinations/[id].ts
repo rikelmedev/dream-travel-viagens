@@ -7,6 +7,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const id = parseInt(req.query.id as string, 10);
   if (isNaN(id)) return res.status(400).json({ error: 'ID inválido' });
 
+  if (req.method === 'GET') {
+    try {
+      const [dest] = await db.select().from(destinations).where(eq(destinations.id, id));
+      if (!dest) return res.status(404).json({ error: 'Destino nao encontrado' });
+      return res.json(dest);
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ error: 'Erro ao buscar destino' });
+    }
+  }
+
   if (req.method === 'DELETE') {
     try {
       await db.delete(destinations).where(eq(destinations.id, id));
