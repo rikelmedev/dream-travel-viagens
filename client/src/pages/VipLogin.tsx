@@ -18,21 +18,33 @@ export default function VipLogin() {
     });
   }, []);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
 
-    // Simulação de verificação na base de dados
-    setTimeout(() => {
-      if (credentials.code.toUpperCase() === 'DREAM2026') {
-        setIsLoading(false);
-        setLocation('/dashboard');
-      } else {
-        setIsLoading(false);
-        setError('As credenciais inseridas não coincidem com os nossos registos de alta curadoria.');
+    try {
+      const res = await fetch('/api/vip-codes/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: credentials.code }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || 'As credenciais inseridas nao coincidem com os nossos registos de alta curadoria.');
+        return;
       }
-    }, 1500);
+
+      localStorage.setItem('vip_client_name', data.client_name);
+      localStorage.setItem('vip_code', data.code);
+      setLocation('/dashboard');
+    } catch {
+      setError('Erro de ligacao. Tente novamente.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
