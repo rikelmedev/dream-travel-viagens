@@ -39,6 +39,12 @@ function slugify(text: string) {
     .replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 }
 
+function formatPrice(value: string): string {
+  const digits = value.replace(/\D/g, '');
+  if (!digits) return '';
+  return Number(digits).toLocaleString('pt-BR');
+}
+
 function generateCode(name: string) {
   const base = name.trim().split(' ')[0].toUpperCase().replace(/[^A-Z]/g, '');
   return `${base}${new Date().getFullYear()}`;
@@ -530,7 +536,19 @@ export default function AdminPanel() {
           <Field label="Nome do Destino" required value={destForm.title} onChange={v => setDestForm(f => ({ ...f, title: v }))} placeholder="Ex: Atol de Baa" />
           <div className="grid grid-cols-2 gap-4">
             <Field label="Pais / Regiao" required value={destForm.location} onChange={v => setDestForm(f => ({ ...f, location: v }))} placeholder="Ex: Maldivas" />
-            <Field label="Preco (R$)" required value={destForm.price} onChange={v => setDestForm(f => ({ ...f, price: v }))} placeholder="Ex: 8.500" />
+            <div>
+              <label className="text-xs font-bold uppercase tracking-widest text-gray-400 block mb-2">Preco (R$)</label>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-gray-400 font-medium">R$</span>
+                <input
+                  required
+                  value={destForm.price}
+                  onChange={e => setDestForm(f => ({ ...f, price: formatPrice(e.target.value) }))}
+                  placeholder="0"
+                  className="w-full border border-gray-200 rounded-xl pl-10 pr-4 py-3 text-sm text-gray-900 bg-white placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#C18D41]/40"
+                />
+              </div>
+            </div>
           </div>
           <div>
             <label className="text-xs font-bold uppercase tracking-widest text-gray-400 block mb-2">Descricao Curta</label>
@@ -624,21 +642,37 @@ export default function AdminPanel() {
       <Modal open={showVipModal} onClose={() => setShowVipModal(false)} title="Novo Acesso VIP">
         <form onSubmit={createVipCode} className="space-y-5">
           <Field label="Nome do Cliente" required value={vipForm.client_name}
-            onChange={v => setVipForm(f => ({ ...f, client_name: v, code: generateCode(v) }))}
+            onChange={v => setVipForm(f => ({ ...f, client_name: v }))}
             placeholder="Ex: Joana Silva" />
-          <Field label="Codigo de Acesso" required value={vipForm.code}
-            onChange={v => setVipForm(f => ({ ...f, code: v.toUpperCase() }))}
-            placeholder="Ex: JOANA2026" />
           <div>
-            <label className="text-xs font-bold uppercase tracking-widest text-gray-400 block mb-2">Notas (opcional)</label>
+            <label className="text-xs font-bold uppercase tracking-widest text-gray-400 block mb-2">Codigo de Acesso</label>
+            <div className="flex gap-2">
+              <input
+                required
+                value={vipForm.code}
+                onChange={e => setVipForm(f => ({ ...f, code: e.target.value.toUpperCase() }))}
+                placeholder="Ex: JOANA2026"
+                className="flex-1 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 bg-white placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#C18D41]/40 font-mono tracking-widest"
+              />
+              <button
+                type="button"
+                onClick={() => setVipForm(f => ({ ...f, code: generateCode(f.client_name || 'VIP') }))}
+                className="px-4 py-3 bg-[#C18D41]/10 hover:bg-[#C18D41]/20 text-[#C18D41] rounded-xl text-xs font-bold uppercase tracking-widest transition-colors whitespace-nowrap"
+              >
+                Gerar
+              </button>
+            </div>
+            <p className="text-[11px] text-gray-400 mt-2">
+              Clique em Gerar para criar automaticamente com base no nome, ou escreva um codigo personalizado.
+            </p>
+          </div>
+          <div>
+            <label className="text-xs font-bold uppercase tracking-widest text-gray-400 block mb-2">Notas pessoais (opcional)</label>
             <textarea rows={3} value={vipForm.notes}
               onChange={e => setVipForm(f => ({ ...f, notes: e.target.value }))}
               placeholder="Ex: Pacote lua de mel, valido ate dezembro"
               className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 bg-white placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#C18D41]/40 resize-none" />
           </div>
-          <p className="text-xs text-gray-400 bg-gray-50 rounded-xl p-4">
-            O codigo e gerado automaticamente com base no nome. Voce pode editar antes de salvar.
-          </p>
           <SubmitButton saving={saving} label="Criar Acesso VIP" />
         </form>
       </Modal>
