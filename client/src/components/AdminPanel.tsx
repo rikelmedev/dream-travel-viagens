@@ -120,7 +120,7 @@ export default function AdminPanel() {
 
   // Forms
   const DEST_EMPTY = { title: '', location: '', description: '', image: '', price: '', rating: 5.0, category: 'praia', size: 'medium' };
-  const POST_EMPTY = { title: '', slug: '', cover_image: '', category: 'Viagem', content: '', status: 'draft' };
+  const POST_EMPTY = { title: '', slug: '', excerpt: '', cover_image: '', category: 'Viagem', location: '', content: '', status: 'draft', featured: false };
   const VIP_EMPTY = { code: '', client_name: '', notes: '' };
 
   const [destForm, setDestForm] = useState(DEST_EMPTY);
@@ -570,10 +570,28 @@ export default function AdminPanel() {
         <form onSubmit={createPost} className="space-y-5">
           <ImageUploadField label="Imagem de Capa" value={postForm.cover_image} folder="blog"
             onChange={url => setPostForm(f => ({ ...f, cover_image: url }))} />
-          <Field label="Titulo" required value={postForm.title}
-            onChange={v => setPostForm(f => ({ ...f, title: v, slug: slugify(v) }))} placeholder="Ex: 10 Razoes para Visitar as Maldivas" />
-          <div className="grid grid-cols-2 gap-4">
-            <Field label="Categoria" value={postForm.category} onChange={v => setPostForm(f => ({ ...f, category: v }))} placeholder="Ex: Viagem, Dicas" />
+          <Field label="Titulo do Post" required value={postForm.title}
+            onChange={v => setPostForm(f => ({ ...f, title: v, slug: slugify(v) }))} placeholder="Ex: O Segredo Bem Guardado da Costa Amalfitana" />
+          <div>
+            <label className="text-xs font-bold uppercase tracking-widest text-gray-400 block mb-2">Resumo (aparece no card)</label>
+            <textarea rows={2} value={postForm.excerpt}
+              onChange={e => setPostForm(f => ({ ...f, excerpt: e.target.value }))}
+              placeholder="Ex: Longe das multidoes de Positano, descobri uma vila onde o tempo parou..."
+              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 bg-white placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#C18D41]/40 resize-none" />
+          </div>
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <label className="text-xs font-bold uppercase tracking-widest text-gray-400 block mb-2">Categoria</label>
+              <select value={postForm.category} onChange={e => setPostForm(f => ({ ...f, category: e.target.value }))}
+                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#C18D41]/40">
+                <option value="Viagem">Viagem</option>
+                <option value="Luxo">Luxo</option>
+                <option value="Aventura">Aventura</option>
+                <option value="Gastronomia">Gastronomia</option>
+                <option value="Dicas">Dicas</option>
+              </select>
+            </div>
+            <Field label="Localizacao" value={postForm.location} onChange={v => setPostForm(f => ({ ...f, location: v }))} placeholder="Ex: Italia" />
             <div>
               <label className="text-xs font-bold uppercase tracking-widest text-gray-400 block mb-2">Status</label>
               <select value={postForm.status} onChange={e => setPostForm(f => ({ ...f, status: e.target.value }))}
@@ -583,11 +601,19 @@ export default function AdminPanel() {
               </select>
             </div>
           </div>
+          <div className="flex items-center gap-3 p-4 bg-[#C18D41]/5 rounded-xl border border-[#C18D41]/20">
+            <input type="checkbox" id="featured" checked={postForm.featured}
+              onChange={e => setPostForm(f => ({ ...f, featured: e.target.checked }))}
+              className="w-4 h-4 accent-[#C18D41]" />
+            <label htmlFor="featured" className="text-xs font-bold uppercase tracking-widest text-gray-600 cursor-pointer">
+              Destacar este post na pagina do Blog
+            </label>
+          </div>
           <div>
-            <label className="text-xs font-bold uppercase tracking-widest text-gray-400 block mb-2">Conteudo</label>
-            <textarea required rows={8} value={postForm.content}
+            <label className="text-xs font-bold uppercase tracking-widest text-gray-400 block mb-2">Conteudo completo</label>
+            <textarea required rows={10} value={postForm.content}
               onChange={e => setPostForm(f => ({ ...f, content: e.target.value }))}
-              placeholder="Escreva o conteudo do post aqui..."
+              placeholder="Escreva o relato completo aqui..."
               className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 bg-white placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#C18D41]/40 resize-none" />
           </div>
           <SubmitButton saving={saving} label="Criar Post" />

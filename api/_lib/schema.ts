@@ -20,10 +20,13 @@ export const posts = pgTable("posts", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
   slug: text("slug").notNull().unique(),
+  excerpt: text("excerpt"),
   cover_image: text("cover_image"),
   category: text("category").default("Viagem"),
+  location: text("location"),
   content: text("content").notNull(),
   status: text("status").default("draft"),
+  featured: boolean("featured").default(false),
   created_at: timestamp("created_at").defaultNow(),
 });
 
