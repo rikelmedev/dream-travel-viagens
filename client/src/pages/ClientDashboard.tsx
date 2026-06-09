@@ -1,56 +1,59 @@
 import { useState, useEffect } from 'react';
+import { useLocation } from 'wouter';
 import { motion } from 'framer-motion';
-import { 
-  Plane, Hotel, Car, 
-  MapPin, Clock, Calendar, MessageSquare, 
-  ChevronDown, Sparkles, Loader2 
+import {
+  Plane, Hotel, Car,
+  MapPin, Clock, Calendar, MessageSquare,
+  ChevronDown, Sparkles, Loader2
 } from 'lucide-react';
 import { Button } from '@/components/painel/button';
 
 export default function ClientDashboard() {
+  const [, setLocation] = useLocation();
   const [expandedDay, setExpandedDay] = useState<number | null>(1);
   const [tripData, setTripData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const clientName = typeof window !== 'undefined'
+    ? localStorage.getItem('vip_client_name') || null
+    : null;
+
   useEffect(() => {
-    fetch('/api/trips/current')
-      .then(res => res.json())
-      .then(data => {
-        setTripData(data);
-        setIsLoading(false);
-      })
-      .catch(() => {
-        setTripData({
-          clientName: "Sr. e Sra. Fernandes",
-          destination: "Costa Amalfitana",
-          daysRemaining: 12,
-          startDate: "15 de Junho, 2026",
-          itinerary: [
-            {
-              day: 1,
-              title: "Chegada e Imersao",
-              description: "Recepcao VIP no aeroporto e transfer privado em Maserati para o Hotel Caruso. Jantar especial com vista panoramica.",
-              location: "Ravello, Italia",
-              type: "logistics"
-            },
-            {
-              day: 2,
-              title: "Navegacao Privada",
-              description: "Dia inteiro a bordo de um Iate Riva exclusivo pela costa. Paragem em enseadas secretas para mergulho.",
-              location: "Mar Tirreno",
-              type: "experience"
-            },
-            {
-              day: 3,
-              title: "Gastronomia Michelin",
-              description: "Reserva confirmada na mesa principal do Restaurante Don Alfonso.",
-              location: "Costa Sul",
-              type: "dining"
-            }
-          ]
-        });
-        setIsLoading(false);
-      });
+    if (!localStorage.getItem('vip_client_name')) {
+      setLocation('/viplogin');
+      return;
+    }
+
+    setTripData({
+      clientName: localStorage.getItem('vip_client_name') || 'Cliente VIP',
+      destination: "Costa Amalfitana",
+      daysRemaining: 12,
+      startDate: "15 de Junho, 2026",
+      itinerary: [
+        {
+          day: 1,
+          title: "Chegada e Imersao",
+          description: "Recepcao VIP no aeroporto e transfer privado em Maserati para o Hotel Caruso. Jantar especial com vista panoramica.",
+          location: "Ravello, Italia",
+          type: "logistics"
+        },
+        {
+          day: 2,
+          title: "Navegacao Privada",
+          description: "Dia inteiro a bordo de um Iate Riva exclusivo pela costa. Paragem em enseadas secretas para mergulho.",
+          location: "Mar Tirreno",
+          type: "experience"
+        },
+        {
+          day: 3,
+          title: "Gastronomia Michelin",
+          description: "Reserva confirmada na mesa principal do Restaurante Don Alfonso.",
+          location: "Costa Sul",
+          type: "dining"
+        }
+      ]
+    });
+    setIsLoading(false);
   }, []);
 
   if (isLoading || !tripData) {
