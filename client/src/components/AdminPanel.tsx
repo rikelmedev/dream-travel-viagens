@@ -53,9 +53,22 @@ function formatPrice(value: string): string {
   return Number(digits).toLocaleString('pt-BR');
 }
 
-function generateCode(name: string) {
-  const base = name.trim().split(' ')[0].toUpperCase().replace(/[^A-Z]/g, '');
-  return `${base}${new Date().getFullYear()}`;
+function generateCode(name: string, existing: string[] = []) {
+  const base = (name.trim().split(' ')[0] || 'VIP').toUpperCase().replace(/[^A-Z0-9]/g, '') || 'VIP';
+  const year = new Date().getFullYear();
+  const taken = new Set(existing.map(c => c.toUpperCase()));
+  // sem caracteres ambiguos (0/O, 1/I) para evitar erro de leitura
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+
+  let candidate = `${base}${year}`;
+  if (!taken.has(candidate)) return candidate;
+
+  // ja existe: adiciona sufixo aleatorio ate ficar unico
+  do {
+    const suffix = Array.from({ length: 3 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+    candidate = `${base}${year}${suffix}`;
+  } while (taken.has(candidate));
+  return candidate;
 }
 
 // ── Image Upload Button ────────────────────────────────────────────────────
@@ -803,7 +816,7 @@ export default function AdminPanel() {
               />
               <button
                 type="button"
-                onClick={() => setVipForm(f => ({ ...f, code: generateCode(f.client_name || 'VIP') }))}
+                onClick={() => setVipForm(f => ({ ...f, code: generateCode(f.client_name || 'VIP', vipCodes.map(v => v.code)) }))}
                 className="px-4 py-3 bg-[#C18D41]/10 hover:bg-[#C18D41]/20 text-[#C18D41] rounded-xl text-xs font-bold uppercase tracking-widest transition-colors whitespace-nowrap"
               >
                 Gerar
