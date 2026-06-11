@@ -4,6 +4,8 @@ import { MapPin, ArrowRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/painel/button";
 import { useLocation } from "wouter";
 import { setSEOHead } from "@/components/SEOHead";
+import Layout from "@/components/Layout";
+import PageTransition from "@/components/PageTransition";
 
 export default function DestinationsPage() {
   const [, setLocation] = useLocation();
@@ -42,6 +44,8 @@ export default function DestinationsPage() {
   );
 
   return (
+    <PageTransition>
+    <Layout>
     <div className="min-h-screen bg-[#FAF9F6]">
       <section className="pt-40 pb-20 px-6 lg:px-12 border-b border-gray-200/50">
         <div className="container max-w-7xl mx-auto">
@@ -145,5 +149,7 @@ export default function DestinationsPage() {
         </div>
       </section>
     </div>
+    </Layout>
+    </PageTransition>
   );
 }
