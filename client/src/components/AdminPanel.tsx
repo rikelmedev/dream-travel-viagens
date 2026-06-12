@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Map, BookOpen, Settings,
   Plus, Trash2, Key, Loader2, X, Upload,
   Globe, FileText, Users, ToggleLeft, ToggleRight,
-  LogOut, Eye, EyeOff, Copy, Check, Route, Pencil
+  LogOut, Eye, EyeOff, Copy, Check, Route, Pencil, ArrowRight
 } from 'lucide-react';
 import { Button } from '@/components/painel/button';
 import { toast } from 'sonner';
@@ -164,6 +164,7 @@ export default function AdminPanel() {
   const [itinForm, setItinForm] = useState(ITIN_EMPTY);
   const [saving, setSaving] = useState(false);
   const [copied, setCopied] = useState<number | null>(null);
+  const [confirm, setConfirm] = useState<{ message: string; onConfirm: () => void } | null>(null);
 
   const sidebarLinks = [
     { id: 'dashboard', label: 'Visao Geral', icon: LayoutDashboard },
@@ -185,7 +186,8 @@ export default function AdminPanel() {
   const loadDestinations = async () => {
     setIsLoading(true);
     const res = await fetch('/api/destinations');
-    setDestinations(Array.isArray(await res.json()) ? await (await fetch('/api/destinations')).json() : []);
+    const data = await res.json();
+    setDestinations(Array.isArray(data) ? data : []);
     setIsLoading(false);
   };
 
@@ -242,11 +244,16 @@ export default function AdminPanel() {
     } finally { setSaving(false); }
   };
 
-  const deleteDestination = async (id: number) => {
-    await fetch(`/api/destinations/${id}`, { method: 'DELETE' });
-    setDestinations(prev => prev.filter(d => d.id !== id));
-    toast.success('Destino removido');
-    loadStats();
+  const deleteDestination = (id: number, title: string) => {
+    setConfirm({
+      message: `Remover o destino "${title}"? Esta acao nao pode ser desfeita.`,
+      onConfirm: async () => {
+        await fetch(`/api/destinations/${id}`, { method: 'DELETE' });
+        setDestinations(prev => prev.filter(d => d.id !== id));
+        toast.success('Destino removido');
+        loadStats();
+      }
+    });
   };
 
   // ── Actions: Posts ────────────────────────────────────────────────────────
@@ -284,11 +291,16 @@ export default function AdminPanel() {
     loadStats();
   };
 
-  const deletePost = async (id: number) => {
-    await fetch(`/api/posts/${id}`, { method: 'DELETE' });
-    setPosts(prev => prev.filter(p => p.id !== id));
-    toast.success('Post removido');
-    loadStats();
+  const deletePost = (id: number, title: string) => {
+    setConfirm({
+      message: `Remover o post "${title}"? Esta acao nao pode ser desfeita.`,
+      onConfirm: async () => {
+        await fetch(`/api/posts/${id}`, { method: 'DELETE' });
+        setPosts(prev => prev.filter(p => p.id !== id));
+        toast.success('Post removido');
+        loadStats();
+      }
+    });
   };
 
   // ── Actions: VIP ─────────────────────────────────────────────────────────
@@ -320,11 +332,16 @@ export default function AdminPanel() {
     loadStats();
   };
 
-  const deleteVipCode = async (id: number) => {
-    await fetch(`/api/vip-codes/${id}`, { method: 'DELETE' });
-    setVipCodes(prev => prev.filter(v => v.id !== id));
-    toast.success('Codigo removido');
-    loadStats();
+  const deleteVipCode = (id: number, name: string) => {
+    setConfirm({
+      message: `Remover o acesso VIP de "${name}"? O cliente perdera o acesso ao dashboard.`,
+      onConfirm: async () => {
+        await fetch(`/api/vip-codes/${id}`, { method: 'DELETE' });
+        setVipCodes(prev => prev.filter(v => v.id !== id));
+        toast.success('Codigo removido');
+        loadStats();
+      }
+    });
   };
 
   const copyCode = (id: number, code: string) => {
@@ -377,11 +394,15 @@ export default function AdminPanel() {
     finally { setSaving(false); }
   };
 
-  const deleteItinerary = async (vip_code: string) => {
-    if (!confirm(`Remover roteiro de ${vip_code}?`)) return;
-    await fetch(`/api/itineraries/${vip_code}`, { method: 'DELETE' });
-    setItineraries(prev => prev.filter(i => i.vip_code !== vip_code));
-    toast.success('Roteiro removido');
+  const deleteItinerary = (vip_code: string) => {
+    setConfirm({
+      message: `Remover o roteiro de ${vip_code}? O cliente deixara de ver o itinerario.`,
+      onConfirm: async () => {
+        await fetch(`/api/itineraries/${vip_code}`, { method: 'DELETE' });
+        setItineraries(prev => prev.filter(i => i.vip_code !== vip_code));
+        toast.success('Roteiro removido');
+      }
+    });
   };
 
   const addDay = () => {
@@ -421,19 +442,28 @@ export default function AdminPanel() {
               <p className="text-[9px] text-[#C18D41] font-bold uppercase tracking-[0.3em] mt-1">Control Room</p>
             </div>
           </div>
-          <nav className="space-y-2">
+          <nav className="space-y-1">
             {sidebarLinks.map(({ id, label, icon: Icon }) => (
               <button key={id} onClick={() => setActiveTab(id)}
-                className={`w-full flex items-center gap-4 px-5 py-4 rounded-2xl transition-all font-bold text-[10px] uppercase tracking-widest ${activeTab === id ? 'bg-white/10 text-white' : 'text-white/40 hover:text-white hover:bg-white/5'}`}>
-                <Icon className="w-4 h-4" /> {label}
+                className={`w-full flex items-center gap-4 px-5 py-[14px] rounded-2xl transition-all font-bold text-[11px] uppercase tracking-widest ${
+                  activeTab === id
+                    ? 'bg-[#C18D41] text-white shadow-lg shadow-[#C18D41]/20'
+                    : 'text-white/40 hover:text-white hover:bg-white/5'
+                }`}>
+                <Icon className="w-4 h-4 shrink-0" /> {label}
               </button>
             ))}
           </nav>
         </div>
-        <div className="p-8 border-t border-white/5">
+        <div className="p-8 border-t border-white/5 space-y-1">
+          <button
+            onClick={() => window.open('/', '_blank')}
+            className="w-full flex items-center gap-4 px-5 py-[14px] rounded-2xl text-white/30 hover:text-white hover:bg-white/5 transition-all font-bold text-[11px] uppercase tracking-widest">
+            <Globe className="w-4 h-4 shrink-0" /> Ver Site
+          </button>
           <button onClick={handleLogout}
-            className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl text-white/30 hover:text-white hover:bg-white/5 transition-all font-bold text-[10px] uppercase tracking-widest">
-            <LogOut className="w-4 h-4" /> Sair
+            className="w-full flex items-center gap-4 px-5 py-[14px] rounded-2xl text-white/30 hover:text-red-400 hover:bg-red-500/5 transition-all font-bold text-[11px] uppercase tracking-widest">
+            <LogOut className="w-4 h-4 shrink-0" /> Sair
           </button>
         </div>
       </aside>
@@ -529,7 +559,7 @@ export default function AdminPanel() {
                             <td className="p-6 text-gray-500 text-sm">R$ {dest.price}</td>
                             <td className="p-6 text-gray-500 text-sm">{dest.rating}</td>
                             <td className="p-6 text-right">
-                              <button onClick={() => deleteDestination(dest.id)} className="text-red-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-xl transition-colors">
+                              <button onClick={() => deleteDestination(dest.id, dest.title)} className="text-red-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-xl transition-colors" title="Remover destino">
                                 <Trash2 className="w-4 h-4" />
                               </button>
                             </td>
@@ -569,7 +599,7 @@ export default function AdminPanel() {
                             className="text-gray-400 hover:text-[#C18D41] p-2 rounded-xl hover:bg-[#C18D41]/10 transition-colors">
                             {post.status === 'published' ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                           </button>
-                          <button onClick={() => deletePost(post.id)} className="text-red-400 hover:text-red-600 p-2 rounded-xl hover:bg-red-50 transition-colors">
+                          <button onClick={() => deletePost(post.id, post.title)} className="text-red-400 hover:text-red-600 p-2 rounded-xl hover:bg-red-50 transition-colors" title="Remover post">
                             <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
@@ -623,7 +653,7 @@ export default function AdminPanel() {
                                   className="text-gray-400 hover:text-[#C18D41] p-2 rounded-xl hover:bg-[#C18D41]/10 transition-colors">
                                   {vip.is_active ? <ToggleRight className="w-4 h-4" /> : <ToggleLeft className="w-4 h-4" />}
                                 </button>
-                                <button onClick={() => deleteVipCode(vip.id)} className="text-red-400 hover:text-red-600 p-2 rounded-xl hover:bg-red-50 transition-colors">
+                                <button onClick={() => deleteVipCode(vip.id, vip.client_name)} className="text-red-400 hover:text-red-600 p-2 rounded-xl hover:bg-red-50 transition-colors" title="Remover acesso">
                                   <Trash2 className="w-4 h-4" />
                                 </button>
                               </div>
@@ -684,9 +714,67 @@ export default function AdminPanel() {
               </motion.div>
             )}
 
+            {/* ── CONFIGURACOES ── */}
+            {activeTab === 'settings' && (
+              <motion.div key="settings" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-6">
+                <div className="bg-white rounded-3xl p-10 shadow-sm border border-gray-100">
+                  <h3 className="font-serif text-xl font-bold text-[#05070a] mb-1">Contato Rapido</h3>
+                  <p className="text-sm text-gray-400 mb-6">Links rapidos para as contas principais da Dream Travel.</p>
+                  <div className="space-y-3">
+                    {[
+                      { label: 'Instagram', url: 'https://instagram.com/dreamtravel', detail: '@dreamtravel' },
+                      { label: 'WhatsApp', url: 'https://wa.me/5517996077150', detail: '+55 (17) 99607-7150' },
+                      { label: 'Supabase (banco de dados)', url: 'https://supabase.com/dashboard', detail: 'dashboard.supabase.com' },
+                      { label: 'Vercel (hospedagem)', url: 'https://vercel.com/dashboard', detail: 'vercel.com/dashboard' },
+                    ].map(({ label, url, detail }) => (
+                      <a key={label} href={url} target="_blank" rel="noreferrer"
+                        className="flex items-center justify-between p-4 rounded-2xl border border-gray-100 hover:border-[#C18D41]/30 hover:bg-[#C18D41]/5 transition-all group">
+                        <div>
+                          <p className="font-bold text-[#05070a] text-sm">{label}</p>
+                          <p className="text-xs text-gray-400">{detail}</p>
+                        </div>
+                        <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-[#C18D41] transition-colors" />
+                      </a>
+                    ))}
+                  </div>
+                </div>
+                <div className="bg-white rounded-3xl p-10 shadow-sm border border-gray-100">
+                  <h3 className="font-serif text-xl font-bold text-[#05070a] mb-1">Senha do Painel</h3>
+                  <p className="text-sm text-gray-400">A senha atual e <code className="bg-gray-100 px-2 py-0.5 rounded text-xs">DreamTravel@2026</code>. Para alterar, fale com o desenvolvedor.</p>
+                </div>
+              </motion.div>
+            )}
+
           </AnimatePresence>
         </div>
       </main>
+
+      {/* ── Dialogo de Confirmacao ── */}
+      <AnimatePresence>
+        {confirm && (
+          <motion.div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] flex items-center justify-center p-6"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <motion.div className="bg-white rounded-3xl shadow-2xl w-full max-w-md p-8"
+              initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}>
+              <div className="w-12 h-12 bg-red-50 rounded-2xl flex items-center justify-center mb-5">
+                <Trash2 className="w-5 h-5 text-red-500" />
+              </div>
+              <h3 className="font-serif text-xl font-bold text-[#05070a] mb-2">Confirmar remocao</h3>
+              <p className="text-sm text-gray-500 mb-8">{confirm.message}</p>
+              <div className="flex gap-3">
+                <button onClick={() => setConfirm(null)}
+                  className="flex-1 h-11 rounded-2xl border border-gray-200 text-gray-600 font-bold text-xs uppercase tracking-widest hover:bg-gray-50 transition-colors">
+                  Cancelar
+                </button>
+                <button onClick={() => { confirm.onConfirm(); setConfirm(null); }}
+                  className="flex-1 h-11 rounded-2xl bg-red-500 hover:bg-red-600 text-white font-bold text-xs uppercase tracking-widest transition-colors">
+                  Remover
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* ── Modal: Novo Destino ── */}
       <Modal open={showDestModal} onClose={() => setShowDestModal(false)} title="Novo Destino" wide>
@@ -718,7 +806,18 @@ export default function AdminPanel() {
               className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 bg-white placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#C18D41]/40 resize-none" />
           </div>
           <div className="grid grid-cols-3 gap-4">
-            <Field label="Rating (1-5)" required type="number" value={String(destForm.rating)} onChange={v => setDestForm(f => ({ ...f, rating: parseFloat(v) }))} placeholder="Ex: 4.9" />
+            <div>
+              <label className="text-xs font-bold uppercase tracking-widest text-gray-400 block mb-2">Avaliacao</label>
+              <div className="flex gap-1 py-2">
+                {[1,2,3,4,5].map(star => (
+                  <button key={star} type="button" onClick={() => setDestForm(f => ({ ...f, rating: star }))}
+                    className={`text-2xl transition-transform hover:scale-110 ${destForm.rating >= star ? 'text-[#C18D41]' : 'text-gray-200'}`}>
+                    ★
+                  </button>
+                ))}
+                <span className="text-xs text-gray-400 font-medium ml-2 self-center">{destForm.rating}.0</span>
+              </div>
+            </div>
             <div>
               <label className="text-xs font-bold uppercase tracking-widest text-gray-400 block mb-2">Categoria</label>
               <select value={destForm.category} onChange={e => setDestForm(f => ({ ...f, category: e.target.value }))}
@@ -845,7 +944,8 @@ export default function AdminPanel() {
             <Field label="Destino" required value={itinForm.destination} onChange={v => setItinForm(f => ({ ...f, destination: v }))} placeholder="Ex: Costa Amalfitana" />
           </div>
           <Field label="Data de Partida" value={itinForm.start_date} onChange={v => setItinForm(f => ({ ...f, start_date: v }))} placeholder="Ex: 15 de Junho, 2026" />
-          <Field label="URL da Imagem de Capa (opcional)" value={itinForm.image_url} onChange={v => setItinForm(f => ({ ...f, image_url: v }))} placeholder="https://..." />
+          <ImageUploadField label="Imagem de Capa do Roteiro (opcional)" value={itinForm.image_url || ''} folder="destinations"
+            onChange={url => setItinForm(f => ({ ...f, image_url: url }))} />
 
           <div className="border-t border-gray-100 pt-4">
             <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Logistica</p>
