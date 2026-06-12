@@ -13,7 +13,6 @@ import { Button } from '@/components/painel/button';
 const IMAGES = [
   { src: '/images/maldivas.jpg',    label: 'Maldivas', scrollSpeed: 0.18, mx: -20, my: -12 },
   { src: '/images/capri.jpg',       label: 'Capri',    scrollSpeed: 0.30, mx: -10, my: -20 },
-  { src: '/images/hero-luxury.jpg', label: '',         scrollSpeed: 0.22, mx:   0, my:  -6 },
   { src: '/images/zermatt.jpg',     label: 'Zermatt',  scrollSpeed: 0.35, mx:  10, my: -18 },
   { src: '/images/kyoto.jpg',       label: 'Kyoto',    scrollSpeed: 0.20, mx:  20, my: -10 },
 ];
