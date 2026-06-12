@@ -2,8 +2,10 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Star, ArrowRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/painel/button";
+import { useLocation } from "wouter";
 
 const FeaturedDestinations = () => {
+  const [, setLocation] = useLocation();
   const [destinations, setDestinations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -47,7 +49,7 @@ const FeaturedDestinations = () => {
             viewport={{ once: true }}
             transition={{ delay: 0.3 }}
           >
-            <Button variant="ghost" className="group text-[#C18D41] hover:text-[#A67632] p-0 text-sm font-bold tracking-widest uppercase gap-2 transition-all">
+            <Button variant="ghost" onClick={() => setLocation('/destinos')} className="group text-[#C18D41] hover:text-[#A67632] p-0 text-sm font-bold tracking-widest uppercase gap-2 transition-all">
               Ver todos os destinos <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
             </Button>
           </motion.div>
@@ -66,6 +68,7 @@ const FeaturedDestinations = () => {
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1, duration: 0.6 }}
+                onClick={() => setLocation(`/destinos/${dest.id}`)}
                 className={`relative group overflow-hidden rounded-3xl cursor-pointer ${
                   dest.size === "large" ? "md:col-span-2 md:row-span-2" : 
                   dest.size === "medium" ? "md:col-span-2 md:row-span-1" : "md:col-span-1 md:row-span-1"
