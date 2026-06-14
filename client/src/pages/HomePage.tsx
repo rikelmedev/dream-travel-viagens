@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Shield, Star, Globe, ChevronDown } from 'lucide-react';
+import { Shield, Star, Globe, ChevronDown, ArrowRight } from 'lucide-react';
 import Layout from '@/components/Layout';
 import { setSEOHead } from '@/components/SEOHead';
 import Globe3D from '@/components/Globe3D';
@@ -188,19 +188,45 @@ export default function HomePage() {
         </section>
 
         {/* ── FAQ ── */}
-        <section className="py-24 bg-[#FAF9F6]">
-          <div className="container px-6 lg:px-12 max-w-3xl mx-auto">
-            <div className="text-center mb-16">
-              <div className="flex items-center justify-center gap-4 mb-6">
-                <div className="h-px w-12 bg-[#C18D41]/50" />
-                <span className="text-[#C18D41] text-[10px] uppercase tracking-[0.5em] font-bold">Perguntas Frequentes</span>
-                <div className="h-px w-12 bg-[#C18D41]/50" />
+        <section className="py-24 bg-[#05070a]">
+          <div className="container px-6 lg:px-12 max-w-7xl mx-auto">
+            <div className="flex flex-col lg:flex-row gap-16 lg:gap-24">
+
+              {/* Coluna esquerda — titulo fixo */}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.7 }}
+                className="lg:w-72 xl:w-96 flex-shrink-0"
+              >
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="h-px w-8 bg-[#C18D41]/50" />
+                  <span className="text-[#C18D41] text-[10px] uppercase tracking-[0.5em] font-bold">FAQ</span>
+                </div>
+                <h2 className="text-4xl md:text-5xl font-serif text-white leading-tight mb-6">
+                  Ficou com <br />
+                  <span className="italic font-light text-[#C18D41]">Duvidas?</span>
+                </h2>
+                <p className="text-white/35 text-sm font-light leading-relaxed mb-10">
+                  Respondemos as perguntas mais comuns sobre como funciona a nossa curadoria de viagens.
+                </p>
+                <a
+                  href="https://wa.me/5517996077150"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 text-[#C18D41] hover:text-white text-[10px] font-bold uppercase tracking-[0.3em] transition-colors duration-300 group"
+                >
+                  Falar com a Jackeline
+                  <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                </a>
+              </motion.div>
+
+              {/* Coluna direita — accordion */}
+              <div className="flex-1 divide-y divide-white/8">
+                <FAQSection />
               </div>
-              <h2 className="text-4xl md:text-5xl font-serif font-bold text-[#05070a] leading-[1.1]">
-                Ficou com <span className="italic font-light text-[#C18D41]">Duvidas?</span>
-              </h2>
             </div>
-            <FAQSection />
           </div>
         </section>
 
@@ -223,24 +249,38 @@ function FAQSection() {
   ];
 
   return (
-    <div className="space-y-3">
+    <>
       {faqs.map((faq, i) => (
-        <motion.div key={i} initial={{ opacity: 0, y: 15 }} whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }} transition={{ delay: i * 0.07 }}
-          className="bg-white border border-gray-100 rounded-2xl overflow-hidden hover:border-[#C18D41]/20 transition-colors">
-          <button onClick={() => setOpen(open === i ? null : i)}
-            className="w-full flex items-center justify-between px-8 py-6 text-left group">
-            <span className="font-serif text-[#05070a] font-bold text-lg pr-4">{faq.q}</span>
-            <ChevronDown className={`w-5 h-5 text-[#C18D41] shrink-0 transition-transform duration-300 ${open === i ? 'rotate-180' : ''}`} />
+        <motion.div
+          key={i}
+          initial={{ opacity: 0, y: 12 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: i * 0.06, duration: 0.5 }}
+        >
+          <button
+            onClick={() => setOpen(open === i ? null : i)}
+            className="w-full flex items-start justify-between py-7 text-left group gap-6"
+          >
+            <span className={`font-serif text-lg leading-snug transition-colors duration-300 ${open === i ? 'text-[#C18D41]' : 'text-white/80 group-hover:text-white'}`}>
+              {faq.q}
+            </span>
+            <span className={`w-6 h-6 rounded-full border flex items-center justify-center flex-shrink-0 mt-0.5 transition-all duration-300 ${open === i ? 'border-[#C18D41] bg-[#C18D41]/10 rotate-45' : 'border-white/20 group-hover:border-white/40'}`}>
+              <ChevronDown className={`w-3 h-3 transition-all duration-300 ${open === i ? 'text-[#C18D41] -rotate-45' : 'text-white/40'}`} />
+            </span>
           </button>
-          {open === i && (
-            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }} className="px-8 pb-6">
-              <p className="text-gray-500 font-light leading-relaxed">{faq.a}</p>
-            </motion.div>
-          )}
+          <motion.div
+            initial={false}
+            animate={{ height: open === i ? 'auto' : 0, opacity: open === i ? 1 : 0 }}
+            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            className="overflow-hidden"
+          >
+            <p className="text-white/40 font-light leading-relaxed pb-7 text-sm max-w-2xl">
+              {faq.a}
+            </p>
+          </motion.div>
         </motion.div>
       ))}
-    </div>
+    </>
   );
 }
