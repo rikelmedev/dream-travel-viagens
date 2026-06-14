@@ -8,7 +8,7 @@ import FeaturedDestinations from '@/components/FeaturedDestinations';
 import PageTransition from '@/components/PageTransition';
 import AboutJackeline from '@/components/AboutJackeline';
 import FormularioQuestionario from '@/components/FormularioQuestionario';
-import ParallaxHero from '@/components/ParallaxHero';
+import SliderHero from '@/components/SliderHero';
 import { useLocation } from 'wouter';
 
 export default function HomePage() {
@@ -24,7 +24,6 @@ export default function HomePage() {
     setSEOHead({
       title: 'Dream Travel | Curadoria de Viagens Exclusivas',
       description: 'Experiências singulares desenhadas milimetricamente para si.',
-      image: '/images/hero-luxury.jpg',
     });
     window.scrollTo(0,0);
   }, []);
@@ -44,11 +43,7 @@ export default function HomePage() {
   return (
     <PageTransition>
       <Layout>
-        <ParallaxHero
-          formData={formData}
-          onChange={(field, value) => setFormData({ ...formData, [field]: value })}
-          onSubmit={handleRequestItinerary}
-        />
+        <SliderHero />
 
         {/* ── Prova Social ── */}
         <section className="py-16 bg-[#FAF9F6] border-b border-gray-100">
@@ -161,7 +156,7 @@ export default function HomePage() {
         </section>
 
         <Globe3D />
-        <FormularioQuestionario />
+        <div id="formulario"><FormularioQuestionario /></div>
       </Layout>
     </PageTransition>
   );
