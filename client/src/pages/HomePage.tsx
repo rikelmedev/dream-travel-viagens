@@ -71,33 +71,80 @@ export default function HomePage() {
         <FeaturedPackages />
 
         {/* ── Beneficios ── */}
-        <section className="py-24 bg-[#FAF9F6]">
+        <section className="py-24 bg-[#05070a]">
           <div className="container px-6 lg:px-12 max-w-7xl mx-auto">
-            <div className="text-center mb-16">
-              <div className="flex items-center justify-center gap-4 mb-6">
-                <div className="h-px w-12 bg-[#C18D41]/50" />
-                <span className="text-[#C18D41] text-[10px] uppercase tracking-[0.5em] font-bold">Por que nos escolher</span>
-                <div className="h-px w-12 bg-[#C18D41]/50" />
-              </div>
-              <h2 className="text-4xl md:text-6xl font-serif font-bold text-[#05070a] leading-[1.1]">
-                A Diferenca que <br />
-                <span className="italic font-light text-[#C18D41]">Voce Merece.</span>
-              </h2>
+
+            {/* Header split */}
+            <div className="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-6">
+              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }} transition={{ duration: 0.7 }}>
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="h-px w-8 bg-[#C18D41]/50" />
+                  <span className="text-[#C18D41] text-[10px] uppercase tracking-[0.5em] font-bold">Por que nos escolher</span>
+                </div>
+                <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif text-white leading-tight">
+                  A Diferenca que <br />
+                  <span className="italic font-light text-[#C18D41]">Voce Merece.</span>
+                </h2>
+              </motion.div>
+              <motion.p initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}
+                viewport={{ once: true }} transition={{ delay: 0.3 }}
+                className="text-white/40 text-sm font-light max-w-xs leading-relaxed md:text-right">
+                Mais do que uma agencia — uma curadora de experiencias que transformam viagens em memorias eternas.
+              </motion.p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+            {/* Lista editorial numerada */}
+            <div className="divide-y divide-white/8">
               {[
-                { icon: Star, title: 'Curadoria de Alto Padrao', desc: 'Cada destino e cuidadosamente selecionado e testado pela Jackeline antes de ser recomendado. Nenhum detalhe e deixado ao acaso.' },
-                { icon: Shield, title: 'Planejamento Seguro', desc: 'Do primeiro atendimento ao seu retorno, acompanhamos cada etapa da sua viagem com suporte 24h e resolucao imediata de imprevistos.' },
-                { icon: Globe, title: 'Destinos Exclusivos', desc: 'Acesso a experiencias nao encontradas em agencias comuns — hoteis boutique, roteiros privados e vivencias que so a curadoria permite.' },
-              ].map(({ icon: Icon, title, desc }, i) => (
-                <motion.div key={title} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }} transition={{ delay: i * 0.15, duration: 0.7 }}
-                  className="bg-white rounded-[2rem] p-10 border border-gray-100 hover:border-[#C18D41]/30 hover:shadow-xl transition-all duration-500 group">
-                  <div className="w-14 h-14 bg-[#C18D41]/10 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-[#C18D41] transition-colors duration-300">
-                    <Icon className="w-6 h-6 text-[#C18D41] group-hover:text-white transition-colors duration-300" />
+                {
+                  num: '01',
+                  title: 'Curadoria de Alto Padrao',
+                  desc: 'Cada destino e pessoalmente testado pela Jackeline antes de ser recomendado. Nenhum hotel, restaurante ou experiencia entra no portfolio sem passar pelo seu crivo exigente.',
+                  tag: 'Selecao pessoal',
+                },
+                {
+                  num: '02',
+                  title: 'Planejamento Seguro',
+                  desc: 'Do primeiro contato ao seu retorno, acompanhamos cada etapa com suporte 24h e resolucao imediata de qualquer imprevisto — para que voce so precise se preocupar em aproveitar.',
+                  tag: 'Suporte completo',
+                },
+                {
+                  num: '03',
+                  title: 'Destinos Exclusivos',
+                  desc: 'Acesso a experiencias que nao existem em agencias comuns: hoteis boutique fora dos roteiros turisticos, jantares privados, transfers em classe executiva e vivencias unicas.',
+                  tag: 'Acesso privilegiado',
+                },
+              ].map(({ num, title, desc, tag }, i) => (
+                <motion.div
+                  key={num}
+                  initial={{ opacity: 0, x: -30 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true, margin: '-60px' }}
+                  transition={{ delay: i * 0.12, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                  className="group grid grid-cols-[64px_1fr] md:grid-cols-[80px_1fr_260px] gap-6 md:gap-12 py-10 items-start hover:bg-white/[0.02] transition-colors duration-300 px-4 -mx-4 rounded-2xl cursor-default"
+                >
+                  {/* Numero */}
+                  <span className="font-black text-5xl md:text-6xl text-white/10 group-hover:text-[#C18D41]/30 transition-colors duration-500 leading-none tabular-nums select-none">
+                    {num}
+                  </span>
+
+                  {/* Titulo + descricao */}
+                  <div>
+                    <h3 className="font-serif text-2xl md:text-3xl text-white mb-3 group-hover:text-[#C18D41] transition-colors duration-300">
+                      {title}
+                    </h3>
+                    <p className="text-white/45 font-light leading-relaxed text-sm max-w-xl">
+                      {desc}
+                    </p>
                   </div>
-                  <h3 className="font-serif text-xl font-bold text-[#05070a] mb-3">{title}</h3>
-                  <p className="text-gray-500 font-light leading-relaxed text-sm">{desc}</p>
+
+                  {/* Tag lateral — visivel apenas em md+ */}
+                  <div className="hidden md:flex items-start justify-end pt-1">
+                    <span className="text-[9px] uppercase tracking-[0.35em] font-bold text-white/20 group-hover:text-[#C18D41]/50 transition-colors duration-300 border border-white/10 group-hover:border-[#C18D41]/30 px-4 py-2 rounded-full">
+                      {tag}
+                    </span>
+                  </div>
                 </motion.div>
               ))}
             </div>
@@ -105,7 +152,7 @@ export default function HomePage() {
         </section>
 
         {/* ── Depoimentos ── */}
-        <section className="py-24 bg-[#05070a]">
+        <section className="py-24 bg-[#FAF9F6]">
           <div className="container px-6 lg:px-12 max-w-7xl mx-auto">
             <div className="text-center mb-16">
               <div className="flex items-center justify-center gap-4 mb-6">
@@ -113,7 +160,7 @@ export default function HomePage() {
                 <span className="text-[#C18D41] text-[10px] uppercase tracking-[0.5em] font-bold">O que dizem nossos clientes</span>
                 <div className="h-px w-12 bg-[#C18D41]/50" />
               </div>
-              <h2 className="text-4xl md:text-5xl font-serif font-bold text-white leading-[1.1]">
+              <h2 className="text-4xl md:text-5xl font-serif font-bold text-[#05070a] leading-[1.1]">
                 Historias que <span className="italic font-light text-[#C18D41]">nos Inspiram.</span>
               </h2>
             </div>
@@ -125,13 +172,13 @@ export default function HomePage() {
               ].map(({ name, local, stars, text }, i) => (
                 <motion.div key={name} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }} transition={{ delay: i * 0.15, duration: 0.7 }}
-                  className="bg-white/[0.04] border border-white/10 rounded-[2rem] p-8 hover:bg-white/[0.07] transition-colors">
+                  className="bg-white border border-gray-100 rounded-[2rem] p-8 hover:shadow-xl hover:border-[#C18D41]/20 transition-all duration-500">
                   <div className="flex text-[#C18D41] mb-5">
                     {Array.from({ length: stars }).map((_, i) => <Star key={i} className="w-4 h-4 fill-current" />)}
                   </div>
-                  <p className="text-white/70 font-light leading-relaxed italic mb-6">"{text}"</p>
-                  <div className="border-t border-white/10 pt-5">
-                    <p className="font-bold text-white text-sm">{name}</p>
+                  <p className="text-gray-500 font-light leading-relaxed italic mb-6">"{text}"</p>
+                  <div className="border-t border-gray-100 pt-5">
+                    <p className="font-bold text-[#05070a] text-sm">{name}</p>
                     <p className="text-[#C18D41] text-[10px] uppercase tracking-widest font-bold mt-1">{local}</p>
                   </div>
                 </motion.div>
