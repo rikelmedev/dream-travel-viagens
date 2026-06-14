@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, MapPin, Calendar, Users, DollarSign, Send } from 'lucide-react';
 
@@ -7,8 +7,12 @@ const estadias = ['Resort / Hotel de Luxo', 'Pousada Boutique', 'Villa Privada',
 const logisticas = ['Aéreo e Terrestre', 'Apenas Terrestre', 'Já possuo voos'];
 
 export default function FormularioQuestionario() {
+  const preDestino = typeof window !== 'undefined'
+    ? new URLSearchParams(window.location.search).get('destino') ?? ''
+    : '';
+
   const [formData, setFormData] = useState({
-    destino: '',
+    destino: preDestino,
     datas: '',
     hospedes: '',
     investimento: '',
@@ -17,6 +21,12 @@ export default function FormularioQuestionario() {
     logistica: '',
     detalhes: '',
   });
+
+  useEffect(() => {
+    if (preDestino) {
+      setFormData((prev) => ({ ...prev, destino: preDestino }));
+    }
+  }, [preDestino]);
 
   const set = (field: string, value: string) =>
     setFormData((prev) => ({ ...prev, [field]: value }));
