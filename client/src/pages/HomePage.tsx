@@ -7,6 +7,7 @@ import Globe3D from '@/components/Globe3D';
 import FeaturedDestinations from '@/components/FeaturedDestinations';
 import PageTransition from '@/components/PageTransition';
 import AboutJackeline from '@/components/AboutJackeline';
+import FeaturedPackages from '@/components/FeaturedPackages';
 import FormularioQuestionario from '@/components/FormularioQuestionario';
 import SliderHero from '@/components/SliderHero';
 import { useLocation } from 'wouter';
@@ -67,6 +68,7 @@ export default function HomePage() {
 
         <AboutJackeline />
         <FeaturedDestinations />
+        <FeaturedPackages />
 
         {/* ── Beneficios ── */}
         <section className="py-24 bg-[#FAF9F6]">
