@@ -37,7 +37,7 @@ export default function BlogPage() {
 
   useEffect(() => {
     setSEOHead({
-      title: 'Journal da Curadora | Dream Travel',
+      title: 'Blog da Curadora | Dream Travel',
       description: 'Relatos, dicas e inspirações de viagens de luxo curadas por Jackeline.',
     });
     window.scrollTo(0, 0);
@@ -76,9 +76,6 @@ export default function BlogPage() {
             >
               <div className="flex items-center gap-3 mb-8">
                 <div className="h-px w-8 bg-[#C18D41]/50" />
-                <span className="text-[#C18D41] text-[10px] uppercase tracking-[0.5em] font-bold">
-                  Journal da Curadora
-                </span>
               </div>
               <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
                 <h1 className="font-serif text-6xl md:text-8xl lg:text-[7rem] text-white leading-[0.88]">
