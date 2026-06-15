@@ -58,12 +58,15 @@ export default function BlogPage() {
     : posts.filter((p) => p.category === activeCategory);
 
   const featured = posts.find((p) => p.featured) ?? posts[0] ?? null;
+  const rest = activeCategory === 'Todos'
+    ? posts.filter((p) => p.id !== featured?.id)
+    : filtered;
 
   return (
     <PageTransition>
       <Layout>
 
-        {/* ── Hero ── */}
+        {/* ── Hero escuro ── */}
         <section className="bg-[#05070a] pt-36 pb-20 px-6 lg:px-12">
           <div className="container max-w-7xl mx-auto">
             <motion.div
@@ -78,11 +81,11 @@ export default function BlogPage() {
                 </span>
               </div>
               <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
-                <h1 className="font-serif text-6xl md:text-8xl lg:text-9xl text-white leading-[0.88]">
+                <h1 className="font-serif text-6xl md:text-8xl lg:text-[7rem] text-white leading-[0.88]">
                   Diário de<br />
                   <span className="italic font-light text-[#C18D41]">Viagens.</span>
                 </h1>
-                <p className="text-white/35 font-light text-sm max-w-sm leading-relaxed lg:text-right lg:pb-3">
+                <p className="text-white/35 font-light text-sm max-w-sm leading-relaxed lg:text-right lg:pb-2">
                   Relatos reais, bastidores e inspirações das jornadas vividas pela Jackeline ao redor do mundo.
                 </p>
               </div>
@@ -93,7 +96,7 @@ export default function BlogPage() {
         {/* ── Filtros sticky ── */}
         <div className="sticky top-0 z-40 bg-[#FAF9F6]/95 backdrop-blur-xl border-b border-gray-200/60">
           <div className="container max-w-7xl mx-auto px-6 lg:px-12">
-            <div className="flex items-center gap-0 overflow-x-auto scrollbar-hide">
+            <div className="flex items-center overflow-x-auto scrollbar-hide">
               {CATEGORIES.map((cat) => (
                 <button
                   key={cat}
@@ -115,8 +118,8 @@ export default function BlogPage() {
           </div>
         </div>
 
-        {/* ── Feed ── */}
-        <section className="bg-[#FAF9F6] py-12 px-6 lg:px-12 min-h-[60vh]">
+        {/* ── Conteúdo ── */}
+        <section className="bg-[#FAF9F6] py-16 px-6 lg:px-12 min-h-[60vh]">
           <div className="container max-w-7xl mx-auto">
 
             {isLoading ? (
@@ -133,43 +136,140 @@ export default function BlogPage() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: 0.35 }}
+                  transition={{ duration: 0.3 }}
                 >
-                  {/* Post em destaque — só na aba "Todos" */}
+
+                  {/* ── Post destaque — layout magazine ── */}
                   {featured && activeCategory === 'Todos' && (
-                    <FeaturedCard post={featured} onClick={() => setLocation(`/blog/${featured.id}`)} />
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.7 }}
+                      className="mb-16"
+                    >
+                      {/* Cabeçalho da seção */}
+                      <div className="flex items-center gap-4 mb-8">
+                        <span className="text-[10px] uppercase tracking-[0.4em] font-bold text-[#05070a]/40">
+                          Em Destaque
+                        </span>
+                        <div className="flex-1 h-px bg-[#05070a]/8" />
+                      </div>
+
+                      {/* Card destaque — imagem esquerda + texto direita */}
+                      <div
+                        onClick={() => setLocation(`/blog/${featured.id}`)}
+                        className="group grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] rounded-2xl overflow-hidden border border-gray-200/80 hover:border-[#C18D41]/30 hover:shadow-2xl transition-all duration-500 cursor-pointer bg-white"
+                      >
+                        {/* Imagem */}
+                        <div className="relative overflow-hidden h-72 lg:h-auto min-h-[320px]">
+                          {featured.cover_image ? (
+                            <img
+                              src={featured.cover_image}
+                              alt={featured.title}
+                              className="w-full h-full object-cover transition-transform duration-[8s] group-hover:scale-105"
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-gradient-to-br from-[#05070a] to-[#C18D41]/30" />
+                          )}
+                          {/* Badge destaque sobre a imagem */}
+                          <div className="absolute top-5 left-5">
+                            <span className="bg-[#C18D41] text-white text-[8px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full">
+                              Destaque do Journal
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Texto */}
+                        <div className="p-8 md:p-12 flex flex-col justify-between bg-white">
+                          <div>
+                            {/* Meta */}
+                            <div className="flex flex-wrap items-center gap-3 mb-6">
+                              {featured.category && (
+                                <span className="text-[9px] font-bold uppercase tracking-widest text-[#C18D41] border border-[#C18D41]/30 px-3 py-1 rounded-full">
+                                  {featured.category}
+                                </span>
+                              )}
+                              {featured.created_at && (
+                                <span className="flex items-center gap-1.5 text-[9px] uppercase tracking-widest text-gray-400 font-bold">
+                                  <Calendar className="w-3 h-3 text-[#C18D41]" />
+                                  {formatDate(featured.created_at)}
+                                </span>
+                              )}
+                              {featured.location && (
+                                <span className="flex items-center gap-1.5 text-[9px] uppercase tracking-widest text-gray-400 font-bold">
+                                  <MapPin className="w-3 h-3 text-[#C18D41]" />
+                                  {featured.location}
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Título */}
+                            <h2 className="font-serif text-3xl md:text-4xl text-[#05070a] leading-tight mb-5 group-hover:text-[#C18D41] transition-colors duration-300">
+                              {featured.title}
+                            </h2>
+
+                            {/* Excerpt */}
+                            {featured.excerpt && (
+                              <p className="text-gray-500 font-light text-sm leading-relaxed line-clamp-4">
+                                {featured.excerpt}
+                              </p>
+                            )}
+                          </div>
+
+                          {/* CTA */}
+                          <div className="flex items-center gap-3 text-[#C18D41] text-[10px] font-bold uppercase tracking-[0.3em] mt-8 group-hover:gap-4 transition-all duration-300">
+                            Ler relato completo
+                            <ArrowRight className="w-3.5 h-3.5" />
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
                   )}
 
-                  {/* Grid de posts */}
-                  {filtered.length > 0 && (
-                    <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 ${featured && activeCategory === 'Todos' ? 'mt-4' : ''}`}>
-                      {(activeCategory === 'Todos' ? filtered.slice(1) : filtered).map((post, i) => (
-                        <motion.div
-                          key={post.id}
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: i * 0.07, duration: 0.5 }}
-                        >
-                          <PostCard post={post} onClick={() => setLocation(`/blog/${post.id}`)} />
-                        </motion.div>
-                      ))}
-                    </div>
+                  {/* ── Grid de posts ── */}
+                  {rest.length > 0 && (
+                    <>
+                      <div className="flex items-center gap-4 mb-10">
+                        <span className="text-[10px] uppercase tracking-[0.4em] font-bold text-[#05070a]/40">
+                          {activeCategory === 'Todos' ? 'Últimas Histórias' : activeCategory}
+                        </span>
+                        <div className="flex-1 h-px bg-[#05070a]/8" />
+                        <span className="text-[9px] uppercase tracking-widest text-[#05070a]/25 font-bold tabular-nums">
+                          {rest.length} {rest.length === 1 ? 'relato' : 'relatos'}
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {rest.map((post, i) => (
+                          <motion.div
+                            key={post.id}
+                            initial={{ opacity: 0, y: 24 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: i * 0.07, duration: 0.6 }}
+                          >
+                            <ArticleCard post={post} onClick={() => setLocation(`/blog/${post.id}`)} />
+                          </motion.div>
+                        ))}
+                      </div>
+                    </>
                   )}
 
-                  {filtered.length === 0 && (
+                  {/* Categoria sem posts */}
+                  {filtered.length === 0 && activeCategory !== 'Todos' && (
                     <div className="flex flex-col items-center justify-center py-32 gap-4">
                       <Camera className="w-10 h-10 text-[#05070a]/10" />
                       <p className="font-serif text-xl text-[#05070a]/40 italic">
-                        Nenhum relato nesta colecão ainda.
+                        Nenhum relato nesta coleção ainda.
                       </p>
                       <button
                         onClick={() => setActiveCategory('Todos')}
                         className="text-[#C18D41] text-[10px] uppercase tracking-widest font-bold hover:underline"
                       >
-                        Ver todos
+                        Ver todos os relatos
                       </button>
                     </div>
                   )}
+
                 </motion.div>
               </AnimatePresence>
             )}
@@ -181,131 +281,77 @@ export default function BlogPage() {
   );
 }
 
-/* ── Card destaque ── */
-function FeaturedCard({ post, onClick }: { post: Post; onClick: () => void }) {
+/* ── Card de artigo — estilo magazine ── */
+function ArticleCard({ post, onClick }: { post: Post; onClick: () => void }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.7 }}
+    <article
       onClick={onClick}
-      className="group relative rounded-2xl overflow-hidden cursor-pointer mb-4 h-[55vh] min-h-[380px]"
+      className="group cursor-pointer flex flex-col h-full bg-white rounded-2xl overflow-hidden border border-gray-100 hover:border-[#C18D41]/25 hover:shadow-xl transition-all duration-500"
     >
-      {post.cover_image ? (
-        <img
-          src={post.cover_image}
-          alt={post.title}
-          className="absolute inset-0 w-full h-full object-cover transition-transform duration-[8s] group-hover:scale-105"
-        />
-      ) : (
-        <div className="absolute inset-0 bg-gradient-to-br from-[#05070a] to-[#C18D41]/20" />
-      )}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
-
-      {/* Badges */}
-      <div className="absolute top-6 left-6 flex items-center gap-2">
-        <span className="bg-[#C18D41] text-white text-[9px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full">
-          Destaque
-        </span>
+      {/* Imagem */}
+      <div className="relative overflow-hidden h-56 bg-gray-100 flex-shrink-0">
+        {post.cover_image ? (
+          <img
+            src={post.cover_image}
+            alt={post.title}
+            className="w-full h-full object-cover transition-transform duration-[8s] group-hover:scale-105"
+          />
+        ) : (
+          <div className="w-full h-full bg-gradient-to-br from-[#05070a] to-[#C18D41]/20 flex items-center justify-center">
+            <Camera className="w-8 h-8 text-white/15" />
+          </div>
+        )}
+        {/* Categoria badge sobre a foto */}
         {post.category && (
-          <span className="bg-white/10 backdrop-blur-sm text-white text-[9px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full border border-white/15">
-            {post.category}
-          </span>
+          <div className="absolute top-4 left-4">
+            <span className="bg-white/90 backdrop-blur-sm text-[#05070a] text-[8px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full shadow-sm">
+              {post.category}
+            </span>
+          </div>
         )}
       </div>
 
-      {/* Conteúdo */}
-      <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
-        <div className="flex-1">
-          <div className="flex items-center gap-5 mb-4 text-[9px] uppercase tracking-widest text-white/40 font-bold">
-            {post.created_at && (
-              <span className="flex items-center gap-1.5">
-                <Calendar className="w-3 h-3 text-[#C18D41]" />
-                {formatDate(post.created_at)}
-              </span>
-            )}
-            {post.location && (
-              <span className="flex items-center gap-1.5">
-                <MapPin className="w-3 h-3 text-[#C18D41]" />
-                {post.location}
-              </span>
-            )}
-          </div>
-          <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl text-white leading-tight group-hover:text-[#C18D41] transition-colors duration-300">
-            {post.title}
-          </h2>
-          {post.excerpt && (
-            <p className="text-white/45 text-sm font-light mt-3 max-w-2xl leading-relaxed line-clamp-2">
-              {post.excerpt}
-            </p>
-          )}
-        </div>
-        <div className="w-12 h-12 rounded-full border border-white/20 group-hover:border-[#C18D41] group-hover:bg-[#C18D41]/10 flex items-center justify-center flex-shrink-0 transition-all duration-300">
-          <ArrowRight className="w-4 h-4 text-white" />
-        </div>
-      </div>
-    </motion.div>
-  );
-}
+      {/* Texto */}
+      <div className="p-6 flex flex-col flex-1">
 
-/* ── Card normal — estilo post de feed ── */
-function PostCard({ post, onClick }: { post: Post; onClick: () => void }) {
-  return (
-    <div
-      onClick={onClick}
-      className="group relative rounded-2xl overflow-hidden cursor-pointer h-80 lg:h-96"
-    >
-      {post.cover_image ? (
-        <img
-          src={post.cover_image}
-          alt={post.title}
-          className="absolute inset-0 w-full h-full object-cover transition-transform duration-[8s] group-hover:scale-105"
-        />
-      ) : (
-        <div className="absolute inset-0 bg-gradient-to-br from-[#05070a] to-[#C18D41]/20 flex items-center justify-center">
-          <Camera className="w-10 h-10 text-white/10" />
-        </div>
-      )}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent" />
-
-      {/* Categoria badge */}
-      {post.category && (
-        <div className="absolute top-4 left-4">
-          <span className="bg-white/10 backdrop-blur-sm text-white text-[8px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full border border-white/15">
-            {post.category}
-          </span>
-        </div>
-      )}
-
-      {/* Conteúdo */}
-      <div className="absolute bottom-0 left-0 right-0 p-6">
-        <div className="flex items-center gap-3 mb-2 text-[8px] uppercase tracking-widest text-white/35 font-bold">
+        {/* Meta — data + local */}
+        <div className="flex items-center gap-4 mb-4">
           {post.created_at && (
-            <span className="flex items-center gap-1">
+            <span className="flex items-center gap-1.5 text-[8px] uppercase tracking-widest text-gray-400 font-bold">
               <Calendar className="w-2.5 h-2.5 text-[#C18D41]" />
               {formatDate(post.created_at)}
             </span>
           )}
           {post.location && (
-            <span className="flex items-center gap-1">
+            <span className="flex items-center gap-1.5 text-[8px] uppercase tracking-widest text-gray-400 font-bold">
               <MapPin className="w-2.5 h-2.5 text-[#C18D41]" />
               {post.location}
             </span>
           )}
         </div>
-        <h3 className="font-serif text-xl text-white leading-snug group-hover:text-[#C18D41] transition-colors duration-300 mb-3">
+
+        {/* Divisor dourado */}
+        <div className="w-8 h-[2px] bg-[#C18D41]/40 mb-4 group-hover:w-14 transition-all duration-500" />
+
+        {/* Título */}
+        <h3 className="font-serif text-xl text-[#05070a] leading-snug mb-3 group-hover:text-[#C18D41] transition-colors duration-300 flex-1">
           {post.title}
         </h3>
-        {post.excerpt && (
-          <p className="text-white/40 text-xs font-light leading-relaxed line-clamp-2 mb-3">
-            {post.excerpt}
+
+        {/* Excerpt */}
+        {(post.excerpt || post.content) && (
+          <p className="text-gray-400 font-light text-sm leading-relaxed line-clamp-3 mb-5">
+            {post.excerpt || post.content.slice(0, 120) + '...'}
           </p>
         )}
-        <div className="flex items-center gap-2 text-[#C18D41] text-[8px] font-bold uppercase tracking-widest opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0 transition-all duration-300">
-          Ler relato <ArrowRight className="w-3 h-3" />
+
+        {/* Ler mais */}
+        <div className="flex items-center gap-2 text-[#05070a] text-[9px] font-bold uppercase tracking-[0.3em] mt-auto pt-5 border-t border-gray-100 group-hover:text-[#C18D41] transition-colors duration-300">
+          Ler relato
+          <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform duration-300" />
         </div>
       </div>
-    </div>
+    </article>
   );
 }
 
