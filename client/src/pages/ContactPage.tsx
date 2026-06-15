@@ -126,15 +126,22 @@ export default function ContactPage() {
                   <div className="relative z-10 pt-12 border-t border-white/10">
                     <p className="text-[9px] uppercase tracking-widest text-white/40 font-bold mb-6">Siga a nossa jornada</p>
                     <div className="flex gap-4">
-                      {['Instagram', 'Facebook'].map((social) => (
-                        <a 
-                          key={social} 
-                          href="#" 
-                          className="text-xs font-bold uppercase tracking-widest text-white hover:text-[#C18D41] transition-colors"
-                        >
-                          {social}
-                        </a>
-                      ))}
+                      <a
+                        href="https://www.instagram.com/dream_travelviagens/"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-xs font-bold uppercase tracking-widest text-white hover:text-[#C18D41] transition-colors"
+                      >
+                        Instagram
+                      </a>
+                      <a
+                        href={`https://wa.me/5517996077150`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-xs font-bold uppercase tracking-widest text-white hover:text-[#C18D41] transition-colors"
+                      >
+                        WhatsApp
+                      </a>
                     </div>
                   </div>
                 </div>

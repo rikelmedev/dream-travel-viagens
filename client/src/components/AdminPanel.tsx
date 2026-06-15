@@ -149,6 +149,7 @@ export default function AdminPanel() {
   const [showItineraryModal, setShowItineraryModal] = useState(false);
   const [editingItinerary, setEditingItinerary] = useState<Itinerary | null>(null);
   const [editingPost, setEditingPost] = useState<Post | null>(null);
+  const [editingDestination, setEditingDestination] = useState<Destination | null>(null);
 
   // Forms
   const DEST_EMPTY = { title: '', location: '', description: '', image: '', price: '', rating: 5.0, category: 'praia', size: 'medium' };
@@ -227,20 +228,55 @@ export default function AdminPanel() {
 
   // ── Actions: Destinations ─────────────────────────────────────────────────
 
-  const createDestination = async (e: React.FormEvent) => {
+  const openNewDest = () => {
+    setEditingDestination(null);
+    setDestForm(DEST_EMPTY);
+    setShowDestModal(true);
+  };
+
+  const openEditDest = (dest: Destination) => {
+    setEditingDestination(dest);
+    setDestForm({
+      title: dest.title,
+      location: dest.location,
+      description: '',
+      image: dest.image,
+      price: dest.price,
+      rating: dest.rating,
+      category: (dest as any).category ?? 'praia',
+      size: dest.size ?? 'medium',
+    });
+    setShowDestModal(true);
+  };
+
+  const saveDest = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
     try {
-      const res = await fetch('/api/destinations', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...destForm, rating: Number(destForm.rating) }),
-      });
-      if (!res.ok) { toast.error('Erro ao criar destino'); return; }
-      const created = await res.json();
-      setDestinations(prev => [...prev, created]);
-      toast.success('Destino criado');
+      const payload = { ...destForm, rating: Number(destForm.rating) };
+      if (editingDestination) {
+        const res = await fetch(`/api/destinations/${editingDestination.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) { toast.error('Erro ao atualizar destino'); return; }
+        const updated = await res.json();
+        setDestinations(prev => prev.map(d => d.id === editingDestination.id ? updated : d));
+        toast.success('Destino atualizado');
+      } else {
+        const res = await fetch('/api/destinations', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) { toast.error('Erro ao criar destino'); return; }
+        const created = await res.json();
+        setDestinations(prev => [...prev, created]);
+        toast.success('Destino criado');
+      }
       setShowDestModal(false);
+      setEditingDestination(null);
       setDestForm(DEST_EMPTY);
       loadStats();
     } finally { setSaving(false); }
@@ -515,7 +551,7 @@ export default function AdminPanel() {
               {sidebarLinks.find(l => l.id === activeTab)?.label}
             </h2>
             {activeTab === 'destinations' && (
-              <Button onClick={() => setShowDestModal(true)} className="bg-[#05070a] hover:bg-[#C18D41] text-white rounded-2xl px-6 h-12">
+              <Button onClick={openNewDest} className="bg-[#05070a] hover:bg-[#C18D41] text-white rounded-2xl px-6 h-12">
                 <Plus className="w-4 h-4 mr-2" /> Novo Destino
               </Button>
             )}
@@ -570,7 +606,7 @@ export default function AdminPanel() {
                 {isLoading ? (
                   <div className="flex justify-center p-20"><Loader2 className="animate-spin w-8 h-8 text-gray-300" /></div>
                 ) : destinations.length === 0 ? (
-                  <EmptyState icon={Map} label="Nenhum destino cadastrado" onAdd={() => setShowDestModal(true)} />
+                  <EmptyState icon={Map} label="Nenhum destino cadastrado" onAdd={openNewDest} />
                 ) : (
                   <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
                     <table className="w-full">
@@ -596,9 +632,15 @@ export default function AdminPanel() {
                             <td className="p-6 text-gray-500 text-sm">R$ {dest.price}</td>
                             <td className="p-6 text-gray-500 text-sm">{dest.rating}</td>
                             <td className="p-6 text-right">
-                              <button onClick={() => deleteDestination(dest.id, dest.title)} className="text-red-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-xl transition-colors" title="Remover destino">
-                                <Trash2 className="w-4 h-4" />
-                              </button>
+                              <div className="flex items-center justify-end gap-2">
+                                <button onClick={() => openEditDest(dest)} title="Editar destino"
+                                  className="text-gray-400 hover:text-[#C18D41] p-2 rounded-xl hover:bg-[#C18D41]/10 transition-colors">
+                                  <Pencil className="w-4 h-4" />
+                                </button>
+                                <button onClick={() => deleteDestination(dest.id, dest.title)} className="text-red-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-xl transition-colors" title="Remover destino">
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
                             </td>
                           </tr>
                         ))}
@@ -817,9 +859,9 @@ export default function AdminPanel() {
         )}
       </AnimatePresence>
 
-      {/* ── Modal: Novo Destino ── */}
-      <Modal open={showDestModal} onClose={() => setShowDestModal(false)} title="Novo Destino" wide>
-        <form onSubmit={createDestination} className="space-y-5">
+      {/* ── Modal: Novo / Editar Destino ── */}
+      <Modal open={showDestModal} onClose={() => { setShowDestModal(false); setEditingDestination(null); }} title={editingDestination ? 'Editar Destino' : 'Novo Destino'} wide>
+        <form onSubmit={saveDest} className="space-y-5">
           <ImageUploadField label="Foto do Destino" value={destForm.image} folder="destinations"
             onChange={url => setDestForm(f => ({ ...f, image: url }))} />
           <Field label="Nome do Destino" required value={destForm.title} onChange={v => setDestForm(f => ({ ...f, title: v }))} placeholder="Ex: Atol de Baa" />
@@ -879,7 +921,7 @@ export default function AdminPanel() {
               </select>
             </div>
           </div>
-          <SubmitButton saving={saving} label="Criar Destino" />
+          <SubmitButton saving={saving} label={editingDestination ? 'Salvar Alterações' : 'Criar Destino'} />
         </form>
       </Modal>
 

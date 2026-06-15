@@ -3,6 +3,7 @@ import { useParams, useLocation } from 'wouter';
 import { motion } from 'framer-motion';
 import { Calendar, MapPin, ArrowLeft, Share2, Bookmark, Loader2 } from 'lucide-react';
 import { Button } from '@/components/painel/button';
+import { toast } from 'sonner';
 import Layout from '@/components/Layout';
 import PageTransition from '@/components/PageTransition';
 
@@ -33,6 +34,14 @@ export default function BlogPostPage() {
   const [post, setPost] = useState<Post | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+
+  const handleNewsletter = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newsletterEmail) return;
+    toast.success('Bem-vindo ao Círculo Restrito! Em breve receberá as nossas descobertas.');
+    setNewsletterEmail('');
+  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -197,16 +206,19 @@ export default function BlogPostPage() {
                   Receba no seu e mail as novas descobertas e roteiros secretos curados pela nossa equipa antes de irem a publico.
                 </p>
 
-                <div className="flex flex-col sm:flex-row gap-0 max-w-lg mx-auto relative z-10 bg-white/5 backdrop-blur-md p-2 rounded-full border border-white/10">
+                <form onSubmit={handleNewsletter} className="flex flex-col sm:flex-row gap-0 max-w-lg mx-auto relative z-10 bg-white/5 backdrop-blur-md p-2 rounded-full border border-white/10">
                   <input
                     type="email"
-                    placeholder="O seu melhor e mail"
+                    required
+                    placeholder="O seu melhor e-mail"
+                    value={newsletterEmail}
+                    onChange={e => setNewsletterEmail(e.target.value)}
                     className="flex-1 bg-transparent border-none px-6 py-4 text-sm focus:outline-none text-white placeholder:text-white/30"
                   />
-                  <Button className="bg-[#C18D41] hover:bg-[#A67632] text-white font-bold rounded-full px-10 h-14 uppercase tracking-widest text-[10px] shadow-lg shadow-[#C18D41]/20">
-                    Aderir ao Circulo
+                  <Button type="submit" className="bg-[#C18D41] hover:bg-[#A67632] text-white font-bold rounded-full px-10 h-14 uppercase tracking-widest text-[10px] shadow-lg shadow-[#C18D41]/20">
+                    Aderir ao Círculo
                   </Button>
-                </div>
+                </form>
               </div>
 
             </div>

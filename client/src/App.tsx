@@ -9,7 +9,6 @@ import ScrollToTop from "./components/ScrollToTop";
 import HomePage from "./pages/HomePage";
 import DestinationsPage from "./pages/DestinationsPage";
 import DestinationDetailPage from "./pages/DestinationDetailPage";
-import PackagesPage from "./pages/PackagesPage";
 import BlogPage from "./pages/BlogPage";
 import BlogPostPage from './pages/BlogPostPage';
 import AboutPage from "./pages/AboutPage";
@@ -34,7 +33,6 @@ function Router() {
       <Route path="/destinos/:id" component={DestinationDetailPage} />
       <Route path="/blog" component={BlogPage} />
       <Route path="/blog/:id" component={BlogPostPage} />
-      <Route path="/pacotes" component={PackagesPage} />
       <Route path="/sobre" component={AboutPage} />
       <Route path="/contato" component={ContactPage} />
 

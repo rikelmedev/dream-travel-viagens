@@ -46,7 +46,7 @@ export default function FeaturedPackages() {
               Experiencias Selecionadas
             </span>
             <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl text-[#05070a] leading-tight">
-              Pacotes <br />
+              Experiências <br />
               <span className="italic font-light">em Destaque</span>
             </h2>
           </motion.div>
@@ -59,7 +59,7 @@ export default function FeaturedPackages() {
             onClick={() => setLocation("/destinos")}
             className="group flex items-center gap-2 text-[#C18D41] hover:text-[#A67632] text-[10px] font-bold uppercase tracking-[0.3em] transition-colors self-start md:self-auto"
           >
-            Ver todos os pacotes
+            Ver todos os destinos
             <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
           </motion.button>
         </div>

@@ -54,6 +54,22 @@ async function startServer() {
     }
   });
 
+  app.put("/api/destinations/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id, 10);
+      if (isNaN(id)) return res.status(400).json({ error: "ID inválido" });
+      const [updated] = await db.update(destinations)
+        .set({ ...req.body, rating: req.body.rating ? Number(req.body.rating) : undefined })
+        .where(eq(destinations.id, id))
+        .returning();
+      if (!updated) return res.status(404).json({ error: "Destino não encontrado" });
+      res.json(updated);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Erro ao atualizar destino" });
+    }
+  });
+
   app.delete("/api/destinations/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id, 10);

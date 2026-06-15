@@ -1,10 +1,20 @@
+import { useState } from 'react';
 import { Link } from 'wouter';
 import { Button } from '@/components/painel/button';
 import { motion } from 'framer-motion';
 import { Lock } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+
+  const handleNewsletter = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newsletterEmail) return;
+    toast.success('Bem-vindo ao Círculo Restrito! Em breve receberá as nossas descobertas.');
+    setNewsletterEmail('');
+  };
 
   const whatsappMessage = encodeURIComponent("Olá Jackeline, estava a explorar o site da Dream Travel e gostaria de iniciar o planeamento de uma viagem exclusiva com a sua curadoria.");
   const whatsappLink = `https://wa.me/5517996077150?text=${whatsappMessage}`;
@@ -36,16 +46,19 @@ export default function Footer() {
             <span className="italic font-light text-[#C18D41]">na sua caixa de entrada.</span>
           </h3>
           
-          <div className="flex flex-col sm:flex-row gap-0 w-full max-w-lg bg-white/5 backdrop-blur-md p-2 rounded-full border border-white/10 shadow-2xl hover:border-white/20 transition-colors">
-            <input 
-              type="email" 
-              placeholder="O seu melhor e-mail" 
+          <form onSubmit={handleNewsletter} className="flex flex-col sm:flex-row gap-0 w-full max-w-lg bg-white/5 backdrop-blur-md p-2 rounded-full border border-white/10 shadow-2xl hover:border-white/20 transition-colors">
+            <input
+              type="email"
+              required
+              placeholder="O seu melhor e-mail"
+              value={newsletterEmail}
+              onChange={e => setNewsletterEmail(e.target.value)}
               className="flex-1 bg-transparent px-8 py-4 text-white focus:outline-none placeholder:text-white/30 font-light text-sm text-center sm:text-left"
             />
-            <Button className="rounded-full h-14 px-10 bg-[#C18D41] text-white font-bold uppercase tracking-widest text-[10px] hover:bg-[#A67632] transition-all shadow-lg shadow-[#C18D41]/20">
+            <Button type="submit" className="rounded-full h-14 px-10 bg-[#C18D41] text-white font-bold uppercase tracking-widest text-[10px] hover:bg-[#A67632] transition-all shadow-lg shadow-[#C18D41]/20">
               Descobrir
             </Button>
-          </div>
+          </form>
         </motion.div>
 
         {/* SECÇÃO 2: Navegação e Marca */}
@@ -162,8 +175,22 @@ export default function Footer() {
         >
           <p>&copy; {currentYear} DREAM TRAVEL. TODOS OS DIREITOS RESERVADOS.</p>
           <div className="flex gap-8">
-            <a href="#" className="hover:text-[#C18D41] transition-colors">Privacidade</a>
-            <a href="#" className="hover:text-[#C18D41] transition-colors">Termos</a>
+            <a
+              href={`https://wa.me/5517996077150?text=${encodeURIComponent('Olá! Gostaria de informações sobre a Política de Privacidade da Dream Travel.')}`}
+              target="_blank"
+              rel="noreferrer"
+              className="hover:text-[#C18D41] transition-colors"
+            >
+              Privacidade
+            </a>
+            <a
+              href={`https://wa.me/5517996077150?text=${encodeURIComponent('Olá! Gostaria de informações sobre os Termos de Uso da Dream Travel.')}`}
+              target="_blank"
+              rel="noreferrer"
+              className="hover:text-[#C18D41] transition-colors"
+            >
+              Termos
+            </a>
             <Link href="/admin">
               <a className="hover:text-white transition-colors opacity-30 hover:opacity-100">Control Room</a>
             </Link>
