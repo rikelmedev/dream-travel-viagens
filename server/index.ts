@@ -7,6 +7,7 @@ import {
   destinations, insertDestinationSchema,
   posts, insertPostSchema,
   vipCodes, insertVipCodeSchema,
+  itineraries, insertItinerarySchema,
 } from "./schema";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -37,6 +38,19 @@ async function startServer() {
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: "Erro ao criar destino" });
+    }
+  });
+
+  app.get("/api/destinations/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id, 10);
+      if (isNaN(id)) return res.status(400).json({ error: "ID inválido" });
+      const [dest] = await db.select().from(destinations).where(eq(destinations.id, id));
+      if (!dest) return res.status(404).json({ error: "Destino não encontrado" });
+      res.json(dest);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Erro ao buscar destino" });
     }
   });
 
@@ -163,6 +177,85 @@ async function startServer() {
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: "Erro ao remover codigo VIP" });
+    }
+  });
+
+  // ── VIP CODE VALIDATION ────────────────────────────────────────────────────
+
+  app.post("/api/vip-codes/validate", async (req, res) => {
+    try {
+      const { code } = req.body;
+      if (!code) return res.status(400).json({ error: "Código obrigatório" });
+      const [vip] = await db.select().from(vipCodes)
+        .where(eq(vipCodes.code, String(code).toUpperCase()));
+      if (!vip) return res.status(401).json({ error: "Código não encontrado" });
+      if (!vip.is_active) return res.status(403).json({ error: "Acesso desativado" });
+      res.json({ code: vip.code, client_name: vip.client_name });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Erro ao validar código" });
+    }
+  });
+
+  // ── ITINERARIES ────────────────────────────────────────────────────────────
+
+  app.get("/api/itineraries", async (_req, res) => {
+    try {
+      const rows = await db.select().from(itineraries).orderBy(itineraries.created_at);
+      res.json(rows);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Erro ao buscar roteiros" });
+    }
+  });
+
+  app.get("/api/itineraries/:vip_code", async (req, res) => {
+    try {
+      const code = req.params.vip_code.toUpperCase();
+      const [itin] = await db.select().from(itineraries).where(eq(itineraries.vip_code, code));
+      if (!itin) return res.status(404).json({ error: "Roteiro não encontrado" });
+      res.json(itin);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Erro ao buscar roteiro" });
+    }
+  });
+
+  app.post("/api/itineraries", async (req, res) => {
+    try {
+      const parsed = insertItinerarySchema.safeParse(req.body);
+      if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
+      const [created] = await db.insert(itineraries).values(parsed.data).returning();
+      res.status(201).json(created);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Erro ao criar roteiro" });
+    }
+  });
+
+  app.put("/api/itineraries/:vip_code", async (req, res) => {
+    try {
+      const code = req.params.vip_code.toUpperCase();
+      const [updated] = await db.update(itineraries)
+        .set(req.body)
+        .where(eq(itineraries.vip_code, code))
+        .returning();
+      if (!updated) return res.status(404).json({ error: "Roteiro não encontrado" });
+      res.json(updated);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Erro ao atualizar roteiro" });
+    }
+  });
+
+  app.delete("/api/itineraries/:vip_code", async (req, res) => {
+    try {
+      const code = req.params.vip_code.toUpperCase();
+      await db.delete(itineraries).where(eq(itineraries.vip_code, code));
+      res.status(204).send();
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Erro ao remover roteiro" });
     }
   });
 

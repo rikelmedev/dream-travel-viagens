@@ -7,7 +7,7 @@ import { setSEOHead } from '@/components/SEOHead';
 
 export default function VipLogin() {
   const [, setLocation] = useLocation();
-  const [credentials, setCredentials] = useState({ email: '', code: '' });
+  const [credentials, setCredentials] = useState({ code: '' });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -80,20 +80,6 @@ export default function VipLogin() {
           </div>
 
           <form onSubmit={handleLogin} className="space-y-6">
-            <div className="group">
-              <label className="text-[10px] font-bold text-white/50 uppercase tracking-widest transition-colors group-focus-within:text-[#C18D41] block mb-2">
-                E-mail do Cliente
-              </label>
-              <input 
-                required
-                type="email"
-                placeholder="O seu e-mail registado"
-                value={credentials.email}
-                onChange={(e) => setCredentials({...credentials, email: e.target.value})}
-                className="w-full bg-black/20 border border-white/10 rounded-xl px-5 py-4 text-white text-sm focus:outline-none focus:border-[#C18D41] transition-all placeholder:text-white/20 font-light"
-              />
-            </div>
-
             <div className="group">
               <label className="text-[10px] font-bold text-white/50 uppercase tracking-widest transition-colors group-focus-within:text-[#C18D41] flex items-center justify-between mb-2">
                 Código de Acesso
