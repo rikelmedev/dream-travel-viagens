@@ -20,7 +20,8 @@ interface Destination {
 }
 interface Post {
   id: number; title: string; slug: string; cover_image: string | null;
-  category: string | null; content: string; status: string | null;
+  category: string | null; location: string | null; excerpt: string | null;
+  content: string; status: string | null; featured: boolean | null;
   created_at: string | null;
 }
 interface VipCode {
@@ -147,6 +148,7 @@ export default function AdminPanel() {
   const [showVipModal, setShowVipModal] = useState(false);
   const [showItineraryModal, setShowItineraryModal] = useState(false);
   const [editingItinerary, setEditingItinerary] = useState<Itinerary | null>(null);
+  const [editingPost, setEditingPost] = useState<Post | null>(null);
 
   // Forms
   const DEST_EMPTY = { title: '', location: '', description: '', image: '', price: '', rating: 5.0, category: 'praia', size: 'medium' };
@@ -258,21 +260,56 @@ export default function AdminPanel() {
 
   // ── Actions: Posts ────────────────────────────────────────────────────────
 
-  const createPost = async (e: React.FormEvent) => {
+  const openNewPost = () => {
+    setEditingPost(null);
+    setPostForm(POST_EMPTY);
+    setShowPostModal(true);
+  };
+
+  const openEditPost = (post: Post) => {
+    setEditingPost(post);
+    setPostForm({
+      title: post.title,
+      slug: post.slug,
+      excerpt: post.excerpt ?? '',
+      cover_image: post.cover_image ?? '',
+      category: post.category ?? 'Viagem',
+      location: post.location ?? '',
+      content: post.content,
+      status: post.status ?? 'draft',
+      featured: post.featured ?? false,
+    });
+    setShowPostModal(true);
+  };
+
+  const savePost = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
     try {
       const payload = { ...postForm, slug: postForm.slug || slugify(postForm.title) };
-      const res = await fetch('/api/posts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) { toast.error('Erro ao criar post'); return; }
-      const created = await res.json();
-      setPosts(prev => [...prev, created]);
-      toast.success('Post criado');
+      if (editingPost) {
+        const res = await fetch(`/api/posts/${editingPost.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) { toast.error('Erro ao atualizar post'); return; }
+        const updated = await res.json();
+        setPosts(prev => prev.map(p => p.id === editingPost.id ? updated : p));
+        toast.success('Post atualizado');
+      } else {
+        const res = await fetch('/api/posts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) { toast.error('Erro ao criar post'); return; }
+        const created = await res.json();
+        setPosts(prev => [...prev, created]);
+        toast.success('Post criado');
+      }
       setShowPostModal(false);
+      setEditingPost(null);
       setPostForm(POST_EMPTY);
       loadStats();
     } finally { setSaving(false); }
@@ -483,7 +520,7 @@ export default function AdminPanel() {
               </Button>
             )}
             {activeTab === 'blog' && (
-              <Button onClick={() => setShowPostModal(true)} className="bg-[#05070a] hover:bg-[#C18D41] text-white rounded-2xl px-6 h-12">
+              <Button onClick={openNewPost} className="bg-[#05070a] hover:bg-[#C18D41] text-white rounded-2xl px-6 h-12">
                 <Plus className="w-4 h-4 mr-2" /> Novo Post
               </Button>
             )}
@@ -578,7 +615,7 @@ export default function AdminPanel() {
                 {isLoading ? (
                   <div className="flex justify-center p-20"><Loader2 className="animate-spin w-8 h-8 text-gray-300" /></div>
                 ) : posts.length === 0 ? (
-                  <EmptyState icon={BookOpen} label="Nenhum post criado" onAdd={() => setShowPostModal(true)} />
+                  <EmptyState icon={BookOpen} label="Nenhum post criado" onAdd={openNewPost} />
                 ) : (
                   <div className="space-y-3">
                     {posts.map(post => (
@@ -595,6 +632,10 @@ export default function AdminPanel() {
                           <span className={`text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full ${post.status === 'published' ? 'bg-green-50 text-green-600' : 'bg-amber-50 text-amber-600'}`}>
                             {post.status === 'published' ? 'Publicado' : 'Rascunho'}
                           </span>
+                          <button onClick={() => openEditPost(post)} title="Editar post"
+                            className="text-gray-400 hover:text-[#C18D41] p-2 rounded-xl hover:bg-[#C18D41]/10 transition-colors">
+                            <Pencil className="w-4 h-4" />
+                          </button>
                           <button onClick={() => togglePostStatus(post)} title={post.status === 'published' ? 'Mover para rascunho' : 'Publicar'}
                             className="text-gray-400 hover:text-[#C18D41] p-2 rounded-xl hover:bg-[#C18D41]/10 transition-colors">
                             {post.status === 'published' ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -842,9 +883,9 @@ export default function AdminPanel() {
         </form>
       </Modal>
 
-      {/* ── Modal: Novo Post ── */}
-      <Modal open={showPostModal} onClose={() => setShowPostModal(false)} title="Novo Post" wide>
-        <form onSubmit={createPost} className="space-y-5">
+      {/* ── Modal: Novo / Editar Post ── */}
+      <Modal open={showPostModal} onClose={() => { setShowPostModal(false); setEditingPost(null); }} title={editingPost ? 'Editar Post' : 'Novo Post'} wide>
+        <form onSubmit={savePost} className="space-y-5">
           <ImageUploadField label="Imagem de Capa" value={postForm.cover_image} folder="blog"
             onChange={url => setPostForm(f => ({ ...f, cover_image: url }))} />
           <Field label="Titulo do Post" required value={postForm.title}
@@ -893,7 +934,7 @@ export default function AdminPanel() {
               placeholder="Escreva o relato completo aqui..."
               className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 bg-white placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#C18D41]/40 resize-none" />
           </div>
-          <SubmitButton saving={saving} label="Criar Post" />
+          <SubmitButton saving={saving} label={editingPost ? 'Salvar Alterações' : 'Criar Post'} />
         </form>
       </Modal>
 

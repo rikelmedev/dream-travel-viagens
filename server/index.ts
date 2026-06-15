@@ -64,6 +64,19 @@ async function startServer() {
     }
   });
 
+  app.get("/api/posts/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id, 10);
+      if (isNaN(id)) return res.status(400).json({ error: "ID inválido" });
+      const [post] = await db.select().from(posts).where(eq(posts.id, id));
+      if (!post) return res.status(404).json({ error: "Post não encontrado" });
+      res.json(post);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Erro ao buscar post" });
+    }
+  });
+
   app.post("/api/posts", async (req, res) => {
     try {
       const parsed = insertPostSchema.safeParse(req.body);
