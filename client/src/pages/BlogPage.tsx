@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calendar, MapPin, ArrowRight, BookOpen, Loader2 } from 'lucide-react';
+import { Calendar, MapPin, ArrowRight, Camera, Loader2 } from 'lucide-react';
 import { useLocation } from 'wouter';
 import Layout from '@/components/Layout';
 import { setSEOHead } from '@/components/SEOHead';
@@ -23,7 +23,7 @@ interface Post {
 function formatDate(dateStr: string | null) {
   if (!dateStr) return '';
   return new Date(dateStr).toLocaleDateString('pt-BR', {
-    day: '2-digit', month: 'short', year: 'numeric'
+    day: '2-digit', month: 'short', year: 'numeric',
   });
 }
 
@@ -38,13 +38,12 @@ export default function BlogPage() {
   useEffect(() => {
     setSEOHead({
       title: 'Journal da Curadora | Dream Travel',
-      description: 'Relatos, dicas e inspiracoes de viagens de luxo curadas por Jackeline.',
+      description: 'Relatos, dicas e inspirações de viagens de luxo curadas por Jackeline.',
     });
     window.scrollTo(0, 0);
-
     fetch('/api/posts')
-      .then(res => res.json())
-      .then(data => {
+      .then((r) => r.json())
+      .then((data) => {
         const published = Array.isArray(data)
           ? data.filter((p: Post) => p.status === 'published')
           : [];
@@ -56,203 +55,275 @@ export default function BlogPage() {
 
   const filtered = activeCategory === 'Todos'
     ? posts
-    : posts.filter(p => p.category === activeCategory);
+    : posts.filter((p) => p.category === activeCategory);
 
-  const featuredPost = posts.find(p => p.featured) || posts[0] || null;
+  const featured = posts.find((p) => p.featured) ?? posts[0] ?? null;
 
   return (
     <PageTransition>
       <Layout>
 
-        {/* HERO */}
-        <section className="pt-40 pb-20 bg-[#FAF9F6] border-b border-gray-200/50">
-          <div className="container max-w-7xl mx-auto px-6 lg:px-12 text-center">
+        {/* ── Hero ── */}
+        <section className="bg-[#05070a] pt-36 pb-20 px-6 lg:px-12">
+          <div className="container max-w-7xl mx-auto">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-              className="max-w-3xl mx-auto"
+              transition={{ duration: 0.8 }}
             >
-              <div className="flex items-center justify-center gap-4 mb-8">
-                <div className="h-px w-12 bg-[#C18D41]/50" />
-                <span className="text-[#C18D41] font-bold uppercase tracking-[0.5em] text-[10px] flex items-center gap-3">
-                  <BookOpen className="w-3 h-3" /> Journal da Curadora
+              <div className="flex items-center gap-3 mb-8">
+                <div className="h-px w-8 bg-[#C18D41]/50" />
+                <span className="text-[#C18D41] text-[10px] uppercase tracking-[0.5em] font-bold">
+                  Journal da Curadora
                 </span>
-                <div className="h-px w-12 bg-[#C18D41]/50" />
               </div>
-              <h1 className="text-5xl md:text-7xl font-bold font-serif text-[#05070a] mb-8 leading-[1.1]">
-                Diario de <span className="italic text-[#C18D41] font-light">Viagens</span>
-              </h1>
-              <p className="text-xl text-gray-500 font-light leading-relaxed">
-                Inspire-se com relatos reais e descubra os segredos dos destinos mais fascinantes do mundo, vividos e aprovados em primeira mao.
-              </p>
+              <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
+                <h1 className="font-serif text-6xl md:text-8xl lg:text-9xl text-white leading-[0.88]">
+                  Diário de<br />
+                  <span className="italic font-light text-[#C18D41]">Viagens.</span>
+                </h1>
+                <p className="text-white/35 font-light text-sm max-w-sm leading-relaxed lg:text-right lg:pb-3">
+                  Relatos reais, bastidores e inspirações das jornadas vividas pela Jackeline ao redor do mundo.
+                </p>
+              </div>
             </motion.div>
           </div>
         </section>
 
-        {isLoading ? (
-          <div className="flex items-center justify-center py-40">
-            <Loader2 className="w-8 h-8 animate-spin text-[#C18D41]" />
+        {/* ── Filtros sticky ── */}
+        <div className="sticky top-0 z-40 bg-[#FAF9F6]/95 backdrop-blur-xl border-b border-gray-200/60">
+          <div className="container max-w-7xl mx-auto px-6 lg:px-12">
+            <div className="flex items-center gap-0 overflow-x-auto scrollbar-hide">
+              {CATEGORIES.map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setActiveCategory(cat)}
+                  className={`relative py-5 px-6 text-[10px] uppercase tracking-[0.3em] font-bold transition-all duration-300 whitespace-nowrap ${
+                    activeCategory === cat ? 'text-[#05070a]' : 'text-gray-400 hover:text-[#05070a]'
+                  }`}
+                >
+                  {cat}
+                  {activeCategory === cat && (
+                    <motion.div
+                      layoutId="journalFilter"
+                      className="absolute bottom-0 left-6 right-6 h-[2px] bg-[#C18D41]"
+                    />
+                  )}
+                </button>
+              ))}
+            </div>
           </div>
-        ) : posts.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-40 text-gray-400 gap-4">
-            <BookOpen className="w-12 h-12 opacity-20" />
-            <p className="text-2xl font-serif italic text-[#05070a]">Nenhum relato publicado ainda.</p>
-          </div>
-        ) : (
-          <>
-            {/* POST EM DESTAQUE */}
-            {featuredPost && activeCategory === 'Todos' && (
-              <section className="py-16 bg-[#FAF9F6]">
-                <div className="container max-w-7xl mx-auto px-6 lg:px-12">
-                  <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, delay: 0.2 }}
-                    onClick={() => setLocation(`/blog/${featuredPost.id}`)}
-                    className="group relative rounded-[2.5rem] overflow-hidden shadow-2xl cursor-pointer border border-gray-200"
-                  >
-                    <div className="aspect-[16/9] md:aspect-[21/8] relative bg-gray-100">
-                      {featuredPost.cover_image ? (
-                        <img
-                          src={featuredPost.cover_image}
-                          alt={featuredPost.title}
-                          className="w-full h-full object-cover transition-transform duration-[15s] group-hover:scale-105"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-[#05070a] to-[#C18D41]/30" />
-                      )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#05070a] via-[#05070a]/40 to-transparent opacity-90" />
-                      <div className="absolute bottom-0 left-0 right-0 p-8 md:p-16 text-white max-w-4xl">
-                        <span className="backdrop-blur-md bg-white/10 border border-white/20 text-white text-[9px] font-bold px-4 py-2 rounded-full uppercase tracking-[0.3em] mb-6 inline-block">
-                          Destaque da Editora
-                        </span>
-                        <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold font-serif mb-6 leading-tight group-hover:text-[#C18D41] transition-colors">
-                          {featuredPost.title}
-                        </h2>
-                        {featuredPost.excerpt && (
-                          <p className="text-white/70 text-lg md:text-xl font-light mb-8 line-clamp-2 max-w-2xl leading-relaxed">
-                            {featuredPost.excerpt}
-                          </p>
-                        )}
-                        <div className="flex items-center gap-8 text-[10px] uppercase tracking-widest font-bold text-white/50">
-                          <div className="flex items-center gap-2">
-                            <Calendar className="w-3 h-3 text-[#C18D41]" />
-                            <span>{formatDate(featuredPost.created_at)}</span>
-                          </div>
-                          {featuredPost.location && (
-                            <div className="flex items-center gap-2">
-                              <MapPin className="w-3 h-3 text-[#C18D41]" />
-                              <span>{featuredPost.location}</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-                </div>
-              </section>
-            )}
+        </div>
 
-            {/* FILTROS */}
-            <section className="py-16 bg-[#FAF9F6] min-h-screen">
-              <div className="container max-w-7xl mx-auto px-6 lg:px-12">
-                <div className="flex flex-wrap items-center justify-center gap-2 mb-20">
-                  {CATEGORIES.map(category => (
-                    <button
-                      key={category}
-                      onClick={() => setActiveCategory(category)}
-                      className={`px-8 py-3 rounded-full text-[10px] uppercase tracking-[0.2em] font-bold transition-all duration-500 ${
-                        activeCategory === category
-                          ? 'bg-[#05070a] text-white shadow-lg'
-                          : 'bg-transparent text-gray-400 hover:text-[#05070a] hover:bg-gray-100'
-                      }`}
-                    >
-                      {category}
-                    </button>
-                  ))}
-                </div>
+        {/* ── Feed ── */}
+        <section className="bg-[#FAF9F6] py-12 px-6 lg:px-12 min-h-[60vh]">
+          <div className="container max-w-7xl mx-auto">
 
-                {/* GRID */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-                  <AnimatePresence mode="popLayout">
-                    {filtered.map(post => (
-                      <motion.div
-                        layout
-                        key={post.id}
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.95 }}
-                        transition={{ duration: 0.5 }}
-                        onClick={() => setLocation(`/blog/${post.id}`)}
-                        className="group bg-white rounded-[2rem] overflow-hidden hover:shadow-2xl transition-all duration-700 cursor-pointer flex flex-col h-full border border-gray-100"
-                      >
-                        <div className="relative h-72 overflow-hidden shrink-0 bg-gray-100">
-                          {post.cover_image ? (
-                            <img
-                              src={post.cover_image}
-                              alt={post.title}
-                              className="w-full h-full object-cover transition-transform duration-[10s] group-hover:scale-110"
-                            />
-                          ) : (
-                            <div className="w-full h-full bg-gradient-to-br from-[#05070a] to-[#C18D41]/20 flex items-center justify-center">
-                              <BookOpen className="w-10 h-10 text-white/20" />
-                            </div>
-                          )}
-                          <div className="absolute top-6 left-6">
-                            <span className="bg-white/90 backdrop-blur-md text-[#05070a] text-[9px] font-bold px-4 py-2 rounded-full uppercase tracking-[0.2em] shadow-sm">
-                              {post.category}
-                            </span>
-                          </div>
-                        </div>
-
-                        <div className="p-10 flex flex-col flex-1">
-                          <div className="flex items-center justify-between text-gray-400 text-[9px] uppercase tracking-widest font-bold mb-6">
-                            <div className="flex items-center gap-2">
-                              <Calendar className="w-3 h-3 text-[#C18D41]" />
-                              <span>{formatDate(post.created_at)}</span>
-                            </div>
-                            {post.location && (
-                              <div className="flex items-center gap-2">
-                                <MapPin className="w-3 h-3 text-[#C18D41]" />
-                                <span>{post.location}</span>
-                              </div>
-                            )}
-                          </div>
-
-                          <h3 className="text-2xl font-bold font-serif text-[#05070a] mb-4 leading-snug group-hover:text-[#C18D41] transition-colors">
-                            {post.title}
-                          </h3>
-
-                          <p className="text-gray-500 font-light text-sm leading-relaxed mb-8 flex-1 line-clamp-3">
-                            {post.excerpt || post.content.slice(0, 120) + '...'}
-                          </p>
-
-                          <div className="mt-auto flex items-center gap-3 text-[#05070a] font-bold text-[10px] uppercase tracking-[0.2em] group-hover:text-[#C18D41] transition-colors">
-                            <span>Ler relato completo</span>
-                            <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform duration-500" />
-                          </div>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </AnimatePresence>
-                </div>
-
-                {filtered.length === 0 && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="text-center py-32 text-gray-400"
-                  >
-                    <BookOpen className="w-12 h-12 mx-auto mb-6 opacity-20" />
-                    <p className="text-2xl font-serif italic text-[#05070a]">Nenhum relato encontrado nesta colecao ainda.</p>
-                  </motion.div>
-                )}
+            {isLoading ? (
+              <div className="flex flex-col items-center justify-center py-40 gap-6">
+                <Loader2 className="w-6 h-6 animate-spin text-[#C18D41]" />
+                <p className="font-serif text-xl text-[#05070a]/40 italic">Carregando relatos...</p>
               </div>
-            </section>
-          </>
-        )}
+            ) : posts.length === 0 ? (
+              <EmptyState />
+            ) : (
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeCategory}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.35 }}
+                >
+                  {/* Post em destaque — só na aba "Todos" */}
+                  {featured && activeCategory === 'Todos' && (
+                    <FeaturedCard post={featured} onClick={() => setLocation(`/blog/${featured.id}`)} />
+                  )}
+
+                  {/* Grid de posts */}
+                  {filtered.length > 0 && (
+                    <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 ${featured && activeCategory === 'Todos' ? 'mt-4' : ''}`}>
+                      {(activeCategory === 'Todos' ? filtered.slice(1) : filtered).map((post, i) => (
+                        <motion.div
+                          key={post.id}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: i * 0.07, duration: 0.5 }}
+                        >
+                          <PostCard post={post} onClick={() => setLocation(`/blog/${post.id}`)} />
+                        </motion.div>
+                      ))}
+                    </div>
+                  )}
+
+                  {filtered.length === 0 && (
+                    <div className="flex flex-col items-center justify-center py-32 gap-4">
+                      <Camera className="w-10 h-10 text-[#05070a]/10" />
+                      <p className="font-serif text-xl text-[#05070a]/40 italic">
+                        Nenhum relato nesta colecão ainda.
+                      </p>
+                      <button
+                        onClick={() => setActiveCategory('Todos')}
+                        className="text-[#C18D41] text-[10px] uppercase tracking-widest font-bold hover:underline"
+                      >
+                        Ver todos
+                      </button>
+                    </div>
+                  )}
+                </motion.div>
+              </AnimatePresence>
+            )}
+          </div>
+        </section>
+
       </Layout>
     </PageTransition>
+  );
+}
+
+/* ── Card destaque ── */
+function FeaturedCard({ post, onClick }: { post: Post; onClick: () => void }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.7 }}
+      onClick={onClick}
+      className="group relative rounded-2xl overflow-hidden cursor-pointer mb-4 h-[55vh] min-h-[380px]"
+    >
+      {post.cover_image ? (
+        <img
+          src={post.cover_image}
+          alt={post.title}
+          className="absolute inset-0 w-full h-full object-cover transition-transform duration-[8s] group-hover:scale-105"
+        />
+      ) : (
+        <div className="absolute inset-0 bg-gradient-to-br from-[#05070a] to-[#C18D41]/20" />
+      )}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+
+      {/* Badges */}
+      <div className="absolute top-6 left-6 flex items-center gap-2">
+        <span className="bg-[#C18D41] text-white text-[9px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full">
+          Destaque
+        </span>
+        {post.category && (
+          <span className="bg-white/10 backdrop-blur-sm text-white text-[9px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full border border-white/15">
+            {post.category}
+          </span>
+        )}
+      </div>
+
+      {/* Conteúdo */}
+      <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div className="flex-1">
+          <div className="flex items-center gap-5 mb-4 text-[9px] uppercase tracking-widest text-white/40 font-bold">
+            {post.created_at && (
+              <span className="flex items-center gap-1.5">
+                <Calendar className="w-3 h-3 text-[#C18D41]" />
+                {formatDate(post.created_at)}
+              </span>
+            )}
+            {post.location && (
+              <span className="flex items-center gap-1.5">
+                <MapPin className="w-3 h-3 text-[#C18D41]" />
+                {post.location}
+              </span>
+            )}
+          </div>
+          <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl text-white leading-tight group-hover:text-[#C18D41] transition-colors duration-300">
+            {post.title}
+          </h2>
+          {post.excerpt && (
+            <p className="text-white/45 text-sm font-light mt-3 max-w-2xl leading-relaxed line-clamp-2">
+              {post.excerpt}
+            </p>
+          )}
+        </div>
+        <div className="w-12 h-12 rounded-full border border-white/20 group-hover:border-[#C18D41] group-hover:bg-[#C18D41]/10 flex items-center justify-center flex-shrink-0 transition-all duration-300">
+          <ArrowRight className="w-4 h-4 text-white" />
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+/* ── Card normal — estilo post de feed ── */
+function PostCard({ post, onClick }: { post: Post; onClick: () => void }) {
+  return (
+    <div
+      onClick={onClick}
+      className="group relative rounded-2xl overflow-hidden cursor-pointer h-80 lg:h-96"
+    >
+      {post.cover_image ? (
+        <img
+          src={post.cover_image}
+          alt={post.title}
+          className="absolute inset-0 w-full h-full object-cover transition-transform duration-[8s] group-hover:scale-105"
+        />
+      ) : (
+        <div className="absolute inset-0 bg-gradient-to-br from-[#05070a] to-[#C18D41]/20 flex items-center justify-center">
+          <Camera className="w-10 h-10 text-white/10" />
+        </div>
+      )}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent" />
+
+      {/* Categoria badge */}
+      {post.category && (
+        <div className="absolute top-4 left-4">
+          <span className="bg-white/10 backdrop-blur-sm text-white text-[8px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full border border-white/15">
+            {post.category}
+          </span>
+        </div>
+      )}
+
+      {/* Conteúdo */}
+      <div className="absolute bottom-0 left-0 right-0 p-6">
+        <div className="flex items-center gap-3 mb-2 text-[8px] uppercase tracking-widest text-white/35 font-bold">
+          {post.created_at && (
+            <span className="flex items-center gap-1">
+              <Calendar className="w-2.5 h-2.5 text-[#C18D41]" />
+              {formatDate(post.created_at)}
+            </span>
+          )}
+          {post.location && (
+            <span className="flex items-center gap-1">
+              <MapPin className="w-2.5 h-2.5 text-[#C18D41]" />
+              {post.location}
+            </span>
+          )}
+        </div>
+        <h3 className="font-serif text-xl text-white leading-snug group-hover:text-[#C18D41] transition-colors duration-300 mb-3">
+          {post.title}
+        </h3>
+        {post.excerpt && (
+          <p className="text-white/40 text-xs font-light leading-relaxed line-clamp-2 mb-3">
+            {post.excerpt}
+          </p>
+        )}
+        <div className="flex items-center gap-2 text-[#C18D41] text-[8px] font-bold uppercase tracking-widest opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0 transition-all duration-300">
+          Ler relato <ArrowRight className="w-3 h-3" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Estado vazio ── */
+function EmptyState() {
+  return (
+    <div className="flex flex-col items-center justify-center py-40 gap-6 text-center">
+      <div className="w-20 h-20 rounded-full border border-[#05070a]/8 flex items-center justify-center">
+        <Camera className="w-8 h-8 text-[#05070a]/15" />
+      </div>
+      <div>
+        <p className="font-serif text-2xl text-[#05070a] italic mb-2">
+          Nenhum relato publicado ainda.
+        </p>
+        <p className="text-[#05070a]/35 text-sm font-light">
+          Em breve Jackeline compartilhará os bastidores das suas viagens.
+        </p>
+      </div>
+    </div>
   );
 }

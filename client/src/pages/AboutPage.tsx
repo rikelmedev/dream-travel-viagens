@@ -1,11 +1,38 @@
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Compass, ShieldCheck, Gem, ArrowRight, Quote } from 'lucide-react';
-import { Button } from '@/components/painel/button';
+import { ArrowRight } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { setSEOHead } from '@/components/SEOHead';
 import Layout from '@/components/Layout';
 import PageTransition from '@/components/PageTransition';
+
+const PILARES = [
+  {
+    num: '01',
+    title: 'Tailor-Made Absoluto',
+    desc: 'Não trabalhamos com prateleiras. Cada jornada começa com uma folha em branco, desenhada milimetricamente a partir do seu perfil psicológico de viajante.',
+    tag: 'Sem templates',
+  },
+  {
+    num: '02',
+    title: 'Acesso Privilegiado',
+    desc: 'A nossa chancela global garante upgrades silenciosos, reservas em mesas impossíveis e acesso a experiências que não constam em nenhum catálogo.',
+    tag: 'Rede exclusiva',
+  },
+  {
+    num: '03',
+    title: 'Concierge Invisível',
+    desc: 'Durante a viagem, orquestramos tudo nos bastidores. A sua única responsabilidade é desfrutar do momento presente com total tranquilidade.',
+    tag: 'Suporte 24/7',
+  },
+];
+
+const STATS = [
+  { num: '15+', label: 'Anos de expertise' },
+  { num: '40+', label: 'Países mapeados' },
+  { num: '100%', label: 'Confidencialidade' },
+  { num: '24/7', label: 'Suporte dedicado' },
+];
 
 export default function AboutPage() {
   const [, setLocation] = useLocation();
@@ -22,189 +49,211 @@ export default function AboutPage() {
   return (
     <PageTransition>
       <Layout>
-        <div className="min-h-screen bg-[#FAF9F6]">
-          
-          {/* HERO EDITORIAL */}
-          <section className="pt-40 pb-20 px-6 lg:px-12 overflow-hidden">
-            <div className="container max-w-7xl mx-auto">
-              <div className="flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
-                
-                {/* Imagem Editorial */}
-                <motion.div 
-                  initial={{ opacity: 0, x: -40 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-                  className="w-full lg:w-1/2 relative"
-                >
-                  <div className="absolute inset-0 bg-[#C18D41]/10 translate-x-4 translate-y-4 rounded-[2.5rem] -z-10" />
-                  <div className="aspect-[4/5] overflow-hidden rounded-[2.5rem] border border-gray-200 bg-gray-100">
-                    <img 
-                      src="/images/jackeline-perfil.jpg" 
-                      alt="Jackeline - Curadora Chefe" 
-                      className="w-full h-full object-cover grayscale-[10%] contrast-[1.05]"
-                      onError={(e) => e.currentTarget.src='https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&q=80'}
-                    />
-                  </div>
-                </motion.div>
 
-                {/* Texto Hero */}
-                <motion.div 
-                  initial={{ opacity: 0, x: 40 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                  className="w-full lg:w-1/2"
-                >
-                  <div className="flex items-center gap-4 mb-8">
-                    <div className="h-px w-12 bg-[#C18D41]/50" />
-                    <span className="text-[#C18D41] text-[10px] uppercase tracking-[0.5em] font-bold">
-                      A Fundadora
-                    </span>
-                  </div>
-                  <h1 className="text-5xl md:text-7xl font-bold text-[#05070a] mb-8 font-serif leading-[1.1]">
-                    A Arte da <br />
-                    <span className="italic font-light text-[#C18D41]">Curadoria</span>
-                  </h1>
-                  <p className="text-xl text-gray-500 font-light leading-relaxed mb-10">
-                    "O verdadeiro luxo não reside apenas no destino, mas na ausência absoluta de preocupações durante a jornada."
-                  </p>
-                  
-                  <div className="flex items-center gap-6">
-                    <img src="/images/assinatura-placeholder.png" alt="Assinatura Jackeline" className="h-12 opacity-40 grayscale" onError={(e) => e.currentTarget.style.display='none'} />
-                    <div className="text-[10px] uppercase tracking-widest font-bold text-[#05070a]">
-                      Jackeline <br />
-                      <span className="text-gray-400 font-normal">Head of Travel</span>
-                    </div>
-                  </div>
-                </motion.div>
+        {/* ── Hero — escuro, editorial ── */}
+        <section className="bg-[#05070a] pt-36 pb-0 px-6 lg:px-12 overflow-hidden">
+          <div className="container max-w-7xl mx-auto">
+            <div className="flex flex-col lg:flex-row items-end gap-12 lg:gap-20">
 
-              </div>
-            </div>
-          </section>
-
-          {/* O MANIFESTO */}
-          <section className="py-24 px-6 lg:px-12 bg-white border-y border-gray-100">
-            <div className="container max-w-3xl mx-auto">
+              {/* Texto */}
               <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-100px" }}
-                transition={{ duration: 0.8 }}
-                className="space-y-8"
+                initial={{ opacity: 0, x: -30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+                className="lg:w-1/2 pb-16 lg:pb-24"
               >
-                <div className="flex justify-center mb-12">
-                  <Quote className="w-12 h-12 text-[#C18D41]/20" />
+                <div className="flex items-center gap-3 mb-8">
+                  <div className="h-px w-8 bg-[#C18D41]/50" />
+                  <span className="text-[#C18D41] text-[10px] uppercase tracking-[0.5em] font-bold">A Fundadora</span>
                 </div>
 
-                <p className="first-letter:text-8xl first-letter:font-serif first-letter:text-[#C18D41] first-letter:float-left first-letter:mr-6 first-letter:-mt-4 text-xl text-[#05070a]/80 font-light leading-loose text-justify">
-                  A minha história começou com uma convicção simples: viajar transforma quem somos. Contudo, ao longo de mais de uma década a explorar os cantos mais recônditos e exclusivos do globo, apercebi-me de uma lacuna no mercado. 
-                </p>
+                <h1 className="font-serif text-6xl md:text-7xl lg:text-8xl text-white leading-[0.88] mb-10">
+                  A Arte da<br />
+                  <span className="italic font-light text-[#C18D41]">Curadoria.</span>
+                </h1>
 
-                <p className="text-xl text-[#05070a]/80 font-light leading-loose text-justify">
-                  Muitos viajantes possuíam os meios para aceder ao extraordinário, mas faltava-lhes o bem mais precioso: o tempo para orquestrar a perfeição e o conhecimento interno para aceder ao inacessível.
-                </p>
+                <blockquote className="border-l-2 border-[#C18D41]/40 pl-6 mb-10">
+                  <p className="text-white/50 font-serif text-lg font-light italic leading-relaxed">
+                    "O verdadeiro luxo não reside apenas no destino, mas na ausência absoluta de preocupações durante a jornada."
+                  </p>
+                </blockquote>
 
-                <p className="text-xl text-[#05070a]/80 font-light leading-loose text-justify">
-                  Foi desse vazio que nasceu a Dream Travel. Uma boutique de viagens desenhada não para "vender pacotes", mas para esculpir o tempo dos nossos clientes. Cada roteiro que assino é o resultado de uma rede de contactos globais cultivada meticulosamente, permitindo abrir portas que habitualmente permanecem fechadas ao público em geral.
-                </p>
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-full bg-[#C18D41]/20 flex items-center justify-center flex-shrink-0">
+                    <span className="text-[#C18D41] font-black text-xs">J</span>
+                  </div>
+                  <div>
+                    <p className="text-white text-sm font-bold">Jackeline</p>
+                    <p className="text-white/30 text-[10px] uppercase tracking-widest font-bold">Head of Travel</p>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Foto editorial — ancora no fundo */}
+              <motion.div
+                initial={{ opacity: 0, y: 40 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1.1, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+                className="lg:w-1/2 relative self-end"
+              >
+                <div className="aspect-[3/4] max-h-[75vh] overflow-hidden rounded-t-[2rem]">
+                  <img
+                    src="/images/jackeline-perfil.jpg"
+                    alt="Jackeline — Curadora Chefe"
+                    className="w-full h-full object-cover object-top"
+                    onError={(e) => {
+                      e.currentTarget.src = 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&q=80';
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#05070a]/60 to-transparent" />
+                </div>
               </motion.div>
             </div>
-          </section>
+          </div>
+        </section>
 
-          {/* OS PILARES (Metodologia) */}
-          <section className="py-32 px-6 lg:px-12">
-            <div className="container max-w-7xl mx-auto">
-              <div className="text-center mb-20">
-                <h2 className="text-4xl md:text-5xl font-bold text-[#05070a] font-serif mb-6">A Nossa Metodologia</h2>
-                <p className="text-gray-500 font-light">Os três pilares que sustentam a excelência da Dream Travel.</p>
+        {/* ── Manifesto — creme ── */}
+        <section className="bg-[#FAF9F6] py-24 px-6 lg:px-12">
+          <div className="container max-w-3xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="space-y-8"
+            >
+              <div className="flex items-center gap-3 mb-10">
+                <div className="h-px w-8 bg-[#C18D41]/50" />
+                <span className="text-[#C18D41] text-[10px] uppercase tracking-[0.5em] font-bold">O Manifesto</span>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-                {[
-                  {
-                    icon: Compass,
-                    title: 'Tailor-Made Absoluto',
-                    desc: 'Não trabalhamos com prateleiras. Cada jornada começa com uma folha em branco, desenhada milimetricamente a partir do seu perfil psicológico de viajante.',
-                  },
-                  {
-                    icon: ShieldCheck,
-                    title: 'Acesso Privilegiado',
-                    desc: 'A nossa chancela global garante upgrades silenciosos, reservas em mesas impossíveis e acesso a experiências que não constam em nenhum catálogo.',
-                  },
-                  {
-                    icon: Gem,
-                    title: 'Concierge Invisível',
-                    desc: 'Durante a viagem, orquestramos tudo nos bastidores. A sua única responsabilidade é desfrutar do momento presente com total tranquilidade.',
-                  },
-                ].map((value, idx) => (
-                  <motion.div
-                    key={idx}
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: idx * 0.1 }}
-                    className="bg-white p-12 rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-200/20 hover:border-[#C18D41]/30 transition-colors group text-center"
-                  >
-                    <div className="w-16 h-16 bg-[#C18D41]/10 rounded-full flex items-center justify-center mx-auto mb-8 group-hover:scale-110 transition-transform duration-500">
-                      <value.icon className="w-6 h-6 text-[#C18D41]" />
-                    </div>
-                    <h3 className="text-2xl font-serif font-bold text-[#05070a] mb-4">
-                      {value.title}
+              <p className="first-letter:text-8xl first-letter:font-serif first-letter:text-[#C18D41] first-letter:float-left first-letter:mr-5 first-letter:leading-none first-letter:-mt-3 text-xl text-[#05070a]/75 font-light leading-loose">
+                A minha história começou com uma convicção simples: viajar transforma quem somos. Contudo, ao longo de mais de uma década a explorar os cantos mais recônditos e exclusivos do globo, apercebi-me de uma lacuna no mercado.
+              </p>
+
+              <p className="text-xl text-[#05070a]/75 font-light leading-loose">
+                Muitos viajantes possuíam os meios para aceder ao extraordinário, mas faltava-lhes o bem mais precioso: o tempo para orquestrar a perfeição e o conhecimento interno para aceder ao inacessível.
+              </p>
+
+              <p className="text-xl text-[#05070a]/75 font-light leading-loose">
+                Foi desse vazio que nasceu a Dream Travel. Uma boutique de viagens desenhada não para "vender pacotes", mas para esculpir o tempo dos nossos clientes. Cada roteiro que assino é o resultado de uma rede de contactos globais cultivada meticulosamente, permitindo abrir portas que habitualmente permanecem fechadas ao público em geral.
+              </p>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* ── Metodologia — escuro, numerada ── */}
+        <section className="bg-[#05070a] py-24 px-6 lg:px-12">
+          <div className="container max-w-7xl mx-auto">
+
+            <div className="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-6">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.7 }}
+              >
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="h-px w-8 bg-[#C18D41]/50" />
+                  <span className="text-[#C18D41] text-[10px] uppercase tracking-[0.5em] font-bold">A Nossa Metodologia</span>
+                </div>
+                <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl text-white leading-tight">
+                  Três Pilares,<br />
+                  <span className="italic font-light text-[#C18D41]">Uma Obsessão.</span>
+                </h2>
+              </motion.div>
+              <motion.p
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.3 }}
+                className="text-white/35 text-sm font-light max-w-xs leading-relaxed md:text-right"
+              >
+                Os princípios que nos guiam em cada experiência criada.
+              </motion.p>
+            </div>
+
+            <div className="divide-y divide-white/8">
+              {PILARES.map(({ num, title, desc, tag }, i) => (
+                <motion.div
+                  key={num}
+                  initial={{ opacity: 0, x: -30 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true, margin: '-60px' }}
+                  transition={{ delay: i * 0.12, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                  className="group grid grid-cols-[64px_1fr] md:grid-cols-[80px_1fr_240px] gap-6 md:gap-12 py-10 items-start hover:bg-white/[0.02] transition-colors duration-300 px-4 -mx-4 rounded-2xl cursor-default"
+                >
+                  <span className="font-black text-5xl md:text-6xl text-white/10 group-hover:text-[#C18D41]/30 transition-colors duration-500 leading-none tabular-nums select-none">
+                    {num}
+                  </span>
+                  <div>
+                    <h3 className="font-serif text-2xl md:text-3xl text-white mb-3 group-hover:text-[#C18D41] transition-colors duration-300">
+                      {title}
                     </h3>
-                    <p className="text-gray-500 font-light leading-relaxed">
-                      {value.desc}
-                    </p>
-                  </motion.div>
-                ))}
-              </div>
+                    <p className="text-white/45 font-light leading-relaxed text-sm max-w-xl">{desc}</p>
+                  </div>
+                  <div className="hidden md:flex items-start justify-end pt-1">
+                    <span className="text-[9px] uppercase tracking-[0.35em] font-bold text-white/20 group-hover:text-[#C18D41]/50 transition-colors duration-300 border border-white/10 group-hover:border-[#C18D41]/30 px-4 py-2 rounded-full">
+                      {tag}
+                    </span>
+                  </div>
+                </motion.div>
+              ))}
             </div>
-          </section>
+          </div>
+        </section>
 
-          {/* STATS EDITORIAL */}
-          <section className="py-20 px-6 lg:px-12 bg-[#05070a] text-white">
-            <div className="container max-w-7xl mx-auto">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 divide-x divide-white/10">
-                {[
-                  { number: '15+', label: 'Anos de Expertise' },
-                  { number: '40+', label: 'Países Mapeados' },
-                  { number: '100%', label: 'Confidencialidade' },
-                  { number: '24/7', label: 'Suporte Dedicado' },
-                ].map((stat, idx) => (
-                  <motion.div 
-                    key={idx} 
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: idx * 0.1 }}
-                    className="text-center px-4"
-                  >
-                    <p className="text-4xl md:text-6xl font-serif font-bold text-[#C18D41] mb-4">{stat.number}</p>
-                    <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-white/50">{stat.label}</p>
-                  </motion.div>
-                ))}
-              </div>
+        {/* ── Stats — creme ── */}
+        <section className="bg-[#FAF9F6] py-24 px-6 lg:px-12 border-y border-gray-100">
+          <div className="container max-w-7xl mx-auto">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-12 divide-x divide-[#05070a]/8">
+              {STATS.map(({ num, label }, i) => (
+                <motion.div
+                  key={label}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1, duration: 0.6 }}
+                  className="text-center px-4"
+                >
+                  <p className="font-serif font-bold text-5xl md:text-6xl text-[#C18D41] mb-3 tabular-nums">{num}</p>
+                  <p className="text-[9px] uppercase tracking-[0.35em] font-bold text-[#05070a]/40">{label}</p>
+                </motion.div>
+              ))}
             </div>
-          </section>
+          </div>
+        </section>
 
-          {/* CTA */}
-          <section className="py-32 px-6 lg:px-12 text-center bg-white relative overflow-hidden">
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1px] h-32 bg-gradient-to-b from-[#C18D41] to-transparent opacity-30" />
-            <div className="container max-w-2xl mx-auto relative z-10">
-              <h2 className="text-4xl md:text-6xl font-bold text-[#05070a] mb-8 font-serif leading-tight">
-                Dê o Primeiro Passo <br/><span className="text-[#C18D41] italic font-light">Rumo à Exceção</span>
+        {/* ── CTA — escuro ── */}
+        <section className="bg-[#05070a] py-24 px-6 lg:px-12">
+          <div className="container max-w-7xl mx-auto text-center">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7 }}
+            >
+              <p className="text-[#C18D41] text-[10px] uppercase tracking-[0.5em] font-bold mb-6">
+                Pronto para começar?
+              </p>
+              <h2 className="font-serif text-4xl md:text-5xl text-white leading-tight mb-6">
+                Dê o Primeiro Passo<br />
+                <span className="italic font-light text-[#C18D41]">Rumo à Exceção.</span>
               </h2>
-              <p className="text-xl text-gray-500 font-light mb-12">
+              <p className="text-white/35 font-light text-sm max-w-md mx-auto mb-10 leading-relaxed">
                 Agende uma consultoria privada e permita-nos desenhar o seu próximo capítulo pelo mundo.
               </p>
-              <Button
-                onClick={() => setLocation('/contato')}
-                className="h-16 bg-[#05070a] hover:bg-[#C18D41] text-white px-10 rounded-2xl uppercase tracking-[0.2em] text-[10px] font-bold shadow-2xl transition-all duration-500 group"
+              <button
+                onClick={() => { window.location.href = '/#formulario'; }}
+                className="group inline-flex items-center gap-3 bg-[#C18D41] hover:bg-[#A67632] text-white text-[10px] font-bold uppercase tracking-[0.3em] px-10 py-4 rounded-full transition-all duration-300 hover:scale-105"
               >
-                Solicitar Curadoria Privada <ArrowRight className="w-4 h-4 ml-3 group-hover:translate-x-2 transition-transform" />
-              </Button>
-            </div>
-          </section>
-          
-        </div>
+                Solicitar Curadoria Privada
+                <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+              </button>
+            </motion.div>
+          </div>
+        </section>
+
       </Layout>
     </PageTransition>
   );
