@@ -45,7 +45,7 @@ export default function AboutJackeline() {
             </div>
             
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-white leading-[1.1] mb-12">
-              Cada destino que indico, <br/>
+              Cada destino que indico,
               <span className="italic font-light text-[#C18D41]">eu já vivi.</span>
             </h2>
 
