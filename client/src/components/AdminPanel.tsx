@@ -810,7 +810,7 @@ export default function AdminPanel() {
                   <p className="text-sm text-gray-400 mb-6">Links rapidos para as contas principais da Dream Travel.</p>
                   <div className="space-y-3">
                     {[
-                      { label: 'Instagram', url: 'https://instagram.com/dreamtravel', detail: '@dreamtravel' },
+                      { label: 'Instagram', url: 'https://www.instagram.com/dream_travelviagens/', detail: '@dream_travelviagens' },
                       { label: 'WhatsApp', url: 'https://wa.me/5517996077150', detail: '+55 (17) 99607-7150' },
                       { label: 'Supabase (banco de dados)', url: 'https://supabase.com/dashboard', detail: 'dashboard.supabase.com' },
                       { label: 'Vercel (hospedagem)', url: 'https://vercel.com/dashboard', detail: 'vercel.com/dashboard' },
