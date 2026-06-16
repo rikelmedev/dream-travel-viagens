@@ -73,7 +73,7 @@ export default function SliderHero() {
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30 z-10 pointer-events-none" />
 
       {/* Conteudo esquerdo */}
-      <div className="absolute left-10 lg:left-20 top-1/2 -translate-y-1/2 z-20 max-w-lg">
+      <div className="absolute left-6 lg:left-20 top-1/2 -translate-y-1/2 z-20 w-[calc(100%-3rem)] lg:max-w-lg lg:w-auto">
         <AnimatePresence mode="wait">
           <motion.div
             key={current}
@@ -91,7 +91,7 @@ export default function SliderHero() {
             </div>
 
             {/* Titulo grande */}
-            <h1 className="text-7xl md:text-8xl lg:text-9xl font-black text-white leading-[0.85] mb-6 tracking-tight">
+            <h1 className="text-6xl md:text-8xl lg:text-9xl font-black text-white leading-[0.85] mb-6 tracking-tight">
               {dest.name}
             </h1>
 
@@ -101,7 +101,7 @@ export default function SliderHero() {
             </p>
 
             {/* Botoes */}
-            <div className="flex items-center gap-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
               <button
                 onClick={() => setLocation('/destinos')}
                 className="group flex items-center gap-3 bg-[#C18D41] hover:bg-[#A67632] text-white text-xs font-bold uppercase tracking-[0.2em] px-8 py-4 rounded-full transition-all duration-300 hover:scale-105"
@@ -123,7 +123,7 @@ export default function SliderHero() {
       </div>
 
       {/* Cards de destinos — direita */}
-      <div className="absolute right-0 top-0 bottom-0 z-20 flex items-center pr-6 lg:pr-12">
+      <div className="absolute right-0 top-0 bottom-0 z-20 hidden lg:flex items-center pr-6 lg:pr-12">
         <AnimatePresence mode="wait">
           <motion.div
             key={current}

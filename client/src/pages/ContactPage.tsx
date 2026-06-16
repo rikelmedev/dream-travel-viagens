@@ -115,7 +115,7 @@ export default function ContactPage() {
                         </div>
                         <div>
                           <p className="text-[9px] uppercase tracking-widest text-white/40 font-bold mb-1">E-mail Principal</p>
-                          <a href="mailto:jackeline@dreamtravel.com.br" className="text-lg font-light hover:text-[#C18D41] transition-colors tracking-wide">
+                          <a href="mailto:jackeline@dreamtravel.com.br" className="text-lg font-light hover:text-[#C18D41] transition-colors tracking-wide break-all">
                             jackeline@dreamtravel.com.br
                           </a>
                         </div>
