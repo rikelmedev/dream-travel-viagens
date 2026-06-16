@@ -32,7 +32,7 @@ export default function Navbar() {
     { href: '/', label: 'Início' },
     { href: '/destinos', label: 'Destinos' },
     { href: '/sobre', label: 'Curadoria' },
-    { href: '/blog', label: 'Journal' },
+    { href: '/blog', label: 'Blog' },
     { href: '/contato', label: 'Contato' },
   ];
 

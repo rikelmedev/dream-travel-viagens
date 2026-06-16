@@ -171,7 +171,7 @@ export default function BlogPage() {
                           {/* Badge destaque sobre a imagem */}
                           <div className="absolute top-5 left-5">
                             <span className="bg-[#C18D41] text-white text-[8px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full">
-                              Destaque do Journal
+                              Destaques
                             </span>
                           </div>
                         </div>

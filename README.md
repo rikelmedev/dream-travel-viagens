@@ -6,7 +6,7 @@ A Dream Travel é uma plataforma tecnológica de alto padrão, desenhada para or
 
 # 🚀 Funcionalidades Principais
 - Catálogo de Destinos: Exibição dinâmica de locais exclusivos com design editorial.
-- Journal (Blog): Espaço para relatos de viagem, com estética de revista de luxo.
+- Diario de Viagens (Blog): Espaço para relatos de viagem, com estética de revista de luxo.
 - Área VIP: Portal restrito onde o cliente tem acesso ao seu roteiro confidencial e suporte direto.
 - Control Room (Admin): Painel de administração para gestão total de conteúdo, imagens e acessos de clientes.
 - Assistente de Consultoria: Integração estratégica com WhatsApp para atendimento imediato e personalizado.
