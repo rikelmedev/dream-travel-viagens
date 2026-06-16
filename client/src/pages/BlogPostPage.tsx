@@ -203,7 +203,7 @@ export default function BlogPostPage() {
 
                 <h3 className="text-4xl font-serif font-bold mb-6 relative z-10">Convite Exclusivo</h3>
                 <p className="text-white/60 mb-10 max-w-md mx-auto relative z-10 font-light leading-relaxed">
-                  Receba no seu e mail as novas descobertas e roteiros secretos curados pela nossa equipa antes de irem a publico.
+                  Receba no seu e-mail as novas descobertas e roteiros secretos curados pela nossa equipa antes de irem a público.
                 </p>
 
                 <form onSubmit={handleNewsletter} className="flex flex-col sm:flex-row gap-0 max-w-lg mx-auto relative z-10 bg-white/5 backdrop-blur-md p-2 rounded-full border border-white/10">

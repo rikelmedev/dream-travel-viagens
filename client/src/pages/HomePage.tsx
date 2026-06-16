@@ -51,10 +51,10 @@ export default function HomePage() {
           <div className="container px-6 lg:px-12 max-w-7xl mx-auto">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
               {[
-                { value: '10+', label: 'Anos de Experiencia' },
-                { value: '200+', label: 'Clientes Satisfeitos' },
-                { value: '40+', label: 'Destinos Curados' },
-                { value: '100%', label: 'Atendimento Personalizado' },
+                { value: '10+', label: 'Anos de Curadoria' },
+                { value: '200+', label: 'Jornadas Desenhadas' },
+                { value: '40+', label: 'Destinos Visitados' },
+                { value: '0', label: 'Roteiros Repetidos' },
               ].map(({ value, label }, i) => (
                 <motion.div key={label} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }} transition={{ delay: i * 0.1, duration: 0.6 }}>
@@ -83,14 +83,14 @@ export default function HomePage() {
                   <span className="text-[#C18D41] text-[10px] uppercase tracking-[0.5em] font-bold">Por que nos escolher</span>
                 </div>
                 <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif text-white leading-tight">
-                  A Diferenca que <br />
-                  <span className="italic font-light text-[#C18D41]">Voce Merece.</span>
+                  O que nos separa <br />
+                  <span className="italic font-light text-[#C18D41]">de todo o resto.</span>
                 </h2>
               </motion.div>
               <motion.p initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}
                 viewport={{ once: true }} transition={{ delay: 0.3 }}
                 className="text-white/40 text-sm font-light max-w-xs leading-relaxed md:text-right">
-                Mais do que uma agencia — uma curadora de experiencias que transformam viagens em memorias eternas.
+                Cada viagem é desenhada uma única vez — para uma única pessoa. Nunca repetimos um roteiro.
               </motion.p>
             </div>
 
@@ -105,9 +105,9 @@ export default function HomePage() {
                 },
                 {
                   num: '02',
-                  title: 'Planejamento Seguro',
-                  desc: 'Do primeiro contato ao seu retorno, acompanhamos cada etapa com suporte 24h e resolucao imediata de qualquer imprevisto — para que voce so precise se preocupar em aproveitar.',
-                  tag: 'Suporte completo',
+                  title: 'Presença em Cada Etapa',
+                  desc: 'Do primeiro contacto ao seu regresso, a Jackeline acompanha cada momento. Disponível em qualquer fuso horário, para que o único pensamento durante a viagem seja o próximo lugar a descobrir.',
+                  tag: 'Suporte contínuo',
                 },
                 {
                   num: '03',
@@ -205,11 +205,11 @@ export default function HomePage() {
                   <span className="text-[#C18D41] text-[10px] uppercase tracking-[0.5em] font-bold">FAQ</span>
                 </div>
                 <h2 className="text-4xl md:text-5xl font-serif text-white leading-tight mb-6">
-                  Ficou com <br />
-                  <span className="italic font-light text-[#C18D41]">Duvidas?</span>
+                  Antes de iniciar <br />
+                  <span className="italic font-light text-[#C18D41]">a sua jornada.</span>
                 </h2>
                 <p className="text-white/35 text-sm font-light leading-relaxed mb-10">
-                  Respondemos as perguntas mais comuns sobre como funciona a nossa curadoria de viagens.
+                  As perguntas que os nossos clientes fazem antes de confiar a nós a próxima viagem.
                 </p>
                 <a
                   href="https://wa.me/5517996077150"
@@ -241,9 +241,9 @@ function FAQSection() {
   const [open, setOpen] = useState<number | null>(null);
   const faqs = [
     { q: 'Como funciona o processo de planejamento?', a: 'Tudo comeca com uma conversa. Voce preenche o formulario de consultoria ou entra em contato pelo WhatsApp. A Jackeline entende os seus desejos, orcamento e estilo de viagem, e em seguida monta um roteiro completamente personalizado para voce.' },
-    { q: 'Quanto tempo leva para receber meu roteiro?', a: 'Apos a primeira consulta, o roteiro inicial e apresentado em ate 3 dias uteis. Refinamentos e ajustes sao feitos juntos ate ficar exatamente como voce sonha.' },
+    { q: 'Quanto tempo leva para receber meu roteiro?', a: 'Após a primeira consulta, o roteiro inicial é apresentado em até 3 dias. Refinamentos e ajustes são feitos juntos até que cada detalhe esteja exatamente como imaginou.' },
     { q: 'A Dream Travel trabalha com destinos internacionais?', a: 'Sim. A nossa especialidade sao destinos internacionais de alto nivel — Europa, Asia, Maldivas, Americas e muito mais. Trabalhamos com os melhores parceiros em cada destino para garantir experiencias exclusivas.' },
-    { q: 'Qual e o perfil de cliente da Dream Travel?', a: 'Atendemos viajantes que valorizam qualidade, personalizacao e tranquilidade acima do preco. Se voce busca uma viagem bem planejada, segura e cheia de momentos especiais, a Dream Travel e para voce.' },
+    { q: 'Qual e o perfil de cliente da Dream Travel?', a: 'Atendemos viajantes que colocam a experiência acima do preço. Pessoas que já viajaram antes, sabem o que querem e precisam de alguém que saiba como entregar — sem improvisos, sem templates.' },
     { q: 'E possivel incluir pedidos de casamento ou celebracoes especiais?', a: 'Absolutamente. Esse e um dos nossos pontos fortes. Organizamos pedidos de casamento em destinos romanticos, aniversarios em ilhas privadas e celebracoes inesqueciveis com todos os detalhes cuidados.' },
     { q: 'Como funciona o suporte durante a viagem?', a: 'Voce viaja com total seguranca. A Jackeline permanece disponivel durante toda a sua jornada para resolver qualquer imprevisto — de um voo cancelado a uma troca de hotel de ultima hora.' },
   ];

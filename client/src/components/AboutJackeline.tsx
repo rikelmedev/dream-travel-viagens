@@ -45,26 +45,26 @@ export default function AboutJackeline() {
             </div>
             
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-white leading-[1.1] mb-12">
-              Transformando Sonhos em <br/>
-              <span className="italic font-light text-[#C18D41]">Destinos Inesquecíveis.</span>
+              Cada destino que indico, <br/>
+              <span className="italic font-light text-[#C18D41]">eu já vivi.</span>
             </h2>
 
             <div className="space-y-8 text-lg text-white/70 font-light leading-relaxed max-w-2xl">
               <p className="first-letter:text-7xl first-letter:font-serif first-letter:text-[#C18D41] first-letter:float-left first-letter:mr-4 first-letter:-mt-2">
-                Meu nome é Jackeline, e a minha história começou com um sonho: conhecer o mundo. Com o tempo, percebi que esse também é o sonho de muitas pessoas — mas que, muitas vezes, falta orientação, planejamento e segurança para torná-lo real.
+                Vinte anos de estradas, trinta e oito países e uma convicção que nunca mudou: ninguém deveria chegar a um destino sem alguém que já conhece os seus bastidores.
               </p>
-              
+
               <p>
-                Foi por isso que criei a minha agência: para transformar sonhos em viagens bem planejadas, seguras e inesquecíveis. Aqui, cada detalhe é pensado para que você tenha a melhor experiência possível, sem preocupações.
+                A Dream Travel não opera com catálogos nem com parceiros que nunca visitei. Cada hotel, cada mesa de restaurante, cada experiência que recomendo passou primeiro pelo meu próprio crivo — antes de entrar no roteiro de qualquer cliente.
               </p>
 
               {/* Bloco de Citação */}
               <p className="italic text-white/90 font-serif border-l-2 border-[#C18D41]/50 pl-6 py-2 text-xl leading-relaxed">
-                "Do primeiro atendimento até o seu retorno, o meu compromisso é cuidar de tudo para que você apenas aproveite. Mais do que vender viagens, eu entrego tranquilidade, confiança e experiências que marcam a vida."
+                "Não me interessa apenas onde o meu cliente vai. Interessa-me como vai chegar, o que vai sentir ao entrar no quarto, com quem vai jantar na primeira noite. Esses detalhes são a viagem."
               </p>
 
               <p className="font-bold text-white/90 pt-4 text-xs uppercase tracking-widest">
-                Se você também sonha em conhecer o mundo, eu estou aqui para ajudar a dar o primeiro passo.
+                Uma agenda limitada. Uma curadoria intransigente. Para quem exige que cada jornada valha o tempo investido.
               </p>
             </div>
 

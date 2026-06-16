@@ -8,25 +8,25 @@ const DESTINATIONS = [
     src: '/images/maldivas.jpg',
     country: 'Oceano Índico',
     name: 'MALDIVAS',
-    desc: 'Paraíso de águas cristalinas e bangalôs suspensos sobre o recife de coral.',
+    desc: 'Isolamento absoluto. Bangalôs sobre lagoas silenciosas onde o horizonte pertence apenas a si.',
   },
   {
     src: '/images/capri.jpg',
     country: 'Itália',
     name: 'CAPRI',
-    desc: 'A ilha do sol, do glamour mediterrâneo e da lendária Gruta Azul.',
+    desc: 'A ilha que Tiberius escolheu. Iate privado, perfume de limão e a Gruta Azul sem multidões.',
   },
   {
     src: '/images/zermatt.jpg',
     country: 'Suíça',
     name: 'ZERMATT',
-    desc: 'Às sombras do Matterhorn, um refúgio alpino de elegância atemporal.',
+    desc: 'À sombra do Matterhorn, onde o ritmo alpino substitui o calendário e o silêncio é o luxo.',
   },
   {
     src: '/images/kyoto.jpg',
     country: 'Japão',
     name: 'KYOTO',
-    desc: 'Jardins zen, templos milenares e a essência cultural do Japão eterno.',
+    desc: 'Kyoto não se visita — experimenta-se. Cerimônias privadas, pagodas ao amanhecer, silêncio que educa.',
   },
 ];
 
@@ -106,7 +106,7 @@ export default function SliderHero() {
                 onClick={() => setLocation('/destinos')}
                 className="group flex items-center gap-3 bg-[#C18D41] hover:bg-[#A67632] text-white text-xs font-bold uppercase tracking-[0.2em] px-8 py-4 rounded-full transition-all duration-300 hover:scale-105"
               >
-                Explorar
+                Descobrir
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </button>
               <button
@@ -115,7 +115,7 @@ export default function SliderHero() {
                 }}
                 className="text-white/70 hover:text-white text-xs font-bold uppercase tracking-[0.2em] px-8 py-4 rounded-full border border-white/20 hover:border-white/50 transition-all duration-300"
               >
-                Solicitar Roteiro
+                Desenhar o Roteiro
               </button>
             </div>
           </motion.div>
