@@ -63,9 +63,6 @@ export default function AboutJackeline() {
                 "Não me interessa apenas onde o meu cliente vai. Interessa-me como vai chegar, o que vai sentir ao entrar no quarto, com quem vai jantar na primeira noite. Esses detalhes são a viagem."
               </p>
 
-              <p className="font-bold text-white/90 pt-4 text-xs uppercase tracking-widest">
-                Uma agenda limitada. Uma curadoria intransigente. Para quem exige que cada jornada valha o tempo investido.
-              </p>
             </div>
 
             {/* Assinatura */}
