@@ -12,20 +12,17 @@ export default function AdminLogin() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
-
-    setTimeout(() => {
-      const ok = login(password);
-      if (ok) {
-        setLocation('/admin');
-      } else {
-        setError('Senha incorreta.');
-        setLoading(false);
-      }
-    }, 600);
+    const ok = await login(password);
+    if (ok) {
+      setLocation('/admin');
+    } else {
+      setError('Senha incorreta.');
+      setLoading(false);
+    }
   };
 
   return (

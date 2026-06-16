@@ -9,11 +9,26 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
   const [newsletterEmail, setNewsletterEmail] = useState('');
 
-  const handleNewsletter = (e: React.FormEvent) => {
+  const handleNewsletter = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newsletterEmail) return;
-    toast.success('Bem-vindo ao Círculo Restrito! Em breve receberá as nossas descobertas.');
-    setNewsletterEmail('');
+    try {
+      const res = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: newsletterEmail }),
+      });
+      if (res.status === 409) {
+        toast.info('Este e-mail já faz parte do Círculo Restrito.');
+      } else if (res.ok) {
+        toast.success('Bem-vindo ao Círculo Restrito! Em breve receberá as nossas descobertas.');
+        setNewsletterEmail('');
+      } else {
+        toast.error('Algo correu mal. Tente novamente.');
+      }
+    } catch {
+      toast.error('Algo correu mal. Tente novamente.');
+    }
   };
 
   const whatsappMessage = encodeURIComponent("Olá Jackeline, estava a explorar o site da Dream Travel e gostaria de iniciar o planeamento de uma viagem exclusiva com a sua curadoria.");

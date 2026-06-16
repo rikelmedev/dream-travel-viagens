@@ -67,3 +67,12 @@ export const itineraries = pgTable("itineraries", {
 
 export const insertItinerarySchema = createInsertSchema(itineraries);
 export const selectItinerarySchema = createSelectSchema(itineraries);
+
+// Tabela de assinantes da newsletter
+export const newsletterSubscribers = pgTable('newsletter_subscribers', {
+  id: serial('id').primaryKey(),
+  email: text('email').notNull().unique(),
+  created_at: timestamp('created_at').defaultNow(),
+});
+
+export const insertNewsletterSchema = createInsertSchema(newsletterSubscribers);

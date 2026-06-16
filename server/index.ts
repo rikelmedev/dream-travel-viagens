@@ -1,6 +1,7 @@
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
+import { randomBytes } from "crypto";
 import { eq } from "drizzle-orm";
 import { db } from "./db";
 import {
@@ -8,14 +9,61 @@ import {
   posts, insertPostSchema,
   vipCodes, insertVipCodeSchema,
   itineraries, insertItinerarySchema,
+  newsletterSubscribers,
 } from "./schema";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'DreamTravel@2026';
+const adminSessions = new Map<string, number>(); // token → expiry timestamp
+
+setInterval(() => {
+  const now = Date.now();
+  for (const [token, expiry] of adminSessions) {
+    if (now > expiry) adminSessions.delete(token);
+  }
+}, 60 * 60 * 1000);
+
+function requireAdmin(req: express.Request, res: express.Response, next: express.NextFunction) {
+  const token = req.headers['x-admin-token'] as string;
+  const expiry = token ? adminSessions.get(token) : undefined;
+  if (!token || !expiry || Date.now() > expiry) {
+    return res.status(401).json({ error: 'Não autorizado' });
+  }
+  next();
+}
+
 async function startServer() {
   const app = express();
   app.use(express.json());
+
+  // ── ADMIN AUTH ─────────────────────────────────────────────────────────────
+
+  app.post('/api/admin/login', (req, res) => {
+    const { password } = req.body;
+    if (!password || password !== ADMIN_PASSWORD) {
+      return res.status(401).json({ error: 'Senha incorreta' });
+    }
+    const token = randomBytes(32).toString('hex');
+    adminSessions.set(token, Date.now() + 24 * 60 * 60 * 1000);
+    res.json({ token });
+  });
+
+  app.get('/api/admin/verify', (req, res) => {
+    const token = req.headers['x-admin-token'] as string;
+    const expiry = token ? adminSessions.get(token) : undefined;
+    if (!token || !expiry || Date.now() > expiry) {
+      return res.status(401).json({ error: 'Não autorizado' });
+    }
+    res.json({ ok: true });
+  });
+
+  app.post('/api/admin/logout', (req, res) => {
+    const token = req.headers['x-admin-token'] as string;
+    if (token) adminSessions.delete(token);
+    res.json({ ok: true });
+  });
 
   app.get("/api/destinations", async (_req, res) => {
     try {
@@ -27,7 +75,7 @@ async function startServer() {
     }
   });
 
-  app.post("/api/destinations", async (req, res) => {
+  app.post("/api/destinations", requireAdmin, async (req, res) => {
     try {
       const parsed = insertDestinationSchema.safeParse(req.body);
       if (!parsed.success) {
@@ -54,7 +102,7 @@ async function startServer() {
     }
   });
 
-  app.put("/api/destinations/:id", async (req, res) => {
+  app.put("/api/destinations/:id", requireAdmin, async (req, res) => {
     try {
       const id = parseInt(req.params.id, 10);
       if (isNaN(id)) return res.status(400).json({ error: "ID inválido" });
@@ -70,7 +118,7 @@ async function startServer() {
     }
   });
 
-  app.delete("/api/destinations/:id", async (req, res) => {
+  app.delete("/api/destinations/:id", requireAdmin, async (req, res) => {
     try {
       const id = parseInt(req.params.id, 10);
       if (isNaN(id)) return res.status(400).json({ error: "ID inválido" });
@@ -107,7 +155,7 @@ async function startServer() {
     }
   });
 
-  app.post("/api/posts", async (req, res) => {
+  app.post("/api/posts", requireAdmin, async (req, res) => {
     try {
       const parsed = insertPostSchema.safeParse(req.body);
       if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
@@ -119,7 +167,7 @@ async function startServer() {
     }
   });
 
-  app.put("/api/posts/:id", async (req, res) => {
+  app.put("/api/posts/:id", requireAdmin, async (req, res) => {
     try {
       const id = parseInt(req.params.id, 10);
       if (isNaN(id)) return res.status(400).json({ error: "ID inválido" });
@@ -131,7 +179,7 @@ async function startServer() {
     }
   });
 
-  app.delete("/api/posts/:id", async (req, res) => {
+  app.delete("/api/posts/:id", requireAdmin, async (req, res) => {
     try {
       const id = parseInt(req.params.id, 10);
       if (isNaN(id)) return res.status(400).json({ error: "ID inválido" });
@@ -155,7 +203,7 @@ async function startServer() {
     }
   });
 
-  app.post("/api/vip-codes", async (req, res) => {
+  app.post("/api/vip-codes", requireAdmin, async (req, res) => {
     try {
       const parsed = insertVipCodeSchema.safeParse(req.body);
       if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
@@ -167,7 +215,7 @@ async function startServer() {
     }
   });
 
-  app.patch("/api/vip-codes/:id/toggle", async (req, res) => {
+  app.patch("/api/vip-codes/:id/toggle", requireAdmin, async (req, res) => {
     try {
       const id = parseInt(req.params.id, 10);
       if (isNaN(id)) return res.status(400).json({ error: "ID inválido" });
@@ -184,7 +232,7 @@ async function startServer() {
     }
   });
 
-  app.delete("/api/vip-codes/:id", async (req, res) => {
+  app.delete("/api/vip-codes/:id", requireAdmin, async (req, res) => {
     try {
       const id = parseInt(req.params.id, 10);
       if (isNaN(id)) return res.status(400).json({ error: "ID inválido" });
@@ -237,7 +285,7 @@ async function startServer() {
     }
   });
 
-  app.post("/api/itineraries", async (req, res) => {
+  app.post("/api/itineraries", requireAdmin, async (req, res) => {
     try {
       const parsed = insertItinerarySchema.safeParse(req.body);
       if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
@@ -249,7 +297,7 @@ async function startServer() {
     }
   });
 
-  app.put("/api/itineraries/:vip_code", async (req, res) => {
+  app.put("/api/itineraries/:vip_code", requireAdmin, async (req, res) => {
     try {
       const code = req.params.vip_code.toUpperCase();
       const [updated] = await db.update(itineraries)
@@ -264,7 +312,7 @@ async function startServer() {
     }
   });
 
-  app.delete("/api/itineraries/:vip_code", async (req, res) => {
+  app.delete("/api/itineraries/:vip_code", requireAdmin, async (req, res) => {
     try {
       const code = req.params.vip_code.toUpperCase();
       await db.delete(itineraries).where(eq(itineraries.vip_code, code));
@@ -272,6 +320,35 @@ async function startServer() {
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: "Erro ao remover roteiro" });
+    }
+  });
+
+  // ── NEWSLETTER ─────────────────────────────────────────────────────────────
+
+  app.post("/api/newsletter", async (req, res) => {
+    try {
+      const { email } = req.body;
+      if (!email || typeof email !== 'string') {
+        return res.status(400).json({ error: "E-mail obrigatório" });
+      }
+      await db.insert(newsletterSubscribers).values({ email: email.toLowerCase().trim() });
+      res.status(201).json({ ok: true });
+    } catch (err: any) {
+      if (err?.code === '23505') {
+        return res.status(409).json({ error: "E-mail já registado" });
+      }
+      console.error(err);
+      res.status(500).json({ error: "Erro ao registar e-mail" });
+    }
+  });
+
+  app.get("/api/newsletter", requireAdmin, async (_req, res) => {
+    try {
+      const rows = await db.select().from(newsletterSubscribers).orderBy(newsletterSubscribers.created_at);
+      res.json(rows);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Erro ao buscar assinantes" });
     }
   });
 

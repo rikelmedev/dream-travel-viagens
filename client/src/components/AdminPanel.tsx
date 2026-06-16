@@ -131,7 +131,12 @@ function ImageUploadField({
 // ── Main Component ─────────────────────────────────────────────────────────
 
 export default function AdminPanel() {
-  const { logout } = useAdminAuth();
+  const { logout, token } = useAdminAuth();
+  const adminFetch = (url: string, options: RequestInit = {}) =>
+    fetch(url, {
+      ...options,
+      headers: { ...(options.headers as Record<string, string>), 'x-admin-token': token ?? '' },
+    });
   const [, setLocation] = useLocation();
   const [activeTab, setActiveTab] = useState('dashboard');
 
@@ -255,7 +260,7 @@ export default function AdminPanel() {
     try {
       const payload = { ...destForm, rating: Number(destForm.rating) };
       if (editingDestination) {
-        const res = await fetch(`/api/destinations/${editingDestination.id}`, {
+        const res = await adminFetch(`/api/destinations/${editingDestination.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
@@ -265,7 +270,7 @@ export default function AdminPanel() {
         setDestinations(prev => prev.map(d => d.id === editingDestination.id ? updated : d));
         toast.success('Destino atualizado');
       } else {
-        const res = await fetch('/api/destinations', {
+        const res = await adminFetch('/api/destinations', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
@@ -286,7 +291,7 @@ export default function AdminPanel() {
     setConfirm({
       message: `Remover o destino "${title}"? Esta acao nao pode ser desfeita.`,
       onConfirm: async () => {
-        await fetch(`/api/destinations/${id}`, { method: 'DELETE' });
+        await adminFetch(`/api/destinations/${id}`, { method: 'DELETE' });
         setDestinations(prev => prev.filter(d => d.id !== id));
         toast.success('Destino removido');
         loadStats();
@@ -324,7 +329,7 @@ export default function AdminPanel() {
     try {
       const payload = { ...postForm, slug: postForm.slug || slugify(postForm.title) };
       if (editingPost) {
-        const res = await fetch(`/api/posts/${editingPost.id}`, {
+        const res = await adminFetch(`/api/posts/${editingPost.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
@@ -334,7 +339,7 @@ export default function AdminPanel() {
         setPosts(prev => prev.map(p => p.id === editingPost.id ? updated : p));
         toast.success('Post atualizado');
       } else {
-        const res = await fetch('/api/posts', {
+        const res = await adminFetch('/api/posts', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
@@ -353,7 +358,7 @@ export default function AdminPanel() {
 
   const togglePostStatus = async (post: Post) => {
     const newStatus = post.status === 'published' ? 'draft' : 'published';
-    const res = await fetch(`/api/posts/${post.id}`, {
+    const res = await adminFetch(`/api/posts/${post.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status: newStatus }),
@@ -368,7 +373,7 @@ export default function AdminPanel() {
     setConfirm({
       message: `Remover o post "${title}"? Esta acao nao pode ser desfeita.`,
       onConfirm: async () => {
-        await fetch(`/api/posts/${id}`, { method: 'DELETE' });
+        await adminFetch(`/api/posts/${id}`, { method: 'DELETE' });
         setPosts(prev => prev.filter(p => p.id !== id));
         toast.success('Post removido');
         loadStats();
@@ -382,7 +387,7 @@ export default function AdminPanel() {
     e.preventDefault();
     setSaving(true);
     try {
-      const res = await fetch('/api/vip-codes', {
+      const res = await adminFetch('/api/vip-codes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(vipForm),
@@ -398,7 +403,7 @@ export default function AdminPanel() {
   };
 
   const toggleVipCode = async (id: number) => {
-    const res = await fetch(`/api/vip-codes/${id}/toggle`, { method: 'PATCH' });
+    const res = await adminFetch(`/api/vip-codes/${id}/toggle`, { method: 'PATCH' });
     const updated = await res.json();
     setVipCodes(prev => prev.map(v => v.id === id ? updated : v));
     toast.success(updated.is_active ? 'Codigo ativado' : 'Codigo desativado');
@@ -409,7 +414,7 @@ export default function AdminPanel() {
     setConfirm({
       message: `Remover o acesso VIP de "${name}"? O cliente perdera o acesso ao dashboard.`,
       onConfirm: async () => {
-        await fetch(`/api/vip-codes/${id}`, { method: 'DELETE' });
+        await adminFetch(`/api/vip-codes/${id}`, { method: 'DELETE' });
         setVipCodes(prev => prev.filter(v => v.id !== id));
         toast.success('Codigo removido');
         loadStats();
@@ -451,11 +456,11 @@ export default function AdminPanel() {
       const payload = { ...itinForm, vip_code: itinForm.vip_code.toUpperCase() };
       let res: Response;
       if (editingItinerary) {
-        res = await fetch(`/api/itineraries/${editingItinerary.vip_code}`, {
+        res = await adminFetch(`/api/itineraries/${editingItinerary.vip_code}`, {
           method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload),
         });
       } else {
-        res = await fetch('/api/itineraries', {
+        res = await adminFetch('/api/itineraries', {
           method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload),
         });
       }
@@ -471,7 +476,7 @@ export default function AdminPanel() {
     setConfirm({
       message: `Remover o roteiro de ${vip_code}? O cliente deixara de ver o itinerario.`,
       onConfirm: async () => {
-        await fetch(`/api/itineraries/${vip_code}`, { method: 'DELETE' });
+        await adminFetch(`/api/itineraries/${vip_code}`, { method: 'DELETE' });
         setItineraries(prev => prev.filter(i => i.vip_code !== vip_code));
         toast.success('Roteiro removido');
       }
