@@ -17,7 +17,3 @@ A Dream Travel é uma plataforma tecnológica de alto padrão, desenhada para or
 - Gestão de Estado: React Hooks.
 - Componentização: UI components baseados em padrões de alta performance.
 - Backend (Mock): Sistema de gestão de estados pronto para integração com API RESTful.
--
-- <img width="1897" height="866" alt="image" src="https://github.com/user-attachments/assets/8e59dbe5-d487-4e7c-8e0d-55a2a35a0e40" />
-
-## PROJETO EM DESENVOLVIMENTO
