@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Map, BookOpen, Settings,
   Plus, Trash2, Key, Loader2, X, Upload,
   Globe, FileText, Users, ToggleLeft, ToggleRight,
-  LogOut, Eye, EyeOff, Copy, Check, Route, Pencil, ArrowRight, Mail
+  LogOut, Eye, EyeOff, Copy, Check, Route, Pencil, ArrowRight, Mail, Download
 } from 'lucide-react';
 import { Button } from '@/components/painel/button';
 import { toast } from 'sonner';
@@ -40,6 +40,9 @@ interface Itinerary {
   hotel_detail: string | null; hotel_sub: string | null;
   transfer_detail: string | null; transfer_sub: string | null;
   days: ItineraryDay[];
+}
+interface NewsletterSub {
+  id: number; email: string; created_at: string | null;
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -146,6 +149,7 @@ export default function AdminPanel() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [vipCodes, setVipCodes] = useState<VipCode[]>([]);
   const [itineraries, setItineraries] = useState<Itinerary[]>([]);
+  const [newsletter, setNewsletter] = useState<NewsletterSub[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   // Modals
@@ -181,6 +185,7 @@ export default function AdminPanel() {
     { id: 'blog', label: 'Blog', icon: BookOpen },
     { id: 'vip', label: 'Acessos VIP', icon: Key },
     { id: 'itineraries', label: 'Roteiros VIP', icon: Route },
+    { id: 'newsletter', label: 'Newsletter', icon: Mail },
     { id: 'settings', label: 'Configuracoes', icon: Settings },
   ];
 
@@ -225,12 +230,38 @@ export default function AdminPanel() {
     setIsLoading(false);
   };
 
+  const loadNewsletter = async () => {
+    setIsLoading(true);
+    const res = await adminFetch('/api/newsletter');
+    const data = await res.json();
+    setNewsletter(Array.isArray(data) ? data : []);
+    setIsLoading(false);
+  };
+
+  const exportNewsletterCSV = () => {
+    if (newsletter.length === 0) { toast.info('Nenhum assinante para exportar.'); return; }
+    const header = 'Email,Data de Inscrição';
+    const rows = newsletter.map(s =>
+      `${s.email},${s.created_at ? new Date(s.created_at).toLocaleDateString('pt-BR') : ''}`
+    );
+    const csv = [header, ...rows].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `newsletter-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success(`${newsletter.length} assinantes exportados.`);
+  };
+
   useEffect(() => {
     if (activeTab === 'dashboard') loadStats();
     if (activeTab === 'destinations') loadDestinations();
     if (activeTab === 'blog') loadPosts();
     if (activeTab === 'vip') loadVipCodes();
     if (activeTab === 'itineraries') loadItineraries();
+    if (activeTab === 'newsletter') loadNewsletter();
   }, [activeTab]);
 
   // ── Actions: Destinations ─────────────────────────────────────────────────
@@ -580,6 +611,11 @@ export default function AdminPanel() {
                 <Plus className="w-4 h-4 mr-2" /> Novo Roteiro
               </Button>
             )}
+            {activeTab === 'newsletter' && (
+              <Button onClick={exportNewsletterCSV} className="bg-[#05070a] hover:bg-[#C18D41] text-white rounded-2xl px-6 h-12">
+                <Download className="w-4 h-4 mr-2" /> Exportar CSV
+              </Button>
+            )}
           </header>
 
           <AnimatePresence mode="wait">
@@ -858,6 +894,50 @@ export default function AdminPanel() {
                         ))}
                       </tbody>
                     </table>
+                  </div>
+                )}
+              </motion.div>
+            )}
+
+            {/* ── NEWSLETTER ── */}
+            {activeTab === 'newsletter' && (
+              <motion.div key="newsletter" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                {isLoading ? (
+                  <div className="flex justify-center p-20"><Loader2 className="animate-spin w-8 h-8 text-gray-300" /></div>
+                ) : newsletter.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-24 text-gray-400 gap-4">
+                    <Mail className="w-10 h-10 opacity-20" />
+                    <p className="text-sm font-medium">Nenhum assinante ainda.</p>
+                    <p className="text-xs text-gray-300 max-w-xs text-center">Quando alguém preencher o formulário de newsletter no site, aparecerá aqui.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3 bg-[#C18D41]/5 border border-[#C18D41]/20 rounded-2xl px-6 py-4">
+                      <Mail className="w-4 h-4 text-[#C18D41]" />
+                      <p className="text-sm font-bold text-[#05070a]">{newsletter.length} assinante{newsletter.length !== 1 ? 's' : ''} no Círculo Restrito</p>
+                    </div>
+                    <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                      <table className="w-full">
+                        <thead>
+                          <tr className="border-b border-gray-100">
+                            <th className="p-6 text-left text-xs text-gray-400 font-bold uppercase tracking-widest">#</th>
+                            <th className="p-6 text-left text-xs text-gray-400 font-bold uppercase tracking-widest">E-mail</th>
+                            <th className="p-6 text-left text-xs text-gray-400 font-bold uppercase tracking-widest">Data de Inscrição</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {newsletter.map((sub, idx) => (
+                            <tr key={sub.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors">
+                              <td className="p-6 text-gray-300 text-sm font-mono">{String(idx + 1).padStart(2, '0')}</td>
+                              <td className="p-6 font-medium text-[#05070a]">{sub.email}</td>
+                              <td className="p-6 text-gray-400 text-sm">
+                                {sub.created_at ? new Date(sub.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' }) : '—'}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 )}
               </motion.div>
