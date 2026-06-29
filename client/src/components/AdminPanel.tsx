@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Map, BookOpen, Settings,
   Plus, Trash2, Key, Loader2, X, Upload,
   Globe, FileText, Users, ToggleLeft, ToggleRight,
-  LogOut, Eye, EyeOff, Copy, Check, Route, Pencil, ArrowRight
+  LogOut, Eye, EyeOff, Copy, Check, Route, Pencil, ArrowRight, Mail
 } from 'lucide-react';
 import { Button } from '@/components/painel/button';
 import { toast } from 'sonner';
@@ -31,6 +31,7 @@ interface VipCode {
 interface Stats {
   destinations: number; postsPublished: number;
   postsDraft: number; vipActive: number; vipTotal: number;
+  newsletterCount: number;
 }
 interface ItineraryDay { day: number; title: string; description: string; location: string; }
 interface Itinerary {
@@ -186,7 +187,8 @@ export default function AdminPanel() {
   // ── Loaders ──────────────────────────────────────────────────────────────
 
   const loadStats = async () => {
-    const res = await fetch('/api/stats');
+    const res = await adminFetch('/api/stats');
+    if (!res.ok) return;
     const data = await res.json();
     setStats(data);
   };
@@ -552,9 +554,12 @@ export default function AdminPanel() {
 
           {/* Header */}
           <header className="flex justify-between items-end mb-12">
-            <h2 className="text-4xl font-bold font-serif text-[#05070a]">
-              {sidebarLinks.find(l => l.id === activeTab)?.label}
-            </h2>
+            {activeTab !== 'dashboard' && (
+              <h2 className="text-4xl font-bold font-serif text-[#05070a]">
+                {sidebarLinks.find(l => l.id === activeTab)?.label}
+              </h2>
+            )}
+            {activeTab === 'dashboard' && <div />}
             {activeTab === 'destinations' && (
               <Button onClick={openNewDest} className="bg-[#05070a] hover:bg-[#C18D41] text-white rounded-2xl px-6 h-12">
                 <Plus className="w-4 h-4 mr-2" /> Novo Destino
@@ -581,27 +586,83 @@ export default function AdminPanel() {
 
             {/* ── DASHBOARD ── */}
             {activeTab === 'dashboard' && (
-              <motion.div key="dashboard" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              <motion.div key="dashboard" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-8">
+
+                {/* Greeting */}
+                <div className="flex items-center justify-between flex-wrap gap-4">
+                  <div>
+                    <p className="text-[10px] font-bold text-[#C18D41] uppercase tracking-[0.3em] mb-1">
+                      {new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+                    </p>
+                    <h2 className="text-3xl font-serif font-bold text-[#05070a]">Bem-vinda, Jackeline</h2>
+                  </div>
+                  <button onClick={() => window.open('/', '_blank')}
+                    className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-[#05070a] border border-gray-200 hover:border-gray-300 px-5 py-2.5 rounded-full transition-all">
+                    <Globe className="w-3.5 h-3.5" /> Ver Site
+                  </button>
+                </div>
+
+                {/* KPI Cards */}
                 {!stats ? (
-                  <div className="flex justify-center p-20"><Loader2 className="animate-spin w-8 h-8 text-gray-300" /></div>
+                  <div className="flex justify-center p-16"><Loader2 className="animate-spin w-8 h-8 text-gray-300" /></div>
                 ) : (
-                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+                  <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
                     {[
-                      { label: 'Destinos', value: stats.destinations, icon: Globe, color: 'text-blue-500', bg: 'bg-blue-50' },
-                      { label: 'Posts Publicados', value: stats.postsPublished, icon: Eye, color: 'text-green-500', bg: 'bg-green-50' },
-                      { label: 'Rascunhos', value: stats.postsDraft, icon: FileText, color: 'text-amber-500', bg: 'bg-amber-50' },
-                      { label: 'Acessos VIP Ativos', value: stats.vipActive, icon: Users, color: 'text-purple-500', bg: 'bg-purple-50' },
-                    ].map(({ label, value, icon: Icon, color, bg }) => (
-                      <div key={label} className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
-                        <div className={`w-12 h-12 ${bg} rounded-2xl flex items-center justify-center mb-5`}>
-                          <Icon className={`w-5 h-5 ${color}`} />
-                        </div>
-                        <p className="text-4xl font-serif font-bold text-[#05070a]">{value}</p>
-                        <p className="text-xs text-gray-400 font-semibold uppercase tracking-widest mt-2">{label}</p>
+                      { label: 'Destinos', value: stats.destinations, icon: Globe, from: 'from-blue-500/10', border: 'border-blue-100', iconCls: 'text-blue-500' },
+                      { label: 'Publicados', value: stats.postsPublished, icon: Eye, from: 'from-emerald-500/10', border: 'border-emerald-100', iconCls: 'text-emerald-500' },
+                      { label: 'Rascunhos', value: stats.postsDraft, icon: FileText, from: 'from-amber-500/10', border: 'border-amber-100', iconCls: 'text-amber-500' },
+                      { label: 'Acessos VIP', value: stats.vipActive, icon: Users, from: 'from-purple-500/10', border: 'border-purple-100', iconCls: 'text-purple-500' },
+                      { label: 'Newsletter', value: stats.newsletterCount, icon: Mail, from: 'from-[#C18D41]/10', border: 'border-[#C18D41]/20', iconCls: 'text-[#C18D41]' },
+                    ].map(({ label, value, icon: Icon, from, border, iconCls }) => (
+                      <div key={label} className={`bg-gradient-to-br ${from} to-white rounded-2xl p-6 border ${border}`}>
+                        <Icon className={`w-5 h-5 ${iconCls} mb-4`} />
+                        <p className="text-3xl font-serif font-bold text-[#05070a]">{value}</p>
+                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1.5">{label}</p>
                       </div>
                     ))}
                   </div>
                 )}
+
+                {/* Ações Rápidas */}
+                <div className="bg-[#05070a] rounded-3xl p-8">
+                  <p className="text-[10px] text-white/30 font-bold uppercase tracking-[0.3em] mb-5">Ações Rápidas</p>
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                    {[
+                      { label: 'Novo Destino', icon: Map, action: () => { setActiveTab('destinations'); setTimeout(openNewDest, 80); } },
+                      { label: 'Novo Post', icon: BookOpen, action: () => { setActiveTab('blog'); setTimeout(openNewPost, 80); } },
+                      { label: 'Novo Acesso VIP', icon: Key, action: () => { setActiveTab('vip'); setTimeout(() => setShowVipModal(true), 80); } },
+                      { label: 'Novo Roteiro', icon: Route, action: () => { setActiveTab('itineraries'); setTimeout(openNewItinerary, 80); } },
+                    ].map(({ label, icon: Icon, action }) => (
+                      <button key={label} onClick={action}
+                        className="flex items-center gap-3 bg-white/5 hover:bg-[#C18D41] text-white/50 hover:text-white rounded-2xl px-5 py-4 transition-all duration-300 text-left group">
+                        <Icon className="w-4 h-4 shrink-0" />
+                        <span className="text-[11px] font-bold uppercase tracking-widest">{label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Cards de Navegação */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                  {[
+                    { id: 'destinations', label: 'Catálogo', desc: 'Gerir destinos e preços', icon: Map, count: stats?.destinations },
+                    { id: 'blog', label: 'Blog', desc: 'Posts publicados e rascunhos', icon: BookOpen, count: (stats?.postsPublished ?? 0) + (stats?.postsDraft ?? 0) },
+                    { id: 'vip', label: 'Acessos VIP', desc: 'Clientes e códigos de acesso', icon: Key, count: stats?.vipTotal },
+                  ].map(({ id, label, desc, icon: Icon, count }) => (
+                    <button key={id} onClick={() => setActiveTab(id)}
+                      className="bg-white border border-gray-100 hover:border-[#C18D41]/30 rounded-2xl p-6 text-left hover:shadow-sm transition-all group">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="w-10 h-10 bg-[#C18D41]/8 rounded-xl flex items-center justify-center group-hover:bg-[#C18D41] transition-colors duration-300">
+                          <Icon className="w-4 h-4 text-[#C18D41] group-hover:text-white transition-colors duration-300" />
+                        </div>
+                        <span className="text-3xl font-serif font-bold text-gray-100 group-hover:text-gray-200 transition-colors">{count ?? '—'}</span>
+                      </div>
+                      <p className="font-bold text-[#05070a] text-sm">{label}</p>
+                      <p className="text-xs text-gray-400 mt-1">{desc}</p>
+                    </button>
+                  ))}
+                </div>
+
               </motion.div>
             )}
 
@@ -828,7 +889,7 @@ export default function AdminPanel() {
                 </div>
                 <div className="bg-white rounded-3xl p-10 shadow-sm border border-gray-100">
                   <h3 className="font-serif text-xl font-bold text-[#05070a] mb-1">Senha do Painel</h3>
-                  <p className="text-sm text-gray-400">A senha atual e <code className="bg-gray-100 px-2 py-0.5 rounded text-xs">DreamTravel@2026</code>. Para alterar, fale com o desenvolvedor.</p>
+                  <p className="text-sm text-gray-400">A senha é definida na variável <code className="bg-gray-100 px-2 py-0.5 rounded text-xs">ADMIN_PASSWORD</code> no ficheiro <code className="bg-gray-100 px-2 py-0.5 rounded text-xs">.env</code> do servidor. Para alterar, edite esse ficheiro e reinicie o servidor.</p>
                 </div>
               </motion.div>
             )}

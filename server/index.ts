@@ -15,7 +15,8 @@ import {
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'DreamTravel@2026';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+if (!ADMIN_PASSWORD) throw new Error('ADMIN_PASSWORD não definida no .env');
 const adminSessions = new Map<string, number>(); // token → expiry timestamp
 
 setInterval(() => {
@@ -354,12 +355,13 @@ async function startServer() {
 
   // ── DASHBOARD STATS ────────────────────────────────────────────────────────
 
-  app.get("/api/stats", async (_req, res) => {
+  app.get("/api/stats", requireAdmin, async (_req, res) => {
     try {
-      const [allDestinations, allPosts, allVipCodes] = await Promise.all([
+      const [allDestinations, allPosts, allVipCodes, allNewsletter] = await Promise.all([
         db.select().from(destinations),
         db.select().from(posts),
         db.select().from(vipCodes),
+        db.select().from(newsletterSubscribers),
       ]);
       res.json({
         destinations: allDestinations.length,
@@ -367,6 +369,7 @@ async function startServer() {
         postsDraft: allPosts.filter(p => p.status === 'draft').length,
         vipActive: allVipCodes.filter(v => v.is_active).length,
         vipTotal: allVipCodes.length,
+        newsletterCount: allNewsletter.length,
       });
     } catch (err) {
       console.error(err);
@@ -386,7 +389,7 @@ async function startServer() {
     res.sendFile(path.join(staticPath, "index.html"));
   });
 
-  const port = process.env.PORT || 3001;
+  const port = process.env.SERVER_PORT || 3001;
 
   app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}/`);
