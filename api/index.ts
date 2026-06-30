@@ -63,11 +63,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   // ── DB (lazy import to isolate failures) ──────────────────────────────────
 
-  const { db } = await import("../server/db.js");
-  const {
-    destinations, posts, vipCodes, itineraries, newsletterSubscribers,
-  } = await import("../server/schema.js");
-  const { eq } = await import("drizzle-orm");
+  let db: any, destinations: any, posts: any, vipCodes: any, itineraries: any, newsletterSubscribers: any, eq: any;
+  try {
+    ({ db } = await import("../server/db"));
+    ({ destinations, posts, vipCodes, itineraries, newsletterSubscribers } = await import("../server/schema"));
+    ({ eq } = await import("drizzle-orm"));
+  } catch (err: any) {
+    return res.status(500).json({ error: `Erro ao carregar módulos: ${err?.message ?? err}` });
+  }
 
   // ── DESTINATIONS ──────────────────────────────────────────────────────────
 
