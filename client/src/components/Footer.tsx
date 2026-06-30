@@ -189,7 +189,7 @@ export default function Footer() {
           className="border-t border-white/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-6 text-[9px] font-bold uppercase tracking-[0.3em] text-white/30"
         >
           <p>&copy; {currentYear} DREAM TRAVEL. TODOS OS DIREITOS RESERVADOS.</p>
-          <div className="flex gap-8">
+          <div className="flex flex-wrap gap-6 justify-center md:justify-end pr-14 md:pr-0">
             <a
               href={`https://wa.me/5517996077150?text=${encodeURIComponent('Olá! Gostaria de informações sobre a Política de Privacidade da Dream Travel.')}`}
               target="_blank"
