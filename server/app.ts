@@ -3,10 +3,10 @@ import { randomBytes } from "crypto";
 import { eq } from "drizzle-orm";
 import { db } from "./db";
 import {
-  destinations, insertDestinationSchema,
-  posts, insertPostSchema,
-  vipCodes, insertVipCodeSchema,
-  itineraries, insertItinerarySchema,
+  destinations,
+  posts,
+  vipCodes,
+  itineraries,
   newsletterSubscribers,
 } from "./schema";
 
@@ -72,9 +72,7 @@ app.get("/api/destinations", async (_req, res) => {
 
 app.post("/api/destinations", requireAdmin, async (req, res) => {
   try {
-    const parsed = insertDestinationSchema.safeParse(req.body);
-    if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
-    const [created] = await db.insert(destinations).values(parsed.data).returning();
+    const [created] = await db.insert(destinations).values(req.body).returning();
     res.status(201).json(created);
   } catch (err) { console.error(err); res.status(500).json({ error: "Erro ao criar destino" }); }
 });
@@ -131,9 +129,7 @@ app.get("/api/posts/:id", async (req, res) => {
 
 app.post("/api/posts", requireAdmin, async (req, res) => {
   try {
-    const parsed = insertPostSchema.safeParse(req.body);
-    if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
-    const [created] = await db.insert(posts).values(parsed.data).returning();
+    const [created] = await db.insert(posts).values(req.body).returning();
     res.status(201).json(created);
   } catch (err) { console.error(err); res.status(500).json({ error: "Erro ao criar post" }); }
 });
@@ -167,9 +163,7 @@ app.get("/api/vip-codes", async (_req, res) => {
 
 app.post("/api/vip-codes", requireAdmin, async (req, res) => {
   try {
-    const parsed = insertVipCodeSchema.safeParse(req.body);
-    if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
-    const [created] = await db.insert(vipCodes).values(parsed.data).returning();
+    const [created] = await db.insert(vipCodes).values(req.body).returning();
     res.status(201).json(created);
   } catch (err) { console.error(err); res.status(500).json({ error: "Erro ao criar codigo VIP" }); }
 });
@@ -226,9 +220,7 @@ app.get("/api/itineraries/:vip_code", async (req, res) => {
 
 app.post("/api/itineraries", requireAdmin, async (req, res) => {
   try {
-    const parsed = insertItinerarySchema.safeParse(req.body);
-    if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
-    const [created] = await db.insert(itineraries).values(parsed.data).returning();
+    const [created] = await db.insert(itineraries).values(req.body).returning();
     res.status(201).json(created);
   } catch (err) { console.error(err); res.status(500).json({ error: "Erro ao criar roteiro" }); }
 });

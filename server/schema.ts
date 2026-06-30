@@ -1,7 +1,5 @@
 import { pgTable, text, serial, real, boolean, timestamp, jsonb } from "drizzle-orm/pg-core";
-import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
-// Tabela de destinos
 export const destinations = pgTable("destinations", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
@@ -14,10 +12,6 @@ export const destinations = pgTable("destinations", {
   size: text("size").default("medium"),
 });
 
-export const insertDestinationSchema = createInsertSchema(destinations);
-export const selectDestinationSchema = createSelectSchema(destinations);
-
-// Tabela de posts do blog
 export const posts = pgTable("posts", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
@@ -32,10 +26,6 @@ export const posts = pgTable("posts", {
   created_at: timestamp("created_at").defaultNow(),
 });
 
-export const insertPostSchema = createInsertSchema(posts);
-export const selectPostSchema = createSelectSchema(posts);
-
-// Tabela de codigos VIP
 export const vipCodes = pgTable("vip_codes", {
   id: serial("id").primaryKey(),
   code: text("code").notNull().unique(),
@@ -45,10 +35,6 @@ export const vipCodes = pgTable("vip_codes", {
   created_at: timestamp("created_at").defaultNow(),
 });
 
-export const insertVipCodeSchema = createInsertSchema(vipCodes);
-export const selectVipCodeSchema = createSelectSchema(vipCodes);
-
-// Tabela de roteiros VIP
 export const itineraries = pgTable("itineraries", {
   id: serial("id").primaryKey(),
   vip_code: text("vip_code").notNull().unique(),
@@ -65,14 +51,8 @@ export const itineraries = pgTable("itineraries", {
   created_at: timestamp("created_at").defaultNow(),
 });
 
-export const insertItinerarySchema = createInsertSchema(itineraries);
-export const selectItinerarySchema = createSelectSchema(itineraries);
-
-// Tabela de assinantes da newsletter
-export const newsletterSubscribers = pgTable('newsletter_subscribers', {
-  id: serial('id').primaryKey(),
-  email: text('email').notNull().unique(),
-  created_at: timestamp('created_at').defaultNow(),
+export const newsletterSubscribers = pgTable("newsletter_subscribers", {
+  id: serial("id").primaryKey(),
+  email: text("email").notNull().unique(),
+  created_at: timestamp("created_at").defaultNow(),
 });
-
-export const insertNewsletterSchema = createInsertSchema(newsletterSubscribers);
