@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { createHmac, timingSafeEqual } from "crypto";
-import { db } from "../server/db";
-import { destinations, posts, vipCodes, itineraries, newsletterSubscribers } from "../server/schema";
+import { db } from "./db";
+import { destinations, posts, vipCodes, itineraries, newsletterSubscribers } from "./schema";
 import { eq } from "drizzle-orm";
 
 const SESSION_DURATION_MS = 24 * 60 * 60 * 1000;
