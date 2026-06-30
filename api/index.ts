@@ -1,5 +1,8 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { createHmac, timingSafeEqual } from "crypto";
+import { db } from "../server/db";
+import { destinations, posts, vipCodes, itineraries, newsletterSubscribers } from "../server/schema";
+import { eq } from "drizzle-orm";
 
 const SESSION_DURATION_MS = 24 * 60 * 60 * 1000;
 
@@ -60,17 +63,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const token = req.headers["x-admin-token"] as string | undefined;
     if (!verifyToken(token, secret)) { res.status(401).json({ error: "Não autorizado" }); return false; }
     return true;
-  }
-
-  // ── DB (lazy import to isolate failures) ──────────────────────────────────
-
-  let db: any, destinations: any, posts: any, vipCodes: any, itineraries: any, newsletterSubscribers: any, eq: any;
-  try {
-    ({ db } = await import("../server/db"));
-    ({ destinations, posts, vipCodes, itineraries, newsletterSubscribers } = await import("../server/schema"));
-    ({ eq } = await import("drizzle-orm"));
-  } catch (err: any) {
-    return res.status(500).json({ error: `Erro ao carregar módulos: ${err?.message ?? err}` });
   }
 
   // ── DESTINATIONS ──────────────────────────────────────────────────────────
