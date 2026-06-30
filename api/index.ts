@@ -28,6 +28,7 @@ function verifyToken(token: string | undefined, secret: string): boolean {
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  try {
   const url = (req.url ?? "").replace(/\?.*$/, "");
   const secret = process.env.ADMIN_PASSWORD;
 
@@ -252,4 +253,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   return res.status(404).json({ error: "Rota não encontrada" });
+  } catch (err: any) {
+    return res.status(500).json({ error: err?.message ?? String(err) });
+  }
 }
