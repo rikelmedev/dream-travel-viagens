@@ -20,6 +20,8 @@
 
 ## 📸 Capturas do Projecto
 
+### Site Público
+
 <table>
   <tr>
     <td width="50%" valign="top">
@@ -31,14 +33,31 @@
       <p align="center"><sub>👤 <strong>A Curadora</strong> — Página de apresentação da Jackeline</sub></p>
     </td>
   </tr>
+</table>
+
+### 🔐 Control Room — Painel Administrativo
+
+<table>
+  <tr>
+    <td colspan="2" valign="top">
+      <img src=".github/screenshots/admin-dashboard.png" alt="Dashboard" width="100%"/>
+      <p align="center"><sub>📊 <strong>Visão Geral</strong> — Estatísticas em tempo real e ações rápidas</sub></p>
+    </td>
+  </tr>
   <tr>
     <td width="50%" valign="top">
-      <img src=".github/screenshots/destinos.png" alt="Portfólio Global" width="100%"/>
-      <p align="center"><sub>🌍 <strong>Portfólio Global</strong> — Catálogo de destinos exclusivos</sub></p>
+      <img src=".github/screenshots/admin-blog.png" alt="Gestão de Blog" width="100%"/>
+      <p align="center"><sub>✍️ <strong>Gestão de Blog</strong> — CRUD de posts com preview</sub></p>
     </td>
     <td width="50%" valign="top">
-      <img src=".github/screenshots/admin.png" alt="Control Room" width="100%"/>
-      <p align="center"><sub>🔐 <strong>Control Room</strong> — Painel administrativo restrito</sub></p>
+      <img src=".github/screenshots/admin-vip.png" alt="Acessos VIP" width="100%"/>
+      <p align="center"><sub>🗝️ <strong>Acessos VIP</strong> — Gestão de clientes e códigos exclusivos</sub></p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" align="center" valign="top">
+      <img src=".github/screenshots/admin.png" alt="Login Admin" width="40%"/>
+      <p align="center"><sub>🔑 <strong>Acesso Restrito</strong> — Auth HMAC-SHA256 sem sessões em memória</sub></p>
     </td>
   </tr>
 </table>
