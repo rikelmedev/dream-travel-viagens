@@ -113,3 +113,6 @@ client/public/__manus__/version.json
 
 .vercel
 .env*
+
+# Local editor/agent config (not part of source)
+.claude/
